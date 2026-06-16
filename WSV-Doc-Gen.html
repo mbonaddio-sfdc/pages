@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkSafe Tactical DocGen MVP</title>
+    <style>
+        /* CORE VARIABLES & RESET */
+        :root {
+            --brand-navy: #003366;
+            --brand-green: #027e46;
+            --brand-blue: #0176d3;
+            --bg-gray: #f3f2f2;
+            --border-color: #dddbda;
+            --word-blue: #2b579a;
+            --text-color: #080707;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #b0c4df; /* Salesforce Blue Background */
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* LAYOUT CONTAINERS */
+        .app-container {
+            width: 1200px;
+            height: 850px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* HEADER (Salesforce Style) */
+        .sf-header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sf-logo { font-size: 1.2rem; font-weight: bold; color: var(--brand-blue); display: flex; align-items: center; gap: 10px; }
+        .sf-search { background: var(--bg-gray); padding: 5px 15px; border-radius: 4px; width: 300px; color: #706e6b; font-size: 0.85rem; border: 1px solid transparent; }
+
+        /* MAIN RECORD CONTENT */
+        .sf-body {
+            flex-grow: 1;
+            display: flex;
+            background: #f3f2f2;
+            overflow: hidden;
+        }
+
+        /* SIDEBAR (Architecture Explainer) */
+        .arch-sidebar {
+            width: 280px;
+            background: #16325c; /* Tech Blue */
+            color: white;
+            padding: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border-right: 1px solid #000;
+        }
+        .arch-title { text-transform: uppercase; letter-spacing: 1px; font-weight: bold; color: #5eb4ff; margin-bottom: 10px; border-bottom: 1px solid #5eb4ff; padding-bottom: 5px; }
+        .log-entry { margin-bottom: 10px; opacity: 0.5; transition: opacity 0.3s; border-left: 2px solid transparent; padding-left: 8px; }
+        .log-entry.active { opacity: 1; border-left-color: #4bca81; font-weight: 600; }
+        .log-timestamp { font-size: 0.7rem; color: #a8b7c7; display: block; }
+
+        /* RECORD VIEW */
+        .record-view {
+            flex-grow: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+        }
+        
+        /* Record Header */
+        .record-header {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .record-icon { width: 32px; height: 32px; background: #f2cf5b; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 10px; }
+        .record-title h1 { margin: 0; font-size: 1.1rem; }
+        .record-title span { font-size: 0.8rem; color: #3e3e3c; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 10px; }
+        .sf-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 6px 15px;
+            border-radius: 4px;
+            color: var(--brand-blue);
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .sf-btn:hover { background: #f3f3f3; }
+        .sf-btn.primary { background: var(--brand-blue); color: white; border-color: var(--brand-blue); }
+        .sf-btn.primary:hover { background: #005fb2; }
+
+        /* Data Cards */
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 4px; border: 1px solid var(--border-color); }
+        .card h3 { margin-top: 0; font-size: 0.9rem; color: #3e3e3c; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .field-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem; }
+        .field-label { color: #706e6b; }
+
+        /* OMNISCRIPT MODAL (The Overlay) */
+        .modal-overlay {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            display: none; /* Hidden by default */
+        }
+        .os-container {
+            width: 900px;
+            height: 700px;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
+
+        /* OS Header */
+        .os-header { padding: 15px 20px; border-bottom: 4px solid var(--brand-navy); background: #fcfcfc; }
+        .os-header h2 { margin: 0; color: var(--brand-navy); font-size: 1.2rem; }
+
+        /* OS Body */
+        .os-content { flex-grow: 1; padding: 30px; overflow-y: auto; position: relative; }
+
+        /* View: Selection */
+        .selection-box { max-width: 400px; margin: 50px auto; }
+        .slds-select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid var(--border-color); margin-top: 5px; }
+
+        /* View: Word Editor */
+        .word-frame {
+            border: 1px solid #c9c7c5;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #f3f2f2;
+        }
+        .word-header { background: var(--word-blue); color: white; padding: 8px 15px; display: flex; align-items: center; font-size: 0.9rem; }
+        .word-ribbon { background: white; border-bottom: 1px solid #e1dfdd; padding: 10px; display: flex; gap: 15px; font-size: 0.85rem; }
+        .word-canvas { flex-grow: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; }
+        .word-page {
+            background: white; width: 600px; min-height: 800px; padding: 60px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1); font-family: 'Times New Roman', serif;
+            color: black; line-height: 1.5; outline: none;
+        }
+
+        /* View: Loading */
+        .loading-state { text-align: center; margin-top: 100px; }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--brand-blue); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* OS Footer */
+        .os-footer { padding: 15px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 10px; background: #fcfcfc; }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- TOP NAV -->
+        <div class="sf-header">
+            <div class="sf-logo">
+                <span style="font-size:1.5rem;">☁️</span> Salesforce | WorkSafe Victoria
+            </div>
+            <div class="sf-search">Search Claims...</div>
+            <div style="width:32px; height:32px; background:#005fb2; border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-size:0.8rem;">JD</div>
+        </div>
+
+        <div class="sf-body">
+            <!-- LEFT: ARCHITECTURE EXPLAINER -->
+            <div class="arch-sidebar">
+                <div class="arch-title">System Activity Log</div>
+                <div id="log-0" class="log-entry active">
+                    <span class="log-timestamp">NOW</span>
+                    User viewing Claim Record. System Idle.
+                </div>
+                <div id="log-1" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>OmniScript Launch:</strong> Context ID passed.
+                </div>
+                <div id="log-2" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>DataRaptor Extract:</strong> Fetched Claim & Worker Details.
+                </div>
+                <div id="log-3" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>DocGen (Server):</strong> Generated .docx Draft.
+                </div>
+                <div id="log-4" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>Files Connect:</strong> Apex pushed blob to SharePoint.
+                </div>
+                <div id="log-5" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>Graph API:</strong> Retrieved WOPI Edit URL.
+                </div>
+                <div id="log-6" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>LWC Render:</strong> Iframe loaded in OmniScript.
+                </div>
+                <div id="log-7" class="log-entry">
+                    <span class="log-timestamp">--</span>
+                    <strong>Sync:</strong> Retrieved final stream, converted to PDF, deleted SharePoint temp file.
+                </div>
+            </div>
+
+            <!-- RIGHT: RECORD PAGE -->
+            <div class="record-view">
+                <!-- Record Header -->
+                <div class="record-header">
+                    <div style="display:flex; align-items:center;">
+                        <div class="record-icon">📄</div>
+                        <div class="record-title">
+                            <span>Claim • V123987</span>
+                            <h1>John Smith - Back Injury (Pending)</h1>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="sf-btn" onclick="startFlow('manual')">Generate Letter...</button>
+                        <button class="sf-btn primary" onclick="startFlow('direct')">Issue Rejection</button>
+                    </div>
+                </div>
+
+                <!-- Record Details -->
+                <div class="data-grid">
+                    <div class="card">
+                        <h3>Worker Details</h3>
+                        <div class="field-row"><span class="field-label">Name:</span> <span>John Smith</span></div>
+                        <div class="field-row"><span class="field-label">DOB:</span> <span>12/04/1985</span></div>
+                        <div class="field-row"><span class="field-label">Address:</span> <span>45 King St, Melbourne</span></div>
+                    </div>
+                    <div class="card">
+                        <h3>Claim Status</h3>
+                        <div class="field-row"><span class="field-label">Date Lodged:</span> <span>10 Jan 2026</span></div>
+                        <div class="field-row"><span class="field-label">Status:</span> <span>Pending Decision</span></div>
+                        <div class="field-row"><span class="field-label">Assigned:</span> <span>Jane Doe</span></div>
+                    </div>
+                    <div class="card">
+                        <h3>Medical Info</h3>
+                        <div class="field-row"><span class="field-label">Injury:</span> <span>Lower Back Strain</span></div>
+                        <div class="field-row"><span class="field-label">Treating Dr:</span> <span>Dr. A. Jones</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OMNISCRIPT MODAL -->
+    <div id="os-modal" class="modal-overlay">
+        <div class="os-container">
+            <div class="os-header">
+                <h2>Correspondence Wizard</h2>
+            </div>
+            
+            <div class="os-content">
+                
+                <!-- VIEW 1: MANUAL SELECT -->
+                <div id="view-select" class="hidden">
+                    <div class="selection-box">
+                        <h3 style="color:var(--brand-navy);">Select Correspondence Template</h3>
+                        <p style="font-size:0.9rem; color:#706e6b;">Please select the letter template you wish to generate for this Claim.</p>
+                        <label style="font-size:0.8rem; font-weight:bold;">Template Name</label>
+                        <select id="template-select" class="slds-select">
+                            <option>-- Select --</option>
+                            <option value="reject">Liability Rejection (S98)</option>
+                            <option value="accept">Liability Acceptance</option>
+                            <option value="info">Request for Information</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- VIEW 2: LOADING (THE PUSH) -->
+                <div id="view-loading" class="hidden loading-state">
+                    <div class="spinner"></div>
+                    <h3 style="color:var(--brand-blue);">Preparing Document...</h3>
+                    <p id="loading-text" style="color:#706e6b; font-size:0.9rem;">Connecting to Office 365...</p>
+                </div>
+
+                <!-- VIEW 3: WORD ONLINE (THE EDITOR) -->
+                <div id="view-word" class="hidden" style="height:100%;">
+                    <div class="word-frame">
+                        <!-- Simulated Word Header -->
+                        <div class="word-header">
+                            <span style="font-weight:bold; margin-right:15px;">Word</span>
+                            <span style="opacity:0.9;">Liability_Rejection_Draft.docx</span>
+                            <span style="margin-left:auto; font-size:0.8rem; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:4px;">Saved to SharePoint</span>
+                        </div>
+                        <!-- Simulated Ribbon -->
+                        <div class="word-ribbon">
+                            <span style="color:var(--word-blue); font-weight:bold; border-bottom:2px solid var(--word-blue);">Home</span>
+                            <span>Insert</span>
+                            <span>Layout</span>
+                            <span style="border-left:1px solid #ccc; padding-left:10px;"><b>B</b></span>
+                            <span><i>I</i></span>
+                            <span><u>U</u></span>
+                            <span style="margin-left:auto; color:#706e6b;">Editing Mode</span>
+                        </div>
+                        <!-- Simulated Canvas -->
+                        <div class="word-canvas">
+                            <div class="word-page" contenteditable="true">
+                                <p style="text-align:right;">16 January 2026</p>
+                                <br>
+                                <p><strong>John Smith</strong><br>45 King St<br>Melbourne VIC 3000</p>
+                                <br>
+                                <p><strong>Re: Liability Decision - Claim V123987</strong></p>
+                                <p>Dear Mr. Smith,</p>
+                                <p>We write regarding your claim for compensation lodged on 10 Jan 2026.</p>
+                                <p>After careful consideration of the medical evidence provided by Dr. A. Jones, we regret to advise that liability for your claim is <strong>Rejected</strong>.</p>
+                                <p style="background:#f0f0f0; padding:10px; border-left:4px solid #999; color:#555;" contenteditable="false">
+                                    [LOCKED] Under Section 98 of the Workplace Injury Rehabilitation and Compensation Act 2013, we are unable to accept liability where the injury is not a significant contributing factor to the incapacity.
+                                </p>
+                                <p>You have the right to request a review of this decision.</p>
+                                <br>
+                                <p>Sincerely,<br>WorkSafe Victoria Claims Team</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIEW 4: PDF SUCCESS -->
+                <div id="view-pdf" class="hidden" style="text-align:center; padding-top:50px;">
+                    <div style="font-size:60px; color:var(--brand-green);">✓</div>
+                    <h2 style="color:var(--brand-navy);">Document Finalized</h2>
+                    <p style="color:#706e6b;">The document has been converted to PDF and saved to the Claim.</p>
+                    <div style="background:#f3f2f2; width:300px; height:350px; margin:20px auto; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; color:#999;">
+                        [PDF Preview]
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="os-footer">
+                <button id="btn-cancel" class="sf-btn" onclick="closeModal()">Cancel</button>
+                <button id="btn-next" class="sf-btn primary" onclick="nextStep()">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const modal = document.getElementById('os-modal');
+        const viewSelect = document.getElementById('view-select');
+        const viewLoading = document.getElementById('view-loading');
+        const viewWord = document.getElementById('view-word');
+        const viewPdf = document.getElementById('view-pdf');
+        const btnNext = document.getElementById('btn-next');
+        const btnCancel = document.getElementById('btn-cancel');
+        const logs = document.querySelectorAll('.log-entry');
+
+        let currentStage = '';
+
+        // HELPER: Highlight Log Sidebar
+        function activateLog(index) {
+            logs.forEach(l => l.classList.remove('active'));
+            if(logs[index]) logs[index].classList.add('active');
+        }
+
+        // 1. OPEN MODAL
+        function startFlow(mode) {
+            modal.style.display = 'flex';
+            activateLog(1); // Log: OmniScript Launch
+
+            if (mode === 'direct') {
+                // Scenario A: Direct Launch (Skip selection)
+                currentStage = 'loading';
+                loadWordEditor();
+            } else {
+                // Scenario B: Manual Selection
+                currentStage = 'select';
+                showView(viewSelect);
+                btnNext.innerText = "Generate Draft";
+            }
+        }
+
+        // 2. NAVIGATION LOGIC
+        function nextStep() {
+            if (currentStage === 'select') {
+                loadWordEditor();
+            } else if (currentStage === 'word') {
+                finalizeDocument();
+            } else if (currentStage === 'final') {
+                closeModal();
+            }
+        }
+
+        // 3. SIMULATE LOADING (THE FILES CONNECT BRIDGE)
+        function loadWordEditor() {
+            currentStage = 'loading';
+            showView(viewLoading);
+            btnNext.disabled = true;
+            btnNext.innerText = "Loading...";
+            
+            // Sequence of Logs to simulate tech stack
+            setTimeout(() => { activateLog(2); document.getElementById('loading-text').innerText = "Generating V1 Draft (DataRaptor)..."; }, 800);
+            setTimeout(() => { activateLog(3); }, 1600);
+            setTimeout(() => { activateLog(4); document.getElementById('loading-text').innerText = "Pushing to SharePoint via Files Connect..."; }, 2400);
+            setTimeout(() => { activateLog(5); document.getElementById('loading-text').innerText = "Obtaining WOPI Edit URL..."; }, 3200);
+
+            setTimeout(() => {
+                // Show Editor
+                currentStage = 'word';
+                activateLog(6);
+                showView(viewWord);
+                btnNext.disabled = false;
+                btnNext.innerText = "Finalize & Save";
+            }, 4000);
+        }
+
+        // 4. FINALIZE (CONVERT & SAVE)
+        function finalizeDocument() {
+            currentStage = 'loading';
+            showView(viewLoading);
+            document.getElementById('loading-text').innerText = "Retrieving changes & Converting to PDF...";
+            activateLog(7); // Log: Sync
+            btnNext.disabled = true;
+
+            setTimeout(() => {
+                currentStage = 'final';
+                showView(viewPdf);
+                btnNext.disabled = false;
+                btnNext.innerText = "Done";
+                btnCancel.style.display = 'none';
+            }, 2500);
+        }
+
+        // UTILITY: View Switcher
+        function showView(viewElement) {
+            viewSelect.classList.add('hidden');
+            viewLoading.classList.add('hidden');
+            viewWord.classList.add('hidden');
+            viewPdf.classList.add('hidden');
+            viewElement.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            activateLog(0); // Reset Log
+            // Reset State for demo
+            btnNext.disabled = false;
+            btnNext.innerText = "Next";
+            btnCancel.style.display = 'block';
+        }
+
+    </script>
+</body>
+</html>
