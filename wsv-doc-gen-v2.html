@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkSafe · Correspondence experience (Collabora prototype)</title>
+<style>
+  :root {
+    --ink:            #172b4d;
+    --ink-2:          #42526e;
+    --muted:          #6b778c;
+    --rule:           #dfe1e6;
+    --rule-soft:      #ebeef2;
+    --paper:          #f4f5f7;
+    --paper-2:        #ffffff;
+    --accent:         #0250d9;
+    --accent-strong:  #003ea6;
+    --accent-soft:    #deebff;
+    --accent-tint:    #f0f6ff;
+    --navy:           #001e5b;
+    --navy-2:         #0a2b6f;
+    --success:        #036c4a;
+    --success-soft:   #e3fcef;
+    --warn:           #7a4b00;
+    --warn-soft:      #fff4de;
+    --danger:         #ae2e24;
+    --danger-soft:    #ffebe6;
+    --cloud68:        #00b3ff;
+    --shadow-sm:      0 1px 0 rgba(9,30,66,0.08), 0 1px 2px rgba(9,30,66,0.06);
+    --shadow-md:      0 4px 8px -2px rgba(9,30,66,0.16), 0 1px 3px rgba(9,30,66,0.08);
+    --shadow-lg:      0 12px 32px -4px rgba(9,30,66,0.25), 0 0 1px rgba(9,30,66,0.31);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: #cad9ee;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 14px;
+    display: flex; justify-content: center; align-items: center;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    width: 1320px; height: 880px;
+    background: var(--paper-2);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Top nav (Salesforce-style) */
+  .topnav {
+    height: 52px;
+    background: linear-gradient(180deg, #0176d3 0%, #005fb2 100%);
+    color: #fff;
+    display: flex; align-items: center;
+    padding: 0 20px;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+  .topnav .brand { font-weight: 700; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+  .topnav .brand .cloud {
+    width: 22px; height: 15px; background: var(--cloud68); border-radius: 8px 8px 6px 6px;
+    position: relative;
+  }
+  .topnav .brand .cloud:before, .topnav .brand .cloud:after {
+    content: ""; position: absolute; background: var(--cloud68); border-radius: 50%;
+  }
+  .topnav .brand .cloud:before { width: 10px; height: 10px; left: -5px; top: 2px; }
+  .topnav .brand .cloud:after  { width: 12px; height: 12px; right: -4px; top: -2px; }
+  .topnav .app-name {
+    background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 4px;
+    font-size: 13px; font-weight: 500;
+  }
+  .topnav .search {
+    flex: 1; max-width: 400px;
+    background: rgba(255,255,255,0.15); border-radius: 4px;
+    padding: 6px 12px; font-size: 13px; color: rgba(255,255,255,0.85);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .topnav .search .ico { opacity: 0.8; }
+  .topnav .right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .topnav .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .topnav .icon-btn {
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    opacity: 0.85; cursor: pointer; border-radius: 4px;
+  }
+  .topnav .icon-btn:hover { background: rgba(255,255,255,0.1); }
+
+  /* Object tab strip */
+  .tabs {
+    height: 40px; background: #fafbfc;
+    border-bottom: 1px solid var(--rule);
+    display: flex; align-items: center;
+    padding: 0 20px; gap: 4px;
+    flex-shrink: 0;
+    font-size: 13px;
+  }
+  .tabs .tab {
+    padding: 8px 14px; border-radius: 4px; color: var(--ink-2); cursor: pointer;
+  }
+  .tabs .tab.active {
+    color: var(--accent); font-weight: 600; background: var(--accent-tint);
+  }
+  .tabs .tab:hover:not(.active) { background: #f0f2f5; }
+
+  /* ============ BODY: sidebar + content ============ */
+  .body {
+    flex: 1; display: flex; min-height: 0;
+  }
+
+  /* Activity log sidebar */
+  .sidebar {
+    width: 280px; background: var(--navy);
+    color: #d6e4ff;
+    display: flex; flex-direction: column;
+    flex-shrink: 0;
+  }
+  .sidebar .hdr {
+    padding: 16px 18px 10px 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .sidebar .hdr .lbl {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--cloud68); font-weight: 700;
+  }
+  .sidebar .hdr .title {
+    font-size: 15px; font-weight: 600; margin-top: 4px; color: #fff;
+  }
+  .sidebar .hdr .sub {
+    font-size: 11px; color: rgba(214,228,255,0.7); margin-top: 3px;
+  }
+  .sidebar .log {
+    flex: 1; overflow-y: auto;
+    padding: 14px 12px;
+  }
+  .sidebar .step {
+    display: grid; grid-template-columns: 22px 1fr; gap: 10px;
+    padding: 8px 8px;
+    border-radius: 6px;
+    opacity: 0.45;
+    transition: all 0.25s ease;
+    margin-bottom: 2px;
+  }
+  .sidebar .step.active {
+    opacity: 1; background: rgba(0,179,255,0.08);
+  }
+  .sidebar .step.done {
+    opacity: 0.85;
+  }
+  .sidebar .step .dot {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    font-size: 10px; color: rgba(255,255,255,0.6);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .sidebar .step.active .dot {
+    background: var(--cloud68); border-color: var(--cloud68); color: var(--navy);
+  }
+  .sidebar .step.done .dot {
+    background: rgba(75,202,129,0.9); border-color: rgba(75,202,129,0.9); color: #fff;
+  }
+  .sidebar .step .body {
+    font-size: 12px; line-height: 1.4;
+  }
+  .sidebar .step .body b { color: #fff; font-weight: 600; display: block; margin-bottom: 2px; }
+  .sidebar .step .body .tech { color: var(--cloud68); font-family: 'SF Mono', Consolas, monospace; font-size: 10.5px; }
+
+  .sidebar .footer {
+    padding: 12px 18px; border-top: 1px solid rgba(255,255,255,0.1);
+    font-size: 10.5px; color: rgba(214,228,255,0.5);
+    line-height: 1.5;
+  }
+  .sidebar .footer strong { color: var(--cloud68); }
+
+  /* ============ MAIN CONTENT: record view ============ */
+  .main {
+    flex: 1; background: var(--paper);
+    overflow-y: auto;
+    padding: 20px 24px;
+  }
+
+  /* Record header */
+  .record-hdr {
+    background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+    padding: 18px 22px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 18px;
+  }
+  .record-hdr .row1 { display: flex; align-items: center; gap: 14px; }
+  .record-hdr .icon {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: linear-gradient(135deg, #fdd835, #f9a825);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .record-hdr .meta { flex: 1; }
+  .record-hdr .meta .obj {
+    font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); font-weight: 600;
+  }
+  .record-hdr .meta h1 {
+    font-size: 20px; margin: 2px 0 0 0; color: var(--ink); font-weight: 600;
+  }
+  .record-hdr .meta .sub {
+    font-size: 12px; color: var(--muted); margin-top: 4px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .record-hdr .meta .status {
+    background: var(--warn-soft); color: var(--warn);
+    padding: 2px 8px; border-radius: 3px; font-weight: 600; font-size: 11px;
+    letter-spacing: 0.3px;
+  }
+
+  .record-hdr .actions {
+    display: flex; gap: 8px;
+  }
+
+  /* Buttons */
+  .btn {
+    background: #fff; border: 1px solid var(--rule);
+    color: var(--accent); font-weight: 500;
+    padding: 7px 14px; border-radius: 4px;
+    font-size: 13px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+    line-height: 1.2;
+  }
+  .btn:hover { background: #f4f6f9; }
+  .btn.primary {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  .btn.primary:hover { background: var(--accent-strong); }
+  .btn.subtle {
+    background: transparent; border: none; color: var(--accent);
+    padding: 6px 8px;
+  }
+  .btn.subtle:hover { background: var(--accent-tint); }
+  .btn.ghost { background: transparent; color: var(--ink-2); border-color: transparent; }
+  .btn.ghost:hover { background: #ecedef; color: var(--ink); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Tabs on record */
+  .record-tabs {
+    display: flex; gap: 20px; padding: 0 4px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 18px;
+    background: transparent;
+  }
+  .record-tabs .rtab {
+    padding: 10px 4px; font-size: 13px; color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+  .record-tabs .rtab.active {
+    color: var(--accent); border-bottom-color: var(--accent); font-weight: 600;
+  }
+
+  /* Record two-column layout */
+  .record-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 18px;
+  }
+
+  .card {
+    background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .card .card-hdr {
+    padding: 12px 16px; border-bottom: 1px solid var(--rule-soft);
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(180deg, #fafbfc, #fff);
+  }
+  .card .card-hdr h3 {
+    font-size: 13px; font-weight: 600; margin: 0; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card .card-hdr .count {
+    background: var(--rule-soft); color: var(--muted);
+    font-size: 11px; padding: 1px 7px; border-radius: 10px; font-weight: 600;
+  }
+  .card .card-body { padding: 14px 16px; }
+
+  /* Detail fields */
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+  .field { }
+  .field .lbl { font-size: 11px; color: var(--muted); margin-bottom: 2px; letter-spacing: 0.2px; }
+  .field .val { font-size: 13px; color: var(--ink); font-weight: 500; }
+  .field .val.link { color: var(--accent); cursor: pointer; }
+
+  /* Existing correspondence list */
+  .corr-list { padding: 0; }
+  .corr-item {
+    padding: 12px 16px; border-bottom: 1px solid var(--rule-soft);
+    display: grid; grid-template-columns: 32px 1fr auto; gap: 12px; align-items: center;
+    cursor: pointer;
+  }
+  .corr-item:last-child { border-bottom: none; }
+  .corr-item:hover { background: var(--accent-tint); }
+  .corr-item .fico {
+    width: 32px; height: 32px; border-radius: 4px;
+    background: #eef4fd; color: var(--accent);
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .corr-item .fico.pdf { background: #fdecea; color: var(--danger); }
+  .corr-item .fico.docx { background: #eef4fd; color: var(--accent); }
+  .corr-item .meta .title { font-size: 13px; font-weight: 500; color: var(--ink); }
+  .corr-item .meta .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .corr-item .status {
+    font-size: 11px; padding: 2px 8px; border-radius: 3px;
+    background: var(--success-soft); color: var(--success); font-weight: 600;
+  }
+  .corr-item .status.pending { background: var(--warn-soft); color: var(--warn); }
+
+  /* Timeline / activity right column */
+  .activity-item {
+    padding: 12px 16px; border-bottom: 1px solid var(--rule-soft);
+    display: grid; grid-template-columns: 30px 1fr; gap: 10px;
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-item .ind {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-tint); color: var(--accent);
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .activity-item .text .msg { font-size: 12.5px; color: var(--ink); line-height: 1.4; }
+  .activity-item .text .when { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ============ MODAL OVERLAY ============ */
+  .modal-overlay {
+    position: absolute; inset: 0;
+    background: rgba(9,30,66,0.55);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.show { display: flex; }
+
+  .wizard {
+    width: 1180px; height: 780px;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+
+  .wizard-hdr {
+    background: #fff;
+    border-bottom: 1px solid var(--rule);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 20px;
+    flex-shrink: 0;
+  }
+  .wizard-hdr .title-block { flex: 1; }
+  .wizard-hdr .kicker {
+    font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+    color: var(--accent); font-weight: 700;
+  }
+  .wizard-hdr h2 {
+    margin: 3px 0 0 0; font-size: 18px; color: var(--ink); font-weight: 600;
+  }
+  .wizard-hdr .close {
+    background: transparent; border: none; font-size: 22px; color: var(--muted);
+    cursor: pointer; padding: 4px 10px; border-radius: 4px;
+  }
+  .wizard-hdr .close:hover { background: #f0f2f5; color: var(--ink); }
+
+  /* Progress stepper */
+  .stepper {
+    background: #fbfcfd; border-bottom: 1px solid var(--rule);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+  .stepper .st {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--muted); font-weight: 500;
+  }
+  .stepper .st .num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #eaedf1; color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .stepper .st.active { color: var(--accent); font-weight: 600; }
+  .stepper .st.active .num { background: var(--accent); color: #fff; }
+  .stepper .st.done { color: var(--ink); }
+  .stepper .st.done .num { background: var(--success); color: #fff; }
+  .stepper .arrow {
+    color: #cbd0d8; margin: 0 12px; font-size: 12px;
+  }
+
+  .wizard-body {
+    flex: 1; overflow: hidden; position: relative;
+  }
+  .view {
+    position: absolute; inset: 0;
+    overflow-y: auto;
+    display: none;
+    padding: 26px 30px;
+  }
+  .view.show { display: block; }
+
+  /* ------ View: template picker ------ */
+  .picker-intro {
+    display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px;
+  }
+  .picker-intro .ico {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--accent-tint); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .picker-intro h3 { margin: 0; font-size: 16px; color: var(--ink); font-weight: 600; }
+  .picker-intro p { margin: 4px 0 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 750px; }
+
+  .picker-toolbar {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+    padding-bottom: 16px; border-bottom: 1px solid var(--rule-soft);
+  }
+  .picker-toolbar .search-in {
+    flex: 1; max-width: 340px;
+    background: #f4f5f7; border: 1px solid transparent; border-radius: 6px;
+    padding: 7px 12px; font-size: 13px; color: var(--ink);
+  }
+  .picker-toolbar .search-in:focus { outline: none; background: #fff; border-color: var(--accent); }
+  .picker-toolbar .chip-group { display: flex; gap: 6px; }
+  .chip {
+    padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 500;
+    background: #eef1f4; color: var(--ink-2); cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .chip.active { background: var(--accent); color: #fff; }
+  .chip:hover:not(.active) { background: #e2e6ea; }
+
+  .templates {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .tpl {
+    border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px;
+    display: grid; grid-template-columns: 40px 1fr auto; gap: 14px; align-items: center;
+    cursor: pointer; background: #fff;
+    transition: all 0.15s ease;
+  }
+  .tpl:hover { border-color: var(--accent); box-shadow: 0 4px 12px rgba(2,80,217,0.1); }
+  .tpl.selected { border-color: var(--accent); background: var(--accent-tint); box-shadow: 0 0 0 3px rgba(2,80,217,0.12); }
+  .tpl .ico {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: #eef4fd; color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 12px;
+  }
+  .tpl.legal .ico { background: #fdecea; color: var(--danger); }
+  .tpl.info .ico { background: var(--warn-soft); color: var(--warn); }
+  .tpl.medical .ico { background: #e6f4ea; color: var(--success); }
+  .tpl .body h4 { margin: 0; font-size: 14px; color: var(--ink); font-weight: 600; }
+  .tpl .body p { margin: 3px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .tpl .meta {
+    text-align: right; font-size: 11px; color: var(--muted);
+  }
+  .tpl .meta .v { display: block; font-weight: 600; color: var(--ink-2); }
+
+  /* ------ View: generating ------ */
+  .gen-wrap {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 500px; flex-direction: column; gap: 22px;
+    text-align: center;
+  }
+  .gen-orb {
+    width: 100px; height: 100px; border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #7aa7ff, var(--accent) 60%, var(--navy));
+    position: relative;
+    animation: pulse 2s ease-in-out infinite;
+    box-shadow: 0 0 50px rgba(2,80,217,0.35);
+  }
+  .gen-orb:before {
+    content: ""; position: absolute; inset: -8px; border-radius: 50%;
+    border: 2px solid var(--accent-soft);
+    animation: ring 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+  @keyframes ring  { 0%,100% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.15); } }
+
+  .gen-title {
+    font-size: 20px; font-weight: 600; color: var(--ink);
+  }
+  .gen-status {
+    font-size: 14px; color: var(--muted); min-height: 22px;
+    font-family: 'SF Mono', Consolas, monospace;
+  }
+  .gen-progress {
+    width: 460px; max-width: 90%;
+    display: flex; flex-direction: column; gap: 8px; margin-top: 10px;
+  }
+  .gen-progress .p-row {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12.5px;
+    padding: 6px 10px; border-radius: 6px;
+    opacity: 0.35;
+    transition: all 0.3s ease;
+    text-align: left;
+  }
+  .gen-progress .p-row.active { opacity: 1; background: var(--accent-tint); }
+  .gen-progress .p-row.done   { opacity: 0.85; }
+  .gen-progress .p-row .m {
+    width: 18px; height: 18px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .gen-progress .p-row      .m { background: #e2e6ea; color: var(--muted); }
+  .gen-progress .p-row.active .m { background: var(--accent); color: #fff; }
+  .gen-progress .p-row.done   .m { background: var(--success); color: #fff; }
+  .gen-progress .p-row .lbl { color: var(--ink); font-weight: 500; }
+  .gen-progress .p-row .tech { color: var(--muted); font-size: 11px; margin-left: auto; font-family: 'SF Mono', Consolas, monospace; }
+
+  /* ------ View: editor (white-labelled Collabora) ------ */
+  .editor {
+    height: 100%;
+    display: flex; flex-direction: column;
+    background: #f4f6fa;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .editor-hdr {
+    background: #fff; border-bottom: 1px solid var(--rule);
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 14px;
+    flex-shrink: 0;
+  }
+  .editor-hdr .fname {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .editor-hdr .fname .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--success);
+  }
+  .editor-hdr .badge {
+    background: var(--success-soft); color: var(--success);
+    font-size: 11px; padding: 2px 8px; border-radius: 3px; font-weight: 600;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .editor-hdr .badge .tick { font-size: 10px; }
+  .editor-hdr .presence {
+    margin-left: auto; display: flex; align-items: center; gap: 6px;
+  }
+  .editor-hdr .presence .av {
+    width: 24px; height: 24px; border-radius: 50%; font-size: 10px; font-weight: 700; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .editor-hdr .presence .av.jd { background: #f57c00; }
+
+  .editor-ribbon {
+    background: #fbfcfd; border-bottom: 1px solid var(--rule);
+    padding: 6px 14px;
+    display: flex; align-items: center; gap: 4px;
+    flex-shrink: 0;
+    font-size: 12.5px;
+  }
+  .editor-ribbon .rgroup {
+    display: flex; align-items: center; gap: 2px;
+    padding-right: 10px; margin-right: 6px;
+    border-right: 1px solid var(--rule);
+  }
+  .editor-ribbon .rgroup:last-child { border-right: none; }
+  .editor-ribbon .rbtn {
+    padding: 4px 8px; border-radius: 4px; color: var(--ink-2); cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    font-size: 12.5px;
+    min-width: 26px; justify-content: center;
+  }
+  .editor-ribbon .rbtn:hover { background: #eef1f4; color: var(--ink); }
+  .editor-ribbon .rbtn.active { background: var(--accent-tint); color: var(--accent); }
+  .editor-ribbon select.rsel {
+    border: 1px solid var(--rule); border-radius: 4px;
+    padding: 3px 6px; font-size: 12px; background: #fff; color: var(--ink);
+  }
+  .editor-ribbon .spacer { flex: 1; }
+  .editor-ribbon .ribbon-info {
+    font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px;
+  }
+
+  .editor-body {
+    flex: 1; overflow-y: auto;
+    padding: 26px 20px 40px 20px;
+    display: flex; justify-content: center;
+    background: #ecf0f5;
+  }
+  .doc-page {
+    background: #fff;
+    width: 720px;
+    min-height: 800px;
+    box-shadow: var(--shadow-md);
+    padding: 60px 70px;
+    font-family: 'Georgia', 'Cambria', serif;
+    font-size: 12pt;
+    color: #1c1c1c;
+    line-height: 1.55;
+    border-radius: 2px;
+    position: relative;
+  }
+  .doc-page h1 { font-size: 16pt; margin: 0 0 8px 0; }
+  .doc-page .addr { font-size: 11pt; margin: 0 0 20px 0; text-align: right; color: #444; }
+  .doc-page p { margin: 10px 0; }
+  .doc-page .locked {
+    background: #f5f8fd;
+    border-left: 3px solid var(--accent);
+    padding: 12px 14px;
+    margin: 14px 0;
+    font-size: 11pt;
+    color: #2c3e50;
+    position: relative;
+  }
+  .doc-page .locked:before {
+    content: "🔒  Regulated clause (locked)";
+    position: absolute;
+    top: -9px; left: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-family: -apple-system, sans-serif;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    font-weight: 700;
+  }
+  .doc-page .editable {
+    outline: 2px dashed transparent;
+    outline-offset: 3px;
+    transition: outline-color 0.2s;
+    border-radius: 2px;
+    padding: 2px 0;
+  }
+  .doc-page .editable:hover, .doc-page .editable:focus {
+    outline-color: var(--accent);
+    background: rgba(2,80,217,0.03);
+  }
+  .doc-page .merge {
+    background: rgba(3,108,74,0.08);
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+  .doc-page .sig { margin-top: 30px; }
+
+  /* Editor right rail — properties / merges / actions */
+  .editor-with-rail {
+    display: grid; grid-template-columns: 1fr 260px;
+    height: 100%; overflow: hidden;
+  }
+  .editor-rail {
+    background: #fff; border-left: 1px solid var(--rule);
+    display: flex; flex-direction: column;
+    overflow-y: auto;
+  }
+  .editor-rail .rail-sec { padding: 14px 16px; border-bottom: 1px solid var(--rule-soft); }
+  .editor-rail .rail-sec:last-child { border-bottom: none; }
+  .editor-rail .rail-sec .lbl {
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--muted); font-weight: 700; margin-bottom: 8px;
+  }
+  .editor-rail .rail-sec h4 {
+    margin: 0; font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .editor-rail .rail-sec .row {
+    display: flex; justify-content: space-between; font-size: 12px; margin: 5px 0;
+  }
+  .editor-rail .rail-sec .row .k { color: var(--muted); }
+  .editor-rail .rail-sec .row .v { color: var(--ink); font-weight: 500; }
+
+  .rail-blocks .block-item {
+    padding: 8px 10px; border-radius: 4px; margin-bottom: 4px;
+    font-size: 12px; color: var(--ink-2); cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    border: 1px solid var(--rule-soft); background: #fbfcfd;
+  }
+  .rail-blocks .block-item:hover { background: var(--accent-tint); color: var(--accent); border-color: var(--accent); }
+  .rail-blocks .block-item .add { color: var(--accent); font-weight: 700; }
+
+  .rail-save {
+    background: #fbfcfd; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--rule-soft);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11.5px; color: var(--ink-2);
+  }
+  .rail-save .g { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+
+  /* ------ View: review / distribute ------ */
+  .review-wrap {
+    display: grid; grid-template-columns: 1fr 380px;
+    gap: 22px; height: 100%;
+    padding-bottom: 6px;
+  }
+  .review-left {
+    background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+    padding: 18px; overflow-y: auto;
+    display: flex; flex-direction: column; align-items: center;
+    background: #f4f6fa;
+  }
+  .review-left .pdf-doc {
+    background: #fff;
+    width: 460px; height: 620px;
+    box-shadow: var(--shadow-md);
+    padding: 40px 46px;
+    font-family: 'Georgia', 'Cambria', serif;
+    font-size: 11pt;
+    color: #1c1c1c;
+    line-height: 1.55;
+    position: relative;
+  }
+  .review-left .pdf-doc:before {
+    content: "PDF · FINALISED";
+    position: absolute; top: -14px; right: -14px;
+    background: var(--success); color: #fff;
+    padding: 5px 10px; border-radius: 4px;
+    font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 8px rgba(3,108,74,0.35);
+  }
+  .review-left .pdf-doc .addr { font-size: 10pt; text-align: right; color: #444; margin-bottom: 20px; }
+  .review-left .pdf-doc p { margin: 8px 0; }
+  .review-left .pdf-doc .locked {
+    background: #f5f8fd; border-left: 3px solid var(--accent);
+    padding: 10px 12px; margin: 10px 0; font-size: 10pt; color: #2c3e50;
+  }
+
+  .review-right { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; padding-right: 4px; }
+
+  .dist-card {
+    background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+    padding: 14px 16px;
+    display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .dist-card:hover { border-color: var(--accent); box-shadow: 0 4px 10px rgba(2,80,217,0.08); }
+  .dist-card.selected { border-color: var(--accent); background: var(--accent-tint); box-shadow: 0 0 0 3px rgba(2,80,217,0.12); }
+  .dist-card .ico {
+    width: 34px; height: 34px; border-radius: 6px;
+    background: var(--accent-tint); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 15px;
+  }
+  .dist-card.print .ico { background: #eee9fc; color: #6b3fa0; }
+  .dist-card.esign .ico { background: var(--success-soft); color: var(--success); }
+  .dist-card.portal .ico { background: var(--warn-soft); color: var(--warn); }
+  .dist-card h4 { margin: 0; font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .dist-card p { margin: 2px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+  .dist-card .toggle {
+    width: 34px; height: 20px; border-radius: 12px; background: #e2e6ea;
+    position: relative; transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .dist-card .toggle:after {
+    content: ""; width: 16px; height: 16px; background: #fff; border-radius: 50%;
+    position: absolute; top: 2px; left: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    transition: left 0.2s;
+  }
+  .dist-card.selected .toggle { background: var(--accent); }
+  .dist-card.selected .toggle:after { left: 16px; }
+
+  .review-summary {
+    background: linear-gradient(135deg, var(--navy), #062372);
+    color: #fff; border-radius: 8px;
+    padding: 14px 16px; font-size: 12px;
+  }
+  .review-summary .lbl {
+    font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--cloud68); font-weight: 700; margin-bottom: 6px;
+  }
+  .review-summary .item { display: flex; justify-content: space-between; margin: 3px 0; }
+  .review-summary .item .k { opacity: 0.7; }
+  .review-summary .item .v { font-weight: 600; }
+
+  /* ------ View: success ------ */
+  .success-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    padding-top: 30px; text-align: center;
+  }
+  .success-orb {
+    width: 90px; height: 90px; border-radius: 50%;
+    background: linear-gradient(135deg, #4bca81, var(--success));
+    box-shadow: 0 12px 30px rgba(3,108,74,0.35);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 44px;
+    margin-bottom: 18px;
+  }
+  .success-wrap h2 {
+    font-size: 22px; margin: 0; color: var(--ink); font-weight: 600;
+  }
+  .success-wrap p.lead {
+    font-size: 14px; color: var(--muted); margin: 6px 0 22px 0;
+  }
+  .success-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; width: 800px; max-width: 90%;
+    margin-top: 8px;
+  }
+  .success-cards .sc {
+    background: #fff; border: 1px solid var(--rule); border-radius: 8px;
+    padding: 16px; text-align: left;
+    box-shadow: var(--shadow-sm);
+  }
+  .success-cards .sc .h {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--accent); font-weight: 700; margin-bottom: 8px;
+  }
+  .success-cards .sc h4 { margin: 0; font-size: 14px; color: var(--ink); font-weight: 600; }
+  .success-cards .sc p { margin: 6px 0 0 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+  .success-record-preview {
+    margin-top: 26px;
+    background: #f4f6fa;
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 14px 18px;
+    width: 800px; max-width: 90%;
+    display: flex; align-items: center; gap: 14px;
+    text-align: left;
+  }
+  .success-record-preview .fico {
+    width: 40px; height: 40px; border-radius: 6px;
+    background: #fdecea; color: var(--danger);
+    font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .success-record-preview .txt h5 { margin: 0; font-size: 13px; color: var(--ink); font-weight: 600; }
+  .success-record-preview .txt p { margin: 2px 0 0 0; font-size: 12px; color: var(--muted); }
+  .success-record-preview .spacer { flex: 1; }
+
+  /* Wizard footer */
+  .wizard-ftr {
+    padding: 14px 24px;
+    border-top: 1px solid var(--rule);
+    background: #fbfcfd;
+    display: flex; align-items: center; gap: 10px;
+    flex-shrink: 0;
+  }
+  .wizard-ftr .lft { color: var(--muted); font-size: 12px; }
+  .wizard-ftr .rt { margin-left: auto; display: flex; gap: 8px; }
+
+  /* helpers */
+  .hidden { display: none !important; }
+  ::selection { background: rgba(2,80,217,0.2); }
+
+  /* Small icons */
+  .icn { display: inline-block; width: 14px; height: 14px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ================= TOP NAV ================= -->
+  <div class="topnav">
+    <div class="brand"><span class="cloud"></span> WorkSafe · Claims</div>
+    <div class="app-name">Claim Management</div>
+    <div class="search">
+      <span class="ico">🔎</span> Search claims, workers, employers…
+    </div>
+    <div class="right">
+      <div class="icon-btn">⚙</div>
+      <div class="icon-btn">🔔</div>
+      <div class="avatar">JD</div>
+    </div>
+  </div>
+
+  <!-- Object tabs -->
+  <div class="tabs">
+    <div class="tab">Home</div>
+    <div class="tab">Claims</div>
+    <div class="tab active">V123987</div>
+    <div class="tab">Reports</div>
+  </div>
+
+  <div class="body">
+
+    <!-- ================= ACTIVITY LOG (behind-the-scenes) ================= -->
+    <div class="sidebar">
+      <div class="hdr">
+        <div class="lbl">Behind the scenes</div>
+        <div class="title">System activity log</div>
+        <div class="sub">What actually happens when the user acts</div>
+      </div>
+      <div class="log" id="log">
+        <div class="step active" data-step="0">
+          <div class="dot">·</div>
+          <div class="body"><b>Claim record loaded</b>User viewing claim V123987</div>
+        </div>
+        <div class="step" data-step="1">
+          <div class="dot">1</div>
+          <div class="body"><b>Action invoked</b>LWC quick-action fires <span class="tech">generateCorrespondence()</span></div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="dot">2</div>
+          <div class="body"><b>Template picker</b>OmniScript step 1 · reads library from SharePoint</div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="dot">3</div>
+          <div class="body"><b>Data harvest</b><span class="tech">DataRaptor</span> pulls claim + worker context</div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="dot">4</div>
+          <div class="body"><b>Merge</b>OmniStudio DocGen merges data into <span class="tech">.docx</span> template</div>
+        </div>
+        <div class="step" data-step="5">
+          <div class="dot">5</div>
+          <div class="body"><b>Draft stored</b>New <span class="tech">ContentVersion</span> in Salesforce Files</div>
+        </div>
+        <div class="step" data-step="6">
+          <div class="dot">6</div>
+          <div class="body"><b>Session opened</b>WOPI host mints token · Collabora loads document</div>
+        </div>
+        <div class="step" data-step="7">
+          <div class="dot">7</div>
+          <div class="body"><b>Editor rendered</b>LWC iframes Collabora, white-labelled</div>
+        </div>
+        <div class="step" data-step="8">
+          <div class="dot">8</div>
+          <div class="body"><b>Autosave loop</b>Edits stream back via <span class="tech">WOPI PutFile</span></div>
+        </div>
+        <div class="step" data-step="9">
+          <div class="dot">9</div>
+          <div class="body"><b>Finalise</b>Retrieve final DOCX · render PDF/A · new ContentVersion</div>
+        </div>
+        <div class="step" data-step="10">
+          <div class="dot">10</div>
+          <div class="body"><b>Promote to record</b>Push to FileNet · retention class applied</div>
+        </div>
+        <div class="step" data-step="11">
+          <div class="dot">11</div>
+          <div class="body"><b>Distribute</b>Email + portal notification queued</div>
+        </div>
+      </div>
+      <div class="footer">
+        <strong>Prototype</strong> · Illustrates the flow. Collabora Online is embedded via WOPI and <em>white-labelled</em> — the user never sees vendor branding.
+      </div>
+    </div>
+
+    <!-- ================= MAIN: RECORD VIEW ================= -->
+    <div class="main">
+
+      <!-- Record header -->
+      <div class="record-hdr">
+        <div class="row1">
+          <div class="icon">📁</div>
+          <div class="meta">
+            <div class="obj">Claim</div>
+            <h1>John Smith · Back injury</h1>
+            <div class="sub">
+              <span>V123987</span>
+              <span>·</span>
+              <span>Assigned to Jane Doe (agent)</span>
+              <span>·</span>
+              <span class="status">Pending decision</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn">Follow</button>
+            <button class="btn">Log a call</button>
+            <button class="btn primary" onclick="openWizard('picker')">✏  Generate correspondence</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Record tabs -->
+      <div class="record-tabs">
+        <div class="rtab active">Details</div>
+        <div class="rtab">Related</div>
+        <div class="rtab">Correspondence <span style="color:var(--muted); font-size:11px;">(3)</span></div>
+        <div class="rtab">Medical</div>
+        <div class="rtab">Payments</div>
+        <div class="rtab">History</div>
+      </div>
+
+      <!-- Record grid -->
+      <div class="record-grid">
+
+        <!-- Left column -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+
+          <div class="card">
+            <div class="card-hdr">
+              <h3>Worker & claim details</h3>
+              <button class="btn subtle">Edit</button>
+            </div>
+            <div class="card-body">
+              <div class="fields">
+                <div class="field"><div class="lbl">Worker name</div><div class="val">John Smith</div></div>
+                <div class="field"><div class="lbl">Date of birth</div><div class="val">12 Apr 1985</div></div>
+                <div class="field"><div class="lbl">Address</div><div class="val">45 King St, Melbourne VIC 3000</div></div>
+                <div class="field"><div class="lbl">Employer</div><div class="val link">Acme Logistics Pty Ltd</div></div>
+                <div class="field"><div class="lbl">Date lodged</div><div class="val">10 Jan 2026</div></div>
+                <div class="field"><div class="lbl">Date of injury</div><div class="val">28 Dec 2025</div></div>
+                <div class="field"><div class="lbl">Injury type</div><div class="val">Lower back strain</div></div>
+                <div class="field"><div class="lbl">Treating clinician</div><div class="val">Dr A. Jones, Bourke St Medical</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hdr">
+              <h3>Correspondence <span class="count">3</span></h3>
+              <button class="btn subtle">View all</button>
+            </div>
+            <div class="corr-list">
+              <div class="corr-item">
+                <div class="fico pdf">PDF</div>
+                <div class="meta">
+                  <div class="title">Claim receipt acknowledgement</div>
+                  <div class="sub">Sent to J. Smith · 10 Jan 2026 · Email + portal</div>
+                </div>
+                <div class="status">Delivered</div>
+              </div>
+              <div class="corr-item">
+                <div class="fico pdf">PDF</div>
+                <div class="meta">
+                  <div class="title">Request for medical certificate</div>
+                  <div class="sub">Sent to Dr A. Jones · 12 Jan 2026 · Email</div>
+                </div>
+                <div class="status">Delivered</div>
+              </div>
+              <div class="corr-item">
+                <div class="fico docx">DOCX</div>
+                <div class="meta">
+                  <div class="title">Independent medical exam — draft</div>
+                  <div class="sub">Draft · saved 14 Jan 2026 by Jane Doe</div>
+                </div>
+                <div class="status pending">Draft</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right column -->
+        <div style="display:flex; flex-direction:column; gap:14px;">
+
+          <div class="card">
+            <div class="card-hdr">
+              <h3>Decision status</h3>
+            </div>
+            <div class="card-body">
+              <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                <div style="width:36px; height:36px; border-radius:50%; background:var(--warn-soft); color:var(--warn); display:flex; align-items:center; justify-content:center; font-size:16px;">⏳</div>
+                <div>
+                  <div style="font-size:14px; font-weight:600; color:var(--ink);">Awaiting decision</div>
+                  <div style="font-size:11.5px; color:var(--muted);">Target: 16 Jan 2026 (in 2 days)</div>
+                </div>
+              </div>
+              <div class="field"><div class="lbl">Suggested outcome (AI)</div><div class="val" style="color:var(--danger);">Reject — S98 grounds</div></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hdr"><h3>Timeline</h3></div>
+            <div>
+              <div class="activity-item">
+                <div class="ind">📄</div>
+                <div class="text">
+                  <div class="msg"><b>Medical evidence</b> reviewed by Jane Doe</div>
+                  <div class="when">Today · 09:14</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="ind">💬</div>
+                <div class="text">
+                  <div class="msg">Note added: <em>"Injury pre-dates employment — see MRI report."</em></div>
+                  <div class="when">Yesterday · 16:42</div>
+                </div>
+              </div>
+              <div class="activity-item">
+                <div class="ind">📧</div>
+                <div class="text">
+                  <div class="msg">Certificate received from Dr A. Jones</div>
+                  <div class="when">14 Jan · 11:03</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= WIZARD MODAL ================= -->
+  <div class="modal-overlay" id="modal">
+    <div class="wizard">
+
+      <div class="wizard-hdr">
+        <div class="title-block">
+          <div class="kicker">Correspondence workflow</div>
+          <h2 id="wiz-title">Select a template</h2>
+        </div>
+        <button class="close" onclick="closeWizard()">✕</button>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper" id="stepper">
+        <div class="st active" data-key="picker">    <div class="num">1</div> Template</div>
+        <div class="arrow">›</div>
+        <div class="st"        data-key="generating"><div class="num">2</div> Generate</div>
+        <div class="arrow">›</div>
+        <div class="st"        data-key="editor">    <div class="num">3</div> Review &amp; edit</div>
+        <div class="arrow">›</div>
+        <div class="st"        data-key="distribute"><div class="num">4</div> Publish &amp; distribute</div>
+        <div class="arrow">›</div>
+        <div class="st"        data-key="done">      <div class="num">5</div> Complete</div>
+      </div>
+
+      <div class="wizard-body">
+
+        <!-- ============ VIEW 1: TEMPLATE PICKER ============ -->
+        <div class="view show" id="v-picker">
+          <div class="picker-intro">
+            <div class="ico">📄</div>
+            <div>
+              <h3>Which letter do you want to generate?</h3>
+              <p>Templates are pulled from the WorkSafe library (SharePoint, governed by Legal). Merge fields will draw from this claim — worker details, employer, treating clinician, medical evidence, decision reasoning.</p>
+            </div>
+          </div>
+
+          <div class="picker-toolbar">
+            <input class="search-in" placeholder="Search templates…" />
+            <div class="chip-group">
+              <div class="chip active">All</div>
+              <div class="chip">Decision letters</div>
+              <div class="chip">Requests for information</div>
+              <div class="chip">Medical</div>
+              <div class="chip">Payments</div>
+            </div>
+          </div>
+
+          <div class="templates" id="tpl-grid">
+            <div class="tpl legal" onclick="pickTemplate(this, 'reject')">
+              <div class="ico">S98</div>
+              <div class="body">
+                <h4>Liability rejection (Section 98)</h4>
+                <p>Standard rejection notice citing the S98 grounds; auto-inserts appeals-rights clause.</p>
+              </div>
+              <div class="meta"><span class="v">v4.2</span>Legal · 2 pages</div>
+            </div>
+            <div class="tpl" onclick="pickTemplate(this, 'accept')">
+              <div class="ico">ACC</div>
+              <div class="body">
+                <h4>Liability acceptance</h4>
+                <p>Formal acceptance with weekly benefit calculation and RTW obligations.</p>
+              </div>
+              <div class="meta"><span class="v">v3.1</span>Claims · 3 pages</div>
+            </div>
+            <div class="tpl info" onclick="pickTemplate(this, 'info')">
+              <div class="ico">RFI</div>
+              <div class="body">
+                <h4>Request for further information</h4>
+                <p>Ask worker or provider for additional evidence; configurable evidence checklist.</p>
+              </div>
+              <div class="meta"><span class="v">v2.6</span>Claims · 1 page</div>
+            </div>
+            <div class="tpl medical" onclick="pickTemplate(this, 'ime')">
+              <div class="ico">IME</div>
+              <div class="body">
+                <h4>Independent medical exam referral</h4>
+                <p>Referral to panel clinician with clinical history summary attached.</p>
+              </div>
+              <div class="meta"><span class="v">v1.8</span>Medical · 2 pages</div>
+            </div>
+            <div class="tpl" onclick="pickTemplate(this, 'notice')">
+              <div class="ico">NOT</div>
+              <div class="body">
+                <h4>Notice of decision review</h4>
+                <p>Formal notice acknowledging review request; sets response timeframe.</p>
+              </div>
+              <div class="meta"><span class="v">v2.0</span>Legal · 1 page</div>
+            </div>
+            <div class="tpl" onclick="pickTemplate(this, 'return')">
+              <div class="ico">RTW</div>
+              <div class="body">
+                <h4>Return-to-work plan</h4>
+                <p>Structured plan with duties, hours, and review dates; requires employer signature.</p>
+              </div>
+              <div class="meta"><span class="v">v3.4</span>RTW · 4 pages</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ VIEW 2: GENERATING ============ -->
+        <div class="view" id="v-generating" style="padding:0;">
+          <div class="gen-wrap">
+            <div class="gen-orb"></div>
+            <div>
+              <div class="gen-title">Preparing your document…</div>
+              <div class="gen-status" id="gen-status">Initialising session</div>
+            </div>
+            <div class="gen-progress" id="gen-progress">
+              <div class="p-row" data-p="a"><div class="m">1</div><div class="lbl">Fetch claim &amp; worker context</div><div class="tech">DataRaptor</div></div>
+              <div class="p-row" data-p="b"><div class="m">2</div><div class="lbl">Merge into template</div><div class="tech">OmniStudio DocGen</div></div>
+              <div class="p-row" data-p="c"><div class="m">3</div><div class="lbl">Save draft as ContentVersion</div><div class="tech">Salesforce Files</div></div>
+              <div class="p-row" data-p="d"><div class="m">4</div><div class="lbl">Open editor session</div><div class="tech">WOPI · Collabora</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ VIEW 3: EDITOR (white-labelled Collabora) ============ -->
+        <div class="view" id="v-editor" style="padding:0;">
+          <div class="editor-with-rail">
+            <div class="editor">
+              <div class="editor-hdr">
+                <div class="fname">
+                  <span class="dot"></span>
+                  Liability rejection · V123987 · John Smith
+                </div>
+                <div class="badge"><span class="tick">●</span> Autosaving</div>
+                <div class="presence">
+                  <div class="av jd" title="Jane Doe">JD</div>
+                </div>
+              </div>
+
+              <div class="editor-ribbon">
+                <div class="rgroup">
+                  <select class="rsel">
+                    <option>Body</option><option>Heading 1</option><option>Heading 2</option>
+                  </select>
+                  <select class="rsel" style="width:110px;">
+                    <option>Georgia · 12</option>
+                  </select>
+                </div>
+                <div class="rgroup">
+                  <div class="rbtn"><b>B</b></div>
+                  <div class="rbtn"><i>I</i></div>
+                  <div class="rbtn"><u>U</u></div>
+                  <div class="rbtn" style="text-decoration:line-through;">S</div>
+                </div>
+                <div class="rgroup">
+                  <div class="rbtn" title="Bullet list">•▬</div>
+                  <div class="rbtn" title="Numbered list">1.▬</div>
+                  <div class="rbtn" title="Increase indent">→|</div>
+                </div>
+                <div class="rgroup">
+                  <div class="rbtn" title="Insert">＋</div>
+                  <div class="rbtn" title="Comment">💬</div>
+                  <div class="rbtn" title="Track changes">↺</div>
+                </div>
+                <div class="spacer"></div>
+                <div class="ribbon-info">Saved 3 seconds ago</div>
+              </div>
+
+              <div class="editor-body">
+                <div class="doc-page">
+                  <div class="addr">16 January 2026</div>
+                  <p><strong>John Smith</strong><br>45 King St<br>Melbourne VIC 3000</p>
+                  <br>
+                  <p><strong>Re: Liability decision — Claim V123987</strong></p>
+                  <p contenteditable="true" class="editable">Dear Mr Smith,</p>
+                  <p contenteditable="true" class="editable">We write regarding your claim for compensation for a <span class="merge">lower back injury</span> lodged on <span class="merge">10 January 2026</span>.</p>
+                  <p contenteditable="true" class="editable">After careful review of the medical evidence provided by <span class="merge">Dr A. Jones</span>, and having considered the MRI findings dated <span class="merge">8 January 2026</span>, we regret to advise that liability for your claim is <strong>rejected</strong>.</p>
+
+                  <div class="locked" contenteditable="false">
+                    Under Section 98 of the Workplace Injury Rehabilitation and Compensation Act 2013, an insurer may only accept liability where the injury arose out of or in the course of employment and the employment was a significant contributing factor to the injury. Based on the evidence before us, we are not satisfied that this test is met.
+                  </div>
+
+                  <p contenteditable="true" class="editable">Specifically, the medical evidence indicates that the injury pre-dates the period of employment, and there is insufficient evidence that work duties materially contributed to the current incapacity.</p>
+
+                  <p contenteditable="true" class="editable">You have the right to request a review of this decision. To do so, please contact the Accident Compensation Conciliation Service within 60 days of the date of this letter.</p>
+
+                  <div class="sig">
+                    <p>Yours sincerely,</p>
+                    <br>
+                    <p><strong>Jane Doe</strong><br>Senior Claims Manager<br>WorkSafe Victoria</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right rail -->
+            <div class="editor-rail">
+              <div class="rail-sec">
+                <div class="lbl">Document</div>
+                <h4>Liability rejection</h4>
+                <div class="row"><span class="k">Template</span><span class="v">S98 · v4.2</span></div>
+                <div class="row"><span class="k">Version</span><span class="v">Draft 1</span></div>
+                <div class="row"><span class="k">Owner</span><span class="v">Jane Doe</span></div>
+              </div>
+
+              <div class="rail-sec">
+                <div class="lbl">Merge fields</div>
+                <div class="row"><span class="k">Worker</span><span class="v">John Smith</span></div>
+                <div class="row"><span class="k">Claim #</span><span class="v">V123987</span></div>
+                <div class="row"><span class="k">Injury</span><span class="v">Lower back</span></div>
+                <div class="row"><span class="k">Clinician</span><span class="v">Dr A. Jones</span></div>
+                <div class="row"><span class="k">Decision date</span><span class="v">16 Jan 2026</span></div>
+              </div>
+
+              <div class="rail-sec rail-blocks">
+                <div class="lbl">Insert clause</div>
+                <div class="block-item"><span class="add">+</span> Appeals rights (extended)</div>
+                <div class="block-item"><span class="add">+</span> Complaint escalation</div>
+                <div class="block-item"><span class="add">+</span> Interpreter services</div>
+                <div class="block-item"><span class="add">+</span> Privacy notice (short)</div>
+              </div>
+
+              <div class="rail-sec">
+                <div class="lbl">Status</div>
+                <div class="rail-save">
+                  <div class="g"></div>
+                  <div>All changes saved · v3 (auto)</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ============ VIEW 4: REVIEW & DISTRIBUTE ============ -->
+        <div class="view" id="v-distribute">
+          <div class="review-wrap">
+            <div class="review-left">
+              <div class="pdf-doc">
+                <div class="addr">16 January 2026</div>
+                <p><strong>John Smith</strong><br>45 King St<br>Melbourne VIC 3000</p>
+                <br>
+                <p><strong>Re: Liability decision — Claim V123987</strong></p>
+                <p>Dear Mr Smith,</p>
+                <p>We write regarding your claim for compensation for a lower back injury lodged on 10 January 2026.</p>
+                <p>After careful review of the medical evidence provided by Dr A. Jones, and having considered the MRI findings dated 8 January 2026, we regret to advise that liability for your claim is <strong>rejected</strong>.</p>
+                <div class="locked">
+                  Under Section 98 of the Workplace Injury Rehabilitation and Compensation Act 2013, an insurer may only accept liability where the injury arose out of or in the course of employment and the employment was a significant contributing factor to the injury.
+                </div>
+                <p>You have the right to request a review of this decision within 60 days…</p>
+              </div>
+            </div>
+
+            <div class="review-right">
+              <div>
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:var(--accent); font-weight:700; margin-bottom:8px;">Distribution channels</div>
+                <div style="font-size:12px; color:var(--muted); margin-bottom:14px;">Pick one or more. Recipient is derived from the claim record.</div>
+              </div>
+
+              <div class="dist-card selected" onclick="toggleDist(this)">
+                <div class="ico">✉</div>
+                <div>
+                  <h4>Email with portal link</h4>
+                  <p>Deep-link to john.smith@… (portal reads the document from FileNet).</p>
+                </div>
+                <div class="toggle"></div>
+              </div>
+
+              <div class="dist-card portal selected" onclick="toggleDist(this)">
+                <div class="ico">📲</div>
+                <div>
+                  <h4>Portal notification</h4>
+                  <p>In-app alert on next portal login · attaches to claim view.</p>
+                </div>
+                <div class="toggle"></div>
+              </div>
+
+              <div class="dist-card print" onclick="toggleDist(this)">
+                <div class="ico">🖨</div>
+                <div>
+                  <h4>Print &amp; mail</h4>
+                  <p>Physical delivery via fulfilment vendor (2-day SLA).</p>
+                </div>
+                <div class="toggle"></div>
+              </div>
+
+              <div class="dist-card esign" onclick="toggleDist(this)">
+                <div class="ico">✍</div>
+                <div>
+                  <h4>DocuSign envelope</h4>
+                  <p>Only if signature required. Not typical for a rejection notice.</p>
+                </div>
+                <div class="toggle"></div>
+              </div>
+
+              <div class="review-summary">
+                <div class="lbl">Ready to publish</div>
+                <div class="item"><span class="k">Document</span><span class="v">Liability rejection.pdf</span></div>
+                <div class="item"><span class="k">Retention</span><span class="v">RDA §1.4.2 · 75 yrs</span></div>
+                <div class="item"><span class="k">Record copy</span><span class="v">FileNet</span></div>
+                <div class="item"><span class="k">Channels</span><span class="v" id="dist-count">2 selected</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============ VIEW 5: SUCCESS ============ -->
+        <div class="view" id="v-done">
+          <div class="success-wrap">
+            <div class="success-orb">✓</div>
+            <h2>Correspondence issued</h2>
+            <p class="lead">The document is finalised, promoted to the record store, and distributed on the selected channels.</p>
+
+            <div class="success-cards">
+              <div class="sc">
+                <div class="h">Record copy</div>
+                <h4>FileNet</h4>
+                <p>Immutable PDF/A stored under RDA §1.4.2 · 75-year retention.</p>
+              </div>
+              <div class="sc">
+                <div class="h">Distribution</div>
+                <h4>Email + portal</h4>
+                <p>Email delivered to J. Smith · portal notification queued.</p>
+              </div>
+              <div class="sc">
+                <div class="h">Audit</div>
+                <h4>Trail written</h4>
+                <p>Who, what, when — recorded in FileNet audit log and claim timeline.</p>
+              </div>
+            </div>
+
+            <div class="success-record-preview">
+              <div class="fico">PDF</div>
+              <div class="txt">
+                <h5>Liability rejection · V123987 · John Smith.pdf</h5>
+                <p>Attached to the claim record · issued 16 Jan 2026 by Jane Doe · v1 (final)</p>
+              </div>
+              <div class="spacer"></div>
+              <button class="btn">Open</button>
+              <button class="btn primary" onclick="closeWizard()">Back to claim</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="wizard-ftr">
+        <div class="lft" id="wiz-hint">Choose a template to continue</div>
+        <div class="rt">
+          <button class="btn ghost" onclick="closeWizard()">Cancel</button>
+          <button class="btn"        id="btn-back" onclick="stepBack()" disabled>Back</button>
+          <button class="btn primary" id="btn-next" onclick="stepForward()" disabled>Continue →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  const STEPS = ['picker', 'generating', 'editor', 'distribute', 'done'];
+  const TITLES = {
+    picker:      { title: 'Select a template',          hint: 'Choose a template to continue' },
+    generating:  { title: 'Generating draft…',           hint: 'Please wait — this takes a few seconds' },
+    editor:      { title: 'Review & edit',              hint: 'Make any last-minute changes — autosaved to the draft' },
+    distribute:  { title: 'Publish & distribute',       hint: 'Pick channels. Finalising will render a PDF/A, promote to FileNet, and dispatch.' },
+    done:        { title: 'All done',                    hint: '' }
+  };
+
+  const modal = document.getElementById('modal');
+  const stepper = document.getElementById('stepper');
+  const btnNext = document.getElementById('btn-next');
+  const btnBack = document.getElementById('btn-back');
+  const wizTitle = document.getElementById('wiz-title');
+  const wizHint = document.getElementById('wiz-hint');
+  const activityLog = document.getElementById('log');
+
+  let currentStep = 'picker';
+  let selectedTemplate = null;
+
+  function openWizard(startStep) {
+    modal.classList.add('show');
+    activateSideLog(1);
+    activateSideLog(2);
+    goTo(startStep || 'picker');
+  }
+
+  function closeWizard() {
+    modal.classList.remove('show');
+    // reset
+    setTimeout(() => {
+      selectedTemplate = null;
+      resetSideLog();
+      goTo('picker');
+      document.querySelectorAll('.tpl').forEach(t => t.classList.remove('selected'));
+      updateNext();
+    }, 250);
+  }
+
+  function goTo(step) {
+    currentStep = step;
+    // views
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('show'));
+    document.getElementById('v-' + step).classList.add('show');
+    // stepper
+    let seen = false;
+    document.querySelectorAll('.stepper .st').forEach(s => {
+      s.classList.remove('active', 'done');
+      const k = s.getAttribute('data-key');
+      if (k === step) { s.classList.add('active'); seen = true; }
+      else if (!seen) { s.classList.add('done'); }
+    });
+    // title
+    wizTitle.textContent = TITLES[step].title;
+    wizHint.textContent  = TITLES[step].hint;
+    // back
+    btnBack.disabled = (STEPS.indexOf(step) === 0);
+    updateNext();
+
+    // side effects per step
+    if (step === 'generating')   runGenerating();
+    if (step === 'editor')       enterEditor();
+    if (step === 'distribute')   enterDistribute();
+    if (step === 'done')         enterDone();
+  }
+
+  function updateNext() {
+    // enable / label
+    if (currentStep === 'picker') {
+      btnNext.disabled = !selectedTemplate;
+      btnNext.textContent = 'Generate →';
+    } else if (currentStep === 'generating') {
+      btnNext.disabled = true;
+      btnNext.textContent = 'Generating…';
+    } else if (currentStep === 'editor') {
+      btnNext.disabled = false;
+      btnNext.textContent = 'Ready to publish →';
+    } else if (currentStep === 'distribute') {
+      btnNext.disabled = false;
+      btnNext.textContent = 'Finalise & distribute';
+    } else if (currentStep === 'done') {
+      btnNext.disabled = false;
+      btnNext.textContent = 'Back to claim';
+    }
+  }
+
+  function stepForward() {
+    if (currentStep === 'done') { closeWizard(); return; }
+    const idx = STEPS.indexOf(currentStep);
+    goTo(STEPS[idx + 1]);
+  }
+  function stepBack() {
+    const idx = STEPS.indexOf(currentStep);
+    if (idx > 0) goTo(STEPS[idx - 1]);
+  }
+
+  // ---- Template picker ----
+  function pickTemplate(el, key) {
+    document.querySelectorAll('.tpl').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedTemplate = key;
+    updateNext();
+    wizHint.textContent = 'Template selected — click Generate to draft the document';
+  }
+
+  // ---- Generating animation ----
+  function runGenerating() {
+    activateSideLog(3);
+    const status = document.getElementById('gen-status');
+    const rows = document.querySelectorAll('#gen-progress .p-row');
+    rows.forEach(r => r.classList.remove('active', 'done'));
+    const seq = [
+      { row: 'a', msg: 'Extracting claim + worker context via DataRaptor…',          log: 3 },
+      { row: 'b', msg: 'Merging into template (S98 · v4.2) via OmniStudio DocGen…',   log: 4 },
+      { row: 'c', msg: 'Storing draft as ContentVersion in Salesforce Files…',       log: 5 },
+      { row: 'd', msg: 'Opening editor session — Collabora via WOPI…',               log: 6 }
+    ];
+    let i = 0;
+    function tick() {
+      if (i > 0) rows[i - 1].classList.remove('active');
+      if (i > 0) rows[i - 1].classList.add('done');
+      if (i >= seq.length) {
+        status.textContent = 'Ready';
+        setTimeout(() => goTo('editor'), 400);
+        return;
+      }
+      rows[i].classList.add('active');
+      status.textContent = seq[i].msg;
+      activateSideLog(seq[i].log);
+      i++;
+      setTimeout(tick, 950);
+    }
+    tick();
+  }
+
+  // ---- Editor ----
+  function enterEditor() {
+    activateSideLog(7);
+    setTimeout(() => activateSideLog(8), 1500);
+  }
+
+  // ---- Distribute ----
+  function toggleDist(el) {
+    el.classList.toggle('selected');
+    const n = document.querySelectorAll('.dist-card.selected').length;
+    document.getElementById('dist-count').textContent = n + ' selected';
+  }
+  function enterDistribute() {
+    // simulate stepping into finalise on next click
+  }
+
+  // ---- Done ----
+  function enterDone() {
+    activateSideLog(9);
+    setTimeout(() => activateSideLog(10), 700);
+    setTimeout(() => activateSideLog(11), 1400);
+    btnBack.style.display = 'none';
+  }
+
+  // Intercept "Finalise & distribute" - simulate finalisation before Done
+  document.getElementById('btn-next').addEventListener('click', function(e) {
+    if (currentStep === 'distribute') {
+      // brief finalise animation would go here
+    }
+  }, true);
+
+  // ---- Side log (behind-the-scenes) ----
+  function activateSideLog(idx) {
+    const steps = document.querySelectorAll('#log .step');
+    steps.forEach((s, i) => {
+      s.classList.remove('active');
+      if (i < idx)  s.classList.add('done');
+      if (i > idx)  s.classList.remove('done');
+    });
+    if (steps[idx]) steps[idx].classList.add('active');
+  }
+  function resetSideLog() {
+    const steps = document.querySelectorAll('#log .step');
+    steps.forEach(s => s.classList.remove('active', 'done'));
+    if (steps[0]) steps[0].classList.add('active');
+  }
+
+  // Restore Back button on wizard open
+  document.addEventListener('DOMContentLoaded', () => {
+    // nothing needed; initial state handled by markup
+  });
+</script>
+</body>
+</html>
