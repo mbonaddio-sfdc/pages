@@ -46,6 +46,13 @@
   .muted { color: #8a97ad; }
   pre { background: #f4f6f9; border: 1px solid #e5e9f0; border-radius: 6px; padding: 10px; overflow-x: auto; margin: 8px 0 0; }
   .hint { font-size: 12px; color: #8a97ad; margin: -8px 0 14px; }
+  .note {
+    margin: 16px 0 0; padding: 12px 14px; font-size: 13px; line-height: 1.45;
+    background: #fef7e8; border: 1px solid #f5d99a; border-left: 4px solid #e6a817;
+    border-radius: 6px; color: #6b4e0a;
+  }
+  .note strong { color: #4d3906; }
+  .note code { background: #f7eccf; padding: 1px 5px; border-radius: 4px; }
   /* placeholder agent bubble */
   #agentBubble {
     position: fixed; right: 22px; bottom: 22px; width: 64px; height: 64px; border-radius: 50%;
@@ -87,6 +94,19 @@
     <button class="primary" id="runBtn">Run check</button>
     <button class="ghost" id="resetBtn">Reset session sampling</button>
     <button class="ghost" id="clearBtn">Clear / hide agent</button>
+
+    <div class="note">
+      <strong>About sampling (read before testing the % dial).</strong>
+      The first time you click <em>Run check</em>, the page rolls the dice once against the
+      Sampling Rate and then <strong>remembers</strong> whether you were IN or OUT for the rest of
+      this browser session. That's intentional — it mirrors a real visitor, so the agent doesn't
+      flicker in and out on every page load.
+      <br><br>
+      The catch when testing: if you change <strong>Sampling Rate</strong> in Salesforce, clicking
+      <em>Run check</em> alone will keep showing the <em>old</em> roll. Click
+      <strong>Reset session sampling</strong> first, then <em>Run check</em>, to force a fresh roll
+      against the new rate. (<code>Clear / hide agent</code> just blanks the panel — no effect on the roll.)
+    </div>
   </div>
 
   <div class="card">
