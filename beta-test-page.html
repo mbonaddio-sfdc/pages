@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Governor — Beta Test Page</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; background: #f4f6f9; color: #16325c; line-height: 1.5;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 24px 20px 120px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #5a6b8c; margin: 0 0 24px; font-size: 14px; }
+  .card {
+    background: #fff; border: 1px solid #dbe0ea; border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: #5a6b8c; margin: 0 0 14px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+  input[type=text], input[type=number] {
+    width: 100%; padding: 9px 11px; border: 1px solid #c4cdda; border-radius: 6px;
+    font-size: 14px; margin-bottom: 14px; color: #16325c;
+  }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .row > div { flex: 1 1 200px; }
+  button {
+    font: inherit; font-weight: 600; border: none; border-radius: 6px; padding: 10px 18px;
+    cursor: pointer; margin: 0 8px 0 0;
+  }
+  .primary { background: #0176d3; color: #fff; }
+  .primary:hover { background: #015fab; }
+  .ghost { background: #eef2f8; color: #16325c; }
+  .ghost:hover { background: #e0e7f2; }
+  .panel { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+  .kv { display: flex; padding: 6px 0; border-bottom: 1px dashed #e5e9f0; }
+  .kv:last-child { border-bottom: none; }
+  .kv .k { width: 150px; color: #5a6b8c; flex-shrink: 0; }
+  .kv .v { word-break: break-all; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }
+  .go { background: #d7f4e3; color: #056a3b; }
+  .stop { background: #fde2e2; color: #a01919; }
+  .err { background: #fce9d6; color: #8a4b08; }
+  .muted { color: #8a97ad; }
+  pre { background: #f4f6f9; border: 1px solid #e5e9f0; border-radius: 6px; padding: 10px; overflow-x: auto; margin: 8px 0 0; }
+  .hint { font-size: 12px; color: #8a97ad; margin: -8px 0 14px; }
+  /* placeholder agent bubble */
+  #agentBubble {
+    position: fixed; right: 22px; bottom: 22px; width: 64px; height: 64px; border-radius: 50%;
+    background: #0176d3; color: #fff; display: none; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(1,118,211,.4); cursor: pointer; z-index: 50;
+  }
+  #agentBubble svg { width: 30px; height: 30px; }
+  #agentBubble .tag {
+    position: absolute; bottom: 72px; right: 0; background: #16325c; color: #fff;
+    font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Agent Governor — Beta Test Page</h1>
+  <p class="sub">Mirrors the <strong>greenfield</strong> client wrapper. The placeholder agent bubble
+  (bottom-right) appears <em>only</em> when the wrapper would launch the real agent: <strong>GO</strong>
+  and <strong>sampled in</strong>. Use it for the Part&nbsp;C, Layer&nbsp;2 tests.</p>
+
+  <div class="card">
+    <h2>Configuration</h2>
+    <label for="base">Salesforce Site base URL</label>
+    <input type="text" id="base" placeholder="https://YOUR_SITE.my.salesforce-sites.com/agentgovernor">
+    <p class="hint">Your Site base, including the site's URL path prefix — the same value the README's
+      wrapper config calls <code>GOVERNOR_SITE_BASE</code>.</p>
+
+    <div class="row">
+      <div>
+        <label for="key">Governor Key</label>
+        <input type="text" id="key" value="beta-test">
+      </div>
+      <div>
+        <label for="timeout">Timeout (ms)</label>
+        <input type="number" id="timeout" value="3000">
+      </div>
+    </div>
+
+    <button class="primary" id="runBtn">Run check</button>
+    <button class="ghost" id="resetBtn">Reset session sampling</button>
+    <button class="ghost" id="clearBtn">Clear / hide agent</button>
+  </div>
+
+  <div class="card">
+    <h2>Decision</h2>
+    <div class="panel" id="panel">
+      <div class="kv"><span class="k">Decision</span><span class="v muted" id="pDecision">— not run yet —</span></div>
+      <div class="kv"><span class="k">Reason</span><span class="v muted" id="pReason">—</span></div>
+      <div class="kv"><span class="k">Sampling rate</span><span class="v muted" id="pRate">—</span></div>
+      <div class="kv"><span class="k">Sampled this session</span><span class="v muted" id="pSample">—</span></div>
+      <div class="kv"><span class="k">Agent shown?</span><span class="v muted" id="pShown">—</span></div>
+      <div class="kv"><span class="k">Request URL</span><span class="v muted" id="pUrl">—</span></div>
+    </div>
+    <pre id="raw">Raw response will appear here.</pre>
+  </div>
+</div>
+
+<div id="agentBubble" title="Placeholder governed agent">
+  <span class="tag">Governed agent (placeholder)</span>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var LOG = '[Agent Governor Beta]';
+
+  var el = function (id) { return document.getElementById(id); };
+  var bubble = el('agentBubble');
+
+  function buildApiUrl(base, key) {
+    var trimmed = base.replace(/\/+$/, '');
+    return trimmed + '/services/apexrest/AgentGovernor/?key=' + encodeURIComponent(key);
+  }
+
+  function fetchStatus(url, timeoutMs) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, timeoutMs);
+    return fetch(url, { method: 'GET', cache: 'no-store', signal: controller.signal })
+      .then(function (response) {
+        clearTimeout(timer);
+        if (!response.ok) { throw new Error('Governor API returned HTTP ' + response.status); }
+        return response.json();
+      });
+  }
+
+  // Sticky per-session roll — identical behaviour to the shipped wrapper.
+  function stickyRoll(key, rate) {
+    var storageKey = 'agentGovernor:' + key;
+    try {
+      var cached = sessionStorage.getItem(storageKey);
+      if (cached !== null) { return cached === 'in'; }
+      var inSample = Math.random() < rate;
+      sessionStorage.setItem(storageKey, inSample ? 'in' : 'out');
+      return inSample;
+    } catch (e) {
+      return Math.random() < rate;
+    }
+  }
+
+  function showAgent()  { bubble.style.display = 'flex'; }
+  function hideAgent()  { bubble.style.display = 'none'; }
+
+  function setDecision(text, cls) {
+    var d = el('pDecision');
+    d.className = 'v';
+    d.innerHTML = '<span class="badge ' + cls + '">' + text + '</span>';
+  }
+
+  function paint(fields) {
+    el('pReason').textContent  = fields.reason;
+    el('pReason').className     = 'v';
+    el('pRate').textContent     = fields.rate;
+    el('pRate').className        = 'v';
+    el('pSample').textContent   = fields.sample;
+    el('pSample').className      = 'v';
+    el('pShown').textContent    = fields.shown;
+    el('pShown').className        = 'v';
+    el('pUrl').textContent      = fields.url;
+    el('pUrl').className          = 'v';
+    el('raw').textContent       = fields.raw;
+  }
+
+  function run() {
+    var base = el('base').value.trim();
+    var key = el('key').value.trim();
+    var timeoutMs = parseInt(el('timeout').value, 10) || 3000;
+    hideAgent();
+
+    if (!base) {
+      setDecision('NO URL', 'err');
+      paint({ reason: 'Enter your Site base URL first', rate: '—', sample: '—', shown: 'no', url: '—', raw: '(no request sent)' });
+      return;
+    }
+
+    var url = buildApiUrl(base, key);
+    setDecision('…checking', 'err');
+    paint({ reason: 'waiting for the Governor API…', rate: '—', sample: '—', shown: '—', url: url, raw: '(request in flight)' });
+
+    fetchStatus(url, timeoutMs)
+      .then(function (data) {
+        var raw = JSON.stringify(data, null, 2);
+        if (data.status === 'GO') {
+          var rate = (typeof data.samplingRate === 'number') ? data.samplingRate : 1;
+          var sampledIn = stickyRoll(key, rate);
+          setDecision('GO', 'go');
+          if (sampledIn) {
+            console.log(LOG + ' GO — sampled in. Launching (placeholder) governed agent.');
+            showAgent();
+            paint({ reason: data.reason, rate: rate, sample: 'IN', shown: 'YES — bubble visible', url: url, raw: raw });
+          } else {
+            console.log(LOG + ' GO — sampled out (control). Showing nothing (greenfield).');
+            paint({ reason: data.reason, rate: rate, sample: 'OUT (control)', shown: 'no — sampled out', url: url, raw: raw });
+          }
+        } else {
+          console.log(LOG + ' STOP (' + data.reason + '). Showing nothing (greenfield).');
+          setDecision('STOP', 'stop');
+          paint({ reason: data.reason, rate: (typeof data.samplingRate === 'number' ? data.samplingRate : '—'), sample: 'n/a', shown: 'no — STOP', url: url, raw: raw });
+        }
+      })
+      .catch(function (error) {
+        console.error(LOG + ' API unavailable:', error.message);
+        console.log(LOG + ' Fail-safe engaged — greenfield shows nothing.');
+        setDecision('ERROR', 'err');
+        var msg = error.message;
+        if (error.name === 'AbortError') { msg = 'Request timed out after ' + timeoutMs + 'ms'; }
+        paint({
+          reason: msg + '  (likely: wrong URL, Site/guest access not set up, or origin not in the CORS allowlist)',
+          rate: '—', sample: 'n/a', shown: 'no — fail-safe', url: url,
+          raw: '(no valid response — fetch failed)'
+        });
+      });
+  }
+
+  function resetSampling() {
+    try {
+      var key = el('key').value.trim();
+      sessionStorage.removeItem('agentGovernor:' + key);
+      console.log(LOG + ' Session sampling reset for key "' + key + '".');
+    } catch (e) {}
+    el('pSample').textContent = '(reset — re-run to roll again)';
+  }
+
+  function clearAll() {
+    hideAgent();
+    setDecision('— not run yet —', '');
+    el('pDecision').className = 'v muted';
+    ['pReason','pRate','pSample','pShown','pUrl'].forEach(function (id) {
+      el(id).textContent = '—'; el(id).className = 'v muted';
+    });
+    el('raw').textContent = 'Raw response will appear here.';
+  }
+
+  el('runBtn').addEventListener('click', run);
+  el('resetBtn').addEventListener('click', resetSampling);
+  el('clearBtn').addEventListener('click', clearAll);
+  bubble.addEventListener('click', function () {
+    alert('This is a placeholder for the real Agentforce / MIAW chat launcher.\n\nIn production, the wrapper would boot the actual agent here. For the beta, its visibility is all you need to verify: it appears only on GO + sampled in.');
+  });
+})();
+</script>
+</body>
+</html>
