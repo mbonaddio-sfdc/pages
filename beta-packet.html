@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Governor — Beta Test Packet</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; background: #f4f6f9; color: #16325c; line-height: 1.55;
+  }
+  .layout { max-width: 1040px; margin: 0 auto; padding: 24px 20px 120px; display: flex; gap: 28px; }
+  nav.toc {
+    position: sticky; top: 20px; align-self: flex-start; width: 210px; flex-shrink: 0;
+    font-size: 13px; max-height: calc(100vh - 40px); overflow-y: auto;
+  }
+  nav.toc .navtitle { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: #8a97ad; margin: 0 0 8px; font-weight: 700; }
+  nav.toc a { display: block; padding: 5px 10px; color: #33475b; text-decoration: none; border-radius: 6px; border-left: 2px solid transparent; }
+  nav.toc a:hover { background: #eef2f8; }
+  nav.toc a.active { background: #eaf3fc; border-left-color: #0176d3; color: #0176d3; font-weight: 600; }
+  main { flex: 1 1 auto; min-width: 0; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #5a6b8c; margin: 0 0 8px; font-size: 14px; }
+  .meta { color: #8a97ad; font-size: 12px; margin: 0 0 20px; }
+  .card {
+    background: #fff; border: 1px solid #dbe0ea; border-radius: 10px;
+    padding: 20px 22px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .card h2 { font-size: 17px; margin: 0 0 6px; color: #16325c; scroll-margin-top: 20px; }
+  .card h3 { font-size: 14px; margin: 18px 0 6px; color: #16325c; }
+  .card p { margin: 0 0 12px; }
+  .tag { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #8a97ad; font-weight: 700; }
+  code { background: #eef2f8; padding: 1px 6px; border-radius: 4px; font-size: .88em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  pre { background: #f4f6f9; border: 1px solid #e5e9f0; border-radius: 6px; padding: 10px 12px; overflow-x: auto; margin: 8px 0 12px; font-size: 12.5px; }
+  pre code { background: none; padding: 0; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 14px; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 9px; border-bottom: 1px solid #eef1f6; vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: #8a97ad; font-weight: 700; }
+  td.id, td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; white-space: nowrap; font-weight: 600; }
+  ol, ul { margin: 0 0 12px; padding-left: 22px; }
+  li { margin: 0 0 6px; }
+  a { color: #0176d3; }
+  .check { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px dashed #eef1f6; }
+  .check:last-child { border-bottom: none; }
+  .check input { margin: 3px 0 0; width: 17px; height: 17px; flex-shrink: 0; cursor: pointer; accent-color: #0176d3; }
+  .check label { cursor: pointer; font-size: 14px; }
+  .check.done label { color: #8a97ad; text-decoration: line-through; text-decoration-color: #c4cdda; }
+  .note {
+    margin: 14px 0; padding: 12px 14px; font-size: 13px; line-height: 1.45;
+    background: #fef7e8; border: 1px solid #f5d99a; border-left: 4px solid #e6a817;
+    border-radius: 6px; color: #6b4e0a;
+  }
+  .note strong { color: #4d3906; }
+  .note code { background: #f7eccf; }
+  .info {
+    margin: 14px 0; padding: 12px 14px; font-size: 13px; line-height: 1.45;
+    background: #eaf3fc; border: 1px solid #bfe0f7; border-left: 4px solid #0176d3;
+    border-radius: 6px; color: #0b4a72;
+  }
+  .info code { background: #d7ebfa; }
+  .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 0; }
+  .btn { font: inherit; font-weight: 600; border: none; border-radius: 6px; padding: 11px 18px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn.primary { background: #0176d3; color: #fff; }
+  .btn.primary:hover { background: #015fab; }
+  .btn.ghost { background: #eef2f8; color: #16325c; }
+  .btn.ghost:hover { background: #e0e7f2; }
+  /* progress */
+  .progress { position: sticky; top: 0; z-index: 30; background: #f4f6f9; padding: 12px 0 10px; margin: -4px 0 14px; }
+  .progress .bar { height: 8px; background: #e0e7f2; border-radius: 999px; overflow: hidden; }
+  .progress .fill { height: 100%; width: 0%; background: #0176d3; transition: width .25s ease; }
+  .progress .lbl { font-size: 12px; color: #5a6b8c; margin: 6px 0 0; display: flex; justify-content: space-between; }
+  .progress .lbl button { font: inherit; font-size: 12px; background: none; border: none; color: #0176d3; cursor: pointer; padding: 0; }
+  .expcell { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; color: #5a6b8c; }
+  @media (max-width: 820px) { nav.toc { display: none; } .layout { padding: 16px 14px 100px; } }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" id="toc">
+    <p class="navtitle">On this page</p>
+    <a href="#top">Read this first</a>
+    <a href="#groundrules">Ground rules</a>
+    <a href="#preflight">Pre-flight gate</a>
+    <a href="#partA">Part A — Install</a>
+    <a href="#partB">Part B — Config record</a>
+    <a href="#partC">Part C — Functional tests</a>
+    <a href="#partD">Part D — Tear-down</a>
+    <a href="#wrapup">Wrap-up</a>
+    <a href="#appendixA">Appendix A — Expected results</a>
+    <a href="#appendixB">Appendix B — Troubleshooting</a>
+  </nav>
+
+  <main>
+    <h1 id="top">Agent Governor — Beta Test Packet</h1>
+    <p class="sub">Clean-room UAT. Install from the docs, tell us where you got stuck, and confirm each control works.</p>
+    <p class="meta">Internal QA artifact. Tick boxes as you go — your progress saves in this browser, so you can close the tab and resume.</p>
+
+    <div class="progress">
+      <div class="bar"><div class="fill" id="pfill"></div></div>
+      <div class="lbl"><span id="plabel">0 of 0 steps checked</span><button id="resetChecks" type="button">Reset checkboxes</button></div>
+    </div>
+
+    <div class="btnrow" style="margin-bottom:18px;">
+      <a class="btn primary" href="https://mbonaddio-sfdc.github.io/pages/beta-test-page.html" target="_blank" rel="noopener">Open the test page (Part C, Layer 2) ↗</a>
+      <a class="btn ghost" href="https://mbonaddio-sfdc.github.io/pages/beta-feedback.html" target="_blank" rel="noopener">Open the feedback form ↗</a>
+    </div>
+
+    <!-- READ THIS FIRST -->
+    <div class="card">
+      <p class="tag">For the tester</p>
+      <h2>Read this first</h2>
+      <p>You are the independent beta tester for a Salesforce accelerator called <strong>Agent Governor</strong>.
+      It is a lightweight "traffic controller" for an Agentforce / MIAW chat agent: a small server-side
+      API returns <strong>GO</strong> or <strong>STOP</strong> for a given agent, and a JavaScript wrapper on
+      the web page decides whether to show the agent based on that answer. It gives an admin four safety
+      controls — a master kill switch, a daily conversation cap, operating hours, and a % traffic sampling dial.</p>
+      <p>Your job is <strong>not</strong> to be told how to install it. Your job is to <strong>install it from the
+      published docs alone</strong>, exactly as a real adopter would, and tell us where you got stuck and whether
+      each control actually works.</p>
+    </div>
+
+    <!-- GROUND RULES -->
+    <div class="card">
+      <h2 id="groundrules">Ground rules <span class="tag">(this is what makes it a valid test)</span></h2>
+      <ol>
+        <li><strong>Docs only.</strong> For the install (Part A) use <strong>only</strong> the repo's
+        <code>README.md</code>. Do <strong>not</strong> ask the author for help, and do <strong>not</strong> use
+        this packet as an install guide — this packet only tells you <em>what to verify</em>, not <em>how to
+        install</em>. If the README doesn't tell you how to do something, that is a finding: write it in the
+        friction log and do your best to proceed.</li>
+        <li><strong>Log everything that isn't obvious.</strong> Every unclear step, missing detail, error message,
+        or "I had to guess" moment goes in the feedback form's friction log, with the README section it relates
+        to. Friction is the most valuable thing you produce.</li>
+        <li><strong>Time-box it.</strong> Aim for ~60–90 minutes total. If you're blocked for more than ~15 minutes
+        on one step, log it as a blocker and move on to whatever you <em>can</em> still test.</li>
+        <li><strong>Additive only / it's a real org.</strong> The target is a live demo org, not a throwaway. Only
+        <em>add</em> things (the deploy, one config record, one Site). Don't delete or modify existing metadata.
+        A clean tear-down is Part D.</li>
+      </ol>
+    </div>
+
+    <!-- PRE-FLIGHT -->
+    <div class="card">
+      <h2 id="preflight">Pre-flight gate — clear every box before you start</h2>
+      <p>Five minutes here saves an hour of dead-ends. <strong>Do not start Part A until all of these are true.</strong></p>
+      <div class="check"><input type="checkbox" data-check="pf1" id="pf1"><label for="pf1"><strong>A Salesforce demo org where you are System Administrator.</strong> It's a live org, not a throwaway — you'll only <em>add</em> to it (see the additive-only ground rule).</label></div>
+      <div class="check"><input type="checkbox" data-check="pf2" id="pf2"><label for="pf2"><strong>Agentforce + Messaging for In-App and Web (MIAW) is enabled in that org.</strong> <em>This is the single most common blocker.</em> Agent Governor ships a trigger on the <code>MessagingSession</code> object, and that object only exists once MIAW is enabled — if it isn't, the Part A deploy fails with an error like <code>no such entity 'MessagingSession'</code>. <br><strong>How to confirm now:</strong> Setup → Quick Find → <strong>Messaging Settings</strong>. If it opens, MIAW is on. If Quick Find returns nothing, it isn't enabled — stop and get it turned on first.</label></div>
+      <div class="check"><input type="checkbox" data-check="pf3" id="pf3"><label for="pf3"><em>(Ideal, not required)</em> <strong>One working messaging agent + channel</strong> already in the org. This lets you run the truest end-to-end daily-limit test (optional <strong>C4-full</strong>). Without it you can still complete every other test.</label></div>
+      <div class="check"><input type="checkbox" data-check="pf4" id="pf4"><strong style="font-weight:400"><label for="pf4"><strong>Salesforce CLI installed</strong> — <code>sf --version</code> returns a version. (<a href="https://developer.salesforce.com/tools/salesforcecli" target="_blank" rel="noopener">install</a>)</label></strong></div>
+      <div class="check"><input type="checkbox" data-check="pf5" id="pf5"><label for="pf5"><strong>Git installed, and access to the repo</strong> the author shared with you (you'll clone it). Repo: <code>https://github.com/mbonaddio-sfdc/agent-governor</code> (or whichever URL the author gave you).</label></div>
+      <div class="check"><input type="checkbox" data-check="pf6" id="pf6"><label for="pf6"><strong>The feedback form is open</strong> — you fill it in as you go: <a href="https://mbonaddio-sfdc.github.io/pages/beta-feedback.html" target="_blank" rel="noopener">the hosted feedback form</a> (or <code>BETA_FEEDBACK_FORM.md</code>).</label></div>
+      <div class="check"><input type="checkbox" data-check="pf7" id="pf7"><label for="pf7"><strong>A modern desktop browser</strong> (Chrome/Edge/Firefox).</label></div>
+      <div class="check"><input type="checkbox" data-check="pf8" id="pf8"><label for="pf8"><strong>The hosted test page loads</strong> (used in Part C, Layer 2 — nothing to install, just confirm the link opens): <a href="https://mbonaddio-sfdc.github.io/pages/beta-test-page.html" target="_blank" rel="noopener">beta-test-page.html</a></label></div>
+      <div class="info">Budget <strong>~60–90 minutes</strong>. If you clear this gate, nothing below should surprise you at the environment level — anything that still does is a genuine finding for the friction log.</div>
+      <h3>Record the version you tested</h3>
+      <p>In the feedback form, note the <strong>git commit</strong> you tested so results are traceable. After you
+      clone, run <code>git rev-parse --short HEAD</code> in the repo folder and paste the result into the form.</p>
+    </div>
+
+    <!-- PART A -->
+    <div class="card">
+      <h2 id="partA">Part A — Install from the docs (clean room)</h2>
+      <p><strong>Instruction:</strong> Open the repo's <code>README.md</code> and follow the
+      <strong>"Deploy from source"</strong> path (README <strong>Installation → Option B</strong>), using the
+      Salesforce CLI. Nothing else.</p>
+      <p>You are done with Part A when the metadata is deployed, the Apex tests pass, and the permission set (if
+      the README specifies one) is assigned to you. Tick each milestone as you reach it — these are here so we
+      know <strong>how far you got</strong>, not how to do it. Record Pass / Fail / Couldn't tell in the feedback form.</p>
+      <div class="check"><input type="checkbox" data-check="a1" id="a1"><label for="a1"><strong>A1</strong> — Repo cloned and Salesforce CLI installed.</label></div>
+      <div class="check"><input type="checkbox" data-check="a2" id="a2"><label for="a2"><strong>A2</strong> — Authorised the demo org (<code>sf org login web</code> or equivalent per the README).</label></div>
+      <div class="check"><input type="checkbox" data-check="a3" id="a3"><label for="a3"><strong>A3</strong> — Source deployed (<code>sf project deploy start --source-dir force-app …</code> per the README).</label></div>
+      <div class="check"><input type="checkbox" data-check="a4" id="a4"><label for="a4"><strong>A4</strong> — Apex tests ran and passed during/after deploy.</label></div>
+      <div class="check"><input type="checkbox" data-check="a5" id="a5"><label for="a5"><strong>A5</strong> — Permission set assigned (if the README calls for one) so you can see the objects/tabs.</label></div>
+      <div class="check"><input type="checkbox" data-check="a6" id="a6"><label for="a6"><strong>A6</strong> — You can find the <strong>Agent Governor Configuration</strong> object/records in the org.</label></div>
+      <div class="check"><input type="checkbox" data-check="a7" id="a7"><label for="a7"><strong>A7</strong> — Public endpoint set up: the README's <strong>Salesforce Site + guest-user Apex access</strong> steps are complete (this is what makes the <code>/services/apexrest/AgentGovernor/</code> URL reachable).</label></div>
+      <div class="check"><input type="checkbox" data-check="a8" id="a8"><label for="a8"><strong>A8</strong> — CORS: the README's CORS allowlist step is complete (needed in Part C). For the hosted test page, the origin to allow is <code>https://mbonaddio-sfdc.github.io</code> (origin only — no path or filename).</label></div>
+      <div class="note">If any README step is missing, ambiguous, or wrong, that's the headline finding — capture it.</div>
+    </div>
+
+    <!-- PART B -->
+    <div class="card">
+      <h2 id="partB">Part B — Create a Governor configuration record</h2>
+      <p>Follow the README's <strong>post-install / "create your first configuration"</strong> step. Create one record:</p>
+      <table>
+        <tr><th>Field</th><th>Value</th></tr>
+        <tr><td class="mono">Governor Key</td><td><code>beta-test</code></td></tr>
+        <tr><td class="mono">Linked Channel Id</td><td>the MIAW <strong>MessagingChannel Id</strong> of your demo agent (only needed for the daily-limit test in Part C; leave your best value if unsure and note it)</td></tr>
+        <tr><td class="mono">Is Active</td><td>✔ true</td></tr>
+        <tr><td class="mono">Sampling Rate</td><td><code>100</code></td></tr>
+        <tr><td class="mono">Time Zone</td><td>your org's time zone (e.g. <code>Australia/Melbourne</code>)</td></tr>
+        <tr><td class="mono">Start / End Hour</td><td>leave blank for now (always open)</td></tr>
+        <tr><td class="mono">Daily Limit</td><td>leave blank for now</td></tr>
+        <tr><td class="mono">Exclude Weekends</td><td>✘ false</td></tr>
+      </table>
+      <div class="check"><input type="checkbox" data-check="b1" id="b1"><label for="b1">Config record created and kept open in a browser tab — you'll toggle its fields throughout Part C.</label></div>
+    </div>
+
+    <!-- PART C -->
+    <div class="card">
+      <h2 id="partC">Part C — Functional tests (do the four controls actually work?)</h2>
+      <p>The tests come in two layers:</p>
+      <ul>
+        <li><strong>Layer 1 — the server decision (no wrapper, no CORS).</strong> Paste the endpoint URL straight
+        into your browser address bar and read the raw JSON. This proves the <em>server-side</em> logic deterministically.</li>
+        <li><strong>Layer 2 — the wrapper on a page (the real integration).</strong> Use the hosted
+        <a href="https://mbonaddio-sfdc.github.io/pages/beta-test-page.html" target="_blank" rel="noopener">test page</a>
+        to confirm the JavaScript actually <strong>shows / hides</strong> the agent based on that decision, including
+        the client-side sampling dial and the fail-safe.</li>
+      </ul>
+
+      <h3>Your endpoint URL</h3>
+      <p>Take your Site base URL (from Part A / README) and append the API path:</p>
+      <pre><code>https://&lt;YOUR-SITE-BASE&gt;/services/apexrest/AgentGovernor/?key=beta-test</code></pre>
+      <p>Open that URL in the browser. You should get a small JSON object like
+      <code>{"status":"GO","reason":"OK","samplingRate":1.0}</code>. If you get an error page instead, the Site or
+      guest-access setup (A7) isn't right — log it; that's a finding.</p>
+      <div class="note"><strong>Tip:</strong> the endpoint caches nothing, but your browser might. After changing the
+      config record, <strong>hard-refresh</strong> (Ctrl/Cmd-Shift-R) or add <code>&amp;t=&lt;random&gt;</code> to the URL.</div>
+
+      <h3>Layer 1 — server decision tests</h3>
+      <p>For each row: change the config record, <strong>Save</strong>, reload the endpoint URL, read the JSON.
+      Record the <code>status</code> and <code>reason</code> in the feedback form, and tick it here.</p>
+      <table>
+        <tr><th style="width:34px"></th><th style="width:40px">#</th><th>Control</th><th>Set on the config record</th><th style="width:26%">Reload endpoint → expected</th></tr>
+        <tr><td><input type="checkbox" data-check="c1" aria-label="C1 done"></td><td class="id">C1</td><td><strong>Master kill switch</strong></td><td>Is Active = false</td><td class="expcell">STOP / INACTIVE</td></tr>
+        <tr><td><input type="checkbox" data-check="c1b" aria-label="C1b done"></td><td class="id">C1b</td><td>(restore)</td><td>Is Active = true</td><td class="expcell">GO / OK</td></tr>
+        <tr><td><input type="checkbox" data-check="c1c" aria-label="C1c done"></td><td class="id">C1c</td><td><strong>Unknown key (typo guard)</strong></td><td>Leave the record as-is; in the endpoint URL change the key to one matching <strong>no</strong> record, e.g. <code>?key=beta-test-typo</code>. Restore <code>?key=beta-test</code> after.</td><td class="expcell">STOP / NOTFOUND — a missing/mistyped key is reported <em>distinctly</em> from an intentional kill switch (INACTIVE).</td></tr>
+        <tr><td><input type="checkbox" data-check="c2" aria-label="C2 done"></td><td class="id">C2</td><td><strong>Operating hours (closed)</strong></td><td>Start Hour = 0, End Hour = 1 (open only 00:00–00:59)</td><td class="expcell">STOP / TIME — unless testing 00:00–01:00, then pick a window excluding the current hour</td></tr>
+        <tr><td><input type="checkbox" data-check="c2b" aria-label="C2b done"></td><td class="id">C2b</td><td><strong>Operating hours (open)</strong></td><td>Start Hour = 0, End Hour = 24</td><td class="expcell">GO / OK</td></tr>
+        <tr><td><input type="checkbox" data-check="c3" aria-label="C3 done"></td><td class="id">C3</td><td><strong>Exclude weekends</strong> <em>(only meaningful Sat/Sun)</em></td><td>Exclude Weekends = true</td><td class="expcell">Sat/Sun → STOP / WEEKEND; weekday → GO. If weekday, note "not testable today".</td></tr>
+        <tr><td><input type="checkbox" data-check="c4" aria-label="C4 done"></td><td class="id">C4</td><td><strong>Daily limit — read path</strong></td><td>Daily Limit = 1, Current Count = 1, Is Green = false, Reset Date = today</td><td class="expcell">STOP / QUOTA</td></tr>
+        <tr><td><input type="checkbox" data-check="c5" aria-label="C5 done"></td><td class="id">C5</td><td><strong>Daily-reset self-heal</strong> (regression)</td><td>Is Green = false, Reset Date = <em>yesterday</em></td><td class="expcell">GO / OK — a stale red flag from a previous day must be ignored</td></tr>
+      </table>
+      <div class="note"><strong>Reset the record to healthy defaults after Layer 1:</strong> Is Active = true,
+      Sampling Rate = 100, Start/End Hour blank, Daily Limit blank, Current Count = 0, Is Green = true,
+      Exclude Weekends = false.</div>
+
+      <h3>Optional C4-full — daily limit end-to-end (only if your demo org has a working agent)</h3>
+      <p>The read-path test proves the <em>response</em>. To prove the <em>counter actually increments</em>:</p>
+      <ol>
+        <li>Set <strong>Daily Limit = 1</strong>, <strong>Current Count = 0</strong>, <strong>Is Green = true</strong>,
+        <strong>Reset Date = today</strong>, and make sure <strong>Linked Channel Id</strong> points at your demo
+        agent's MessagingChannel.</li>
+        <li>Start <strong>one</strong> real conversation with that agent (send at least one message so a
+        <code>MessagingSession</code> is created).</li>
+        <li>Reload the endpoint URL. Expect <code>STOP</code> / <code>QUOTA</code>, and on the config record confirm
+        <strong>Current Count = 1</strong> and <strong>Is Green = false</strong>. (The count updates asynchronously —
+        give it a few seconds and refresh.)</li>
+      </ol>
+      <div class="check"><input type="checkbox" data-check="c4full" id="c4full"><label for="c4full"><strong>C4-full</strong> attempted (or noted as not applicable — no working agent).</label></div>
+
+      <h3>Layer 2 — the wrapper on a page</h3>
+      <p>This proves the client actually shows/hides the agent, plus the <strong>sampling</strong> dial and the
+      <strong>fail-safe</strong>. Open the
+      <a href="https://mbonaddio-sfdc.github.io/pages/beta-test-page.html" target="_blank" rel="noopener">test page</a>
+      — think of it as a stand-in for a customer's website with the wrapper installed. It shows a
+      <strong>Decision panel</strong> and a <strong>placeholder agent bubble</strong> (bottom-right) that appears
+      <strong>only</strong> when the wrapper would actually launch the agent — i.e. Decision = GO <strong>and</strong>
+      you were sampled <strong>in</strong>.</p>
+
+      <h3>One-time setup (CORS)</h3>
+      <p>The page runs in your browser and calls your Salesforce Site. The browser blocks that call unless the Site
+      trusts the page's address. Add it once:</p>
+      <ol>
+        <li>In the demo org: <strong>Setup</strong> → Quick Find <strong>CORS</strong> → <strong>CORS</strong> → <strong>New</strong>.</li>
+        <li><strong>Origin URL Pattern:</strong> <code>https://mbonaddio-sfdc.github.io</code> (origin only — no
+        <code>/pages/</code>, no filename, no trailing slash). <strong>Save</strong>.</li>
+      </ol>
+      <p>If the page shows a red <strong>ERROR</strong> with "Failed to fetch", the two usual causes are: this CORS
+      entry is missing, or the Site base URL you typed is wrong.</p>
+
+      <div class="note"><strong>Sampling is "sticky" for your browser session, on purpose.</strong> The first
+      <em>Run check</em> rolls the dice once against the Sampling Rate and then <em>remembers</em> the in/out result
+      for the session (so a live visitor doesn't see the agent flicker). Practical consequence: if you change
+      <strong>Sampling Rate</strong> in Salesforce, click <strong>Reset session sampling</strong> before
+      <em>Run check</em> to force a fresh roll.</div>
+
+      <p>The test loop for every control below is the same: change the field on your config record → <strong>Save</strong>
+      → back to the page → <strong>Run check</strong>. Record the result in the feedback form and tick it here.</p>
+      <table>
+        <tr><th style="width:34px"></th><th style="width:40px">#</th><th>Control</th><th>Do this</th><th style="width:28%">Expected on the page</th></tr>
+        <tr><td><input type="checkbox" data-check="c6" aria-label="C6 done"></td><td class="id">C6</td><td><strong>Wrapper shows on GO</strong></td><td>Config healthy (GO/OK), Sampling 100 → Run check</td><td class="expcell">GO, sampled <strong>in</strong>; <strong>bubble appears</strong> bottom-right</td></tr>
+        <tr><td><input type="checkbox" data-check="c7" aria-label="C7 done"></td><td class="id">C7</td><td><strong>Sampling 0% hides it</strong></td><td>Sampling Rate = 0, Save → Reset session sampling → Run check</td><td class="expcell">still GO, but sampled <strong>out</strong>; <strong>no bubble</strong></td></tr>
+        <tr><td><input type="checkbox" data-check="c7b" aria-label="C7b done"></td><td class="id">C7b</td><td><strong>Sampling 100% shows it</strong></td><td>Sampling Rate = 100, Save → Reset session sampling → Run check</td><td class="expcell">sampled <strong>in</strong>; <strong>bubble appears</strong></td></tr>
+        <tr><td><input type="checkbox" data-check="c8" aria-label="C8 done"></td><td class="id">C8</td><td><strong>Wrapper hides on STOP</strong></td><td>Is Active = false, Save → Run check</td><td class="expcell">STOP / INACTIVE; <strong>no bubble</strong></td></tr>
+        <tr><td><input type="checkbox" data-check="c9" aria-label="C9 done"></td><td class="id">C9</td><td><strong>Fail-safe on error</strong></td><td>Restore Is Active = true. Type a <strong>wrong Site base URL</strong> → Run check</td><td class="expcell">ERROR and <strong>no bubble</strong> — fails <em>safe</em>. Fix the URL and Run check again to recover.</td></tr>
+      </table>
+      <div class="note"><strong>Reminder:</strong> for C7 and C7b, the <strong>Reset session sampling</strong> click
+      is what makes the new rate take effect — skip it and the first roll sticks and the test looks broken.</div>
+    </div>
+
+    <!-- PART D -->
+    <div class="card">
+      <h2 id="partD">Part D — Tear-down <span class="tag">(optional but appreciated)</span></h2>
+      <p>If the README documents removal/decommission, follow it and confirm the metadata comes out cleanly (or
+      note what's left behind). If there's no tear-down section, that itself is a finding.</p>
+      <div class="check"><input type="checkbox" data-check="d1" id="d1"><label for="d1">Tear-down attempted per the README (or absence of a tear-down section noted as a finding).</label></div>
+    </div>
+
+    <!-- WRAP-UP -->
+    <div class="card">
+      <h2 id="wrapup">Wrap-up</h2>
+      <p>Fill in the feedback form <strong>as you go</strong> (don't reconstruct from memory at the end), then send
+      it back to the author. The single most useful output is the <strong>friction log</strong> and the
+      <strong>overall verdict</strong> — "could a real adopter install this unaided, yes/no, and what would block them."</p>
+      <div class="btnrow">
+        <a class="btn primary" href="https://mbonaddio-sfdc.github.io/pages/beta-feedback.html" target="_blank" rel="noopener">Open the feedback form ↗</a>
+      </div>
+      <p style="margin-top:14px;">Thank you — this is the gate that lets the accelerator ship.</p>
+    </div>
+
+    <!-- APPENDIX A -->
+    <div class="card">
+      <h2 id="appendixA">Appendix A — Expected results reference (self-verify)</h2>
+      <p>Use this to check your own results without asking the author. If what you see doesn't match, that's a
+      finding — record the <em>actual</em> value in the feedback form and note it in the friction log.</p>
+      <h3>Layer 1 — raw JSON from the endpoint URL</h3>
+      <p>On <strong>GO</strong> the response includes <code>samplingRate</code> (the record's Sampling Rate as a
+      0–1 decimal, e.g. <code>100</code> → <code>1.0</code>, <code>50</code> → <code>0.5</code>). On
+      <strong>STOP</strong> it returns just <code>status</code> and <code>reason</code>.</p>
+      <table>
+        <tr><th>Scenario</th><th>Expected JSON (shape)</th></tr>
+        <tr><td>Healthy, Sampling 100 (C1b/C2b)</td><td class="mono">{"status":"GO","reason":"OK","samplingRate":1.0}</td></tr>
+        <tr><td>Healthy, Sampling 50</td><td class="mono">{"status":"GO","reason":"OK","samplingRate":0.5}</td></tr>
+        <tr><td>Kill switch off (C1)</td><td class="mono">{"status":"STOP","reason":"INACTIVE"}</td></tr>
+        <tr><td>Unknown/mistyped key (C1c)</td><td class="mono">{"status":"STOP","reason":"NOTFOUND"}</td></tr>
+        <tr><td>Outside operating hours (C2)</td><td class="mono">{"status":"STOP","reason":"TIME"}</td></tr>
+        <tr><td>Weekend excluded, on Sat/Sun (C3)</td><td class="mono">{"status":"STOP","reason":"WEEKEND"}</td></tr>
+        <tr><td>Daily quota exhausted (C4)</td><td class="mono">{"status":"STOP","reason":"QUOTA"}</td></tr>
+        <tr><td>Stale quota from a prior day (C5)</td><td class="mono">{"status":"GO","reason":"OK","samplingRate":1.0}</td></tr>
+      </table>
+      <div class="info">Exact number formatting may vary slightly by browser (<code>1.0</code> vs <code>1</code>);
+      what matters is the <code>status</code> and <code>reason</code> pair.</div>
+      <h3>Layer 2 — the test page and the browser console</h3>
+      <p>The test page shows the outcome in its <strong>Decision panel</strong>. The <em>shipped</em> greenfield
+      wrapper logs the same outcome to the <strong>browser DevTools console</strong> (F12 → Console) if you want to
+      confirm the wrapper's own reporting matches the panel.</p>
+      <table>
+        <tr><th>Scenario</th><th>Test-page Decision panel</th><th>Greenfield wrapper console line</th></tr>
+        <tr><td>GO + sampled <strong>in</strong> (C6/C7b)</td><td>GO, Sampled IN, Agent shown Yes → <strong>bubble</strong></td><td class="mono">[Agent Governor] GO — sampled in. Initialising agent.</td></tr>
+        <tr><td>GO + sampled <strong>out</strong> (C7)</td><td>GO, Sampled OUT, Agent shown No → <strong>no bubble</strong></td><td class="mono">[Agent Governor] GO — sampled out (control group). Showing nothing.</td></tr>
+        <tr><td>STOP, any reason (C8)</td><td>STOP, reason shown, <strong>no bubble</strong></td><td class="mono">[Agent Governor] STOP (INACTIVE). Showing nothing.</td></tr>
+        <tr><td>Error / timeout (C9)</td><td>ERROR, <strong>no bubble</strong></td><td class="mono">[Agent Governor] API unavailable: … → Fail-safe engaged — showing nothing.</td></tr>
+      </table>
+    </div>
+
+    <!-- APPENDIX B -->
+    <div class="card">
+      <h2 id="appendixB">Appendix B — Troubleshooting (get unblocked without breaking the test)</h2>
+      <p><strong>Log the symptom in the friction log first</strong> — it's real feedback about the docs — then use
+      this to get moving again. The goal is to keep you testing, not to replace the README. If a fix below isn't
+      discoverable from the README alone, that gap is itself a finding.</p>
+      <table>
+        <tr><th>Symptom</th><th>Most likely cause</th><th>How to get unblocked</th></tr>
+        <tr><td>Deploy fails: <code>no such entity 'MessagingSession'</code></td><td>MIAW/Agentforce not enabled (the trigger targets that object)</td><td>Enable Agentforce / Messaging for In-App and Web (pre-flight gate), then re-run the deploy.</td></tr>
+        <tr><td>Endpoint URL shows an error page / "Authorization Required" / 404</td><td>Site not activated, guest user lacks Apex access to <code>AgentGovernorAPI</code>, or the Site base URL is wrong</td><td>Re-check the README's Site steps: activate the Site, add <code>AgentGovernorAPI</code> to the guest profile's enabled Apex classes, confirm the correct Site base URL.</td></tr>
+        <tr><td>Test page shows red <code>ERROR</code> / "Failed to fetch"</td><td>Page's origin isn't in CORS, or the Site base URL typed into the page is wrong</td><td>Add <code>https://mbonaddio-sfdc.github.io</code> under Setup → CORS (origin only); double-check the Site base URL field on the page.</td></tr>
+        <tr><td>You get <code>STOP</code> / <code>NOTFOUND</code> when you expected <code>GO</code></td><td>The key in the URL/page doesn't match any record's Governor Key (typo or case mismatch)</td><td>Make the key exactly match the record's Governor Key (<code>beta-test</code>). This is intended behaviour for a wrong key — good to see, just not while testing GO.</td></tr>
+        <tr><td>Config change doesn't seem to take effect (old status/reason)</td><td>Browser cached the previous response</td><td>Hard-refresh (Ctrl/Cmd-Shift-R), or append <code>&amp;t=&lt;random&gt;</code>; on the test page just click <strong>Run check</strong> again.</td></tr>
+        <tr><td>Test page: bubble won't appear even though Decision = GO</td><td>You were sampled <strong>out</strong> (sticky for the session), or Sampling Rate is 0</td><td>Click <strong>Reset session sampling</strong>, confirm Sampling Rate = 100 (Save), then <strong>Run check</strong>.</td></tr>
+        <tr><td>(Optional C4-full) Current Count never increments</td><td>Counter updates asynchronously, Linked Channel Id doesn't match the channel you chatted on, or no <code>MessagingSession</code> was created</td><td>Confirm the Linked Channel Id is the channel you messaged, send a real message, wait a few seconds, refresh the record.</td></tr>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var STORAGE_KEY = 'agentGovernorBetaPacket:v1';
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('input[data-check]'));
+
+  function load() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) {}
+    if (!saved) return;
+    boxes.forEach(function (b) {
+      if (saved[b.getAttribute('data-check')]) { b.checked = true; }
+      reflect(b);
+    });
+  }
+  function save() {
+    var state = {};
+    boxes.forEach(function (b) { if (b.checked) state[b.getAttribute('data-check')] = 1; });
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+  function reflect(b) {
+    var wrap = b.closest('.check');
+    if (wrap) { wrap.classList.toggle('done', b.checked); }
+  }
+  function updateProgress() {
+    var done = boxes.filter(function (b) { return b.checked; }).length;
+    var total = boxes.length;
+    document.getElementById('plabel').textContent = done + ' of ' + total + ' steps checked';
+    document.getElementById('pfill').style.width = total ? Math.round(done / total * 100) + '%' : '0%';
+  }
+
+  boxes.forEach(function (b) {
+    b.addEventListener('change', function () { reflect(b); save(); updateProgress(); });
+  });
+
+  document.getElementById('resetChecks').addEventListener('click', function () {
+    if (!confirm('Uncheck all steps and clear saved progress on this page?')) return;
+    boxes.forEach(function (b) { b.checked = false; reflect(b); });
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    updateProgress();
+  });
+
+  // Sticky-nav active-section highlighting
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var targets = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  function onScroll() {
+    var pos = window.scrollY + 120;
+    var current = targets[0];
+    targets.forEach(function (t) { if (t.offsetTop <= pos) current = t; });
+    links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + (current && current.id)); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  load();
+  updateProgress();
+  onScroll();
+})();
+</script>
+</body>
+</html>
