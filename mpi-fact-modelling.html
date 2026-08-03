@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MPI — Modelling extracted values (titre_value)</title>
+<style>
+  :root{
+    color-scheme:light;
+    --bg:#fafaf7;--panel:#fff;--panel-2:#f7f5ef;--border:#e5e2da;--border-strong:#c8c3b6;
+    --ink:#1a1a1a;--ink-muted:#555049;--ink-faint:#8a857a;
+    --accent:#b8541b;--accent-soft:#f4e7dc;--teal:#1f5d6e;--teal-soft:#e0eef2;
+    --purple:#6b4a8a;--purple-soft:#efe7f6;--good:#2d6a3a;--good-soft:#e3eee2;
+    --gold:#8a6d1e;--gold-soft:#f5edd6;--bad:#8a2d2d;--bad-soft:#f3e1e1;--blue:#2f5aa8;--blue-soft:#e3eaf7;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5}
+  .wrap{max-width:1120px;margin:0 auto;padding:24px 24px 60px}
+  h1{font-size:22px;margin:0 0 3px;letter-spacing:-.01em}
+  .sub{color:var(--ink-muted);font-size:14px;margin-bottom:16px;max-width:900px}
+  .sub .mono{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;background:var(--panel-2);padding:1px 5px;border-radius:4px}
+
+  .toggle{display:flex;gap:8px;margin-bottom:14px}
+  .tg{flex:1;background:var(--panel);border:1px solid var(--border-strong);border-radius:8px;padding:10px 14px;cursor:pointer;
+    font:inherit;font-size:13px;font-weight:700;color:var(--ink-muted);text-align:left;transition:.14s}
+  .tg .s{display:block;font-size:11px;font-weight:500;color:var(--ink-faint);margin-top:2px}
+  .tg.on.bad{background:var(--bad);border-color:var(--bad);color:#fff}
+  .tg.on.good{background:var(--good);border-color:var(--good);color:#fff}
+  .tg.on .s{color:rgba(255,255,255,.85)}
+
+  .panel{border:1px solid var(--border);border-radius:10px;background:var(--panel);padding:15px;min-height:280px}
+
+  table{border-collapse:collapse;font-size:12px}
+  th,td{border:1px solid var(--border);padding:6px 9px;text-align:left;white-space:nowrap;vertical-align:top}
+  th{background:var(--panel-2);font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-muted);font-weight:800}
+  .mono{font-family:ui-monospace,Menlo,monospace}
+  .nul{color:var(--ink-faint)}
+  .rdname{font-weight:700}
+
+  /* trap view */
+  .scroller{position:relative;overflow-x:auto;border-radius:8px}
+  .trap-th{background:var(--bad-soft);color:var(--bad)}
+  .ghost{color:#b9b3a6;font-style:italic}
+  .fade{position:absolute;top:0;right:0;width:70px;height:100%;pointer-events:none;
+    background:linear-gradient(90deg,transparent,var(--panel) 82%)}
+  .trapnote{margin-top:12px;background:var(--bad-soft);border:1px solid #e0b7b7;border-radius:8px;padding:10px 13px;font-size:12.5px;color:#5f1f1f}
+  .trapnote b{color:var(--bad)}
+  .growchip{display:inline-block;background:var(--bad);color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;margin-left:4px}
+
+  /* pattern view */
+  .pgrid{display:grid;grid-template-columns:270px 1fr;gap:14px}
+  @media(max-width:820px){.pgrid{grid-template-columns:1fr}}
+  .cathd,.rowhd{font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:800;color:var(--ink-muted);margin-bottom:7px}
+  .catcard{border:1px solid #d8c9e6;border-left:4px solid var(--purple);border-radius:9px;background:var(--purple-soft);padding:11px 13px}
+  .catcard .ct{font-size:9.5px;font-weight:800;letter-spacing:.05em;color:var(--purple);text-transform:uppercase}
+  .catcard .cn{font-family:ui-monospace,Menlo,monospace;font-size:14px;font-weight:700;margin:2px 0 8px}
+  .kv{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:3px 0;border-bottom:1px dotted #d8c9e6}
+  .kv:last-child{border-bottom:0}
+  .kv .k{color:var(--ink-faint)}.kv .v{font-weight:600;text-align:right}
+  .cattag{margin-top:9px;font-size:10.5px;color:var(--purple);background:var(--panel);border:1px solid #d8c9e6;border-radius:6px;padding:5px 8px}
+  .cattag b{color:#4d3568}
+
+  .factrow-titre{background:var(--gold-soft)}
+  .prov{font-size:10px;font-weight:800;padding:2px 7px;border-radius:9px;text-transform:uppercase}
+  .prov.auth{background:var(--good-soft);color:var(--good)}
+  .patternnote{margin-top:12px;background:var(--good-soft);border:1px solid #c5dac4;border-radius:8px;padding:10px 13px;font-size:12.5px;color:#1e4427}
+  .patternnote b{color:var(--good)}
+
+  /* flow */
+  .flowsec{margin-top:22px}
+  .flowsec h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-muted);margin:0 0 3px}
+  .flowsec .fsub{font-size:12.5px;color:var(--ink-faint);margin-bottom:12px}
+  .pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .pnode{flex:1;min-width:135px;border:1px solid var(--border-strong);border-radius:9px;background:var(--panel);padding:10px 11px;position:relative}
+  .pnode .pt{font-size:9.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-faint)}
+  .pnode .pm{font-size:12px;font-weight:600;margin-top:3px;line-height:1.3}
+  .pnode .val{font-family:ui-monospace,Menlo,monospace;font-size:12px;font-weight:700;margin-top:5px;background:var(--gold-soft);
+    color:#6a5310;border:1px solid #e6d9ad;border-radius:5px;padding:2px 6px;display:inline-block}
+  .parr{display:flex;align-items:center;color:var(--ink-faint);font-weight:800;font-size:18px;padding:0 6px}
+  @media(max-width:820px){.parr{transform:rotate(90deg);padding:4px 0;width:100%;justify-content:center}}
+  .pnode.doc{border-left:4px solid var(--blue)}
+  .pnode.ai{border-left:4px solid var(--teal)}
+  .pnode.fact{border-left:4px solid var(--purple)}
+  .pnode.proj{border-left:4px solid var(--accent)}
+  .pnode.bre{border-left:4px solid var(--gold)}
+  .pnode.out{border-left:4px solid var(--good);background:var(--good-soft)}
+  .pnode.out .pm{color:var(--good);font-weight:800;font-size:14px}
+  .builtonce{text-align:center;font-size:10.5px;color:var(--accent);font-weight:700;margin-top:8px;font-style:italic}
+
+  .keytake{margin-top:20px;background:var(--ink);color:#f4f1ea;border-radius:9px;padding:12px 16px;font-size:13.5px;line-height:1.55}
+  .keytake b{color:#fff}.keytake .mono{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;color:#e8c9a8}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Modelling an extracted value — <span class="mono" style="font-family:ui-monospace,Menlo,monospace">titre_value</span> from a rabies report</h1>
+  <div class="sub">Document AI reads <span class="mono">0.7&nbsp;IU/ml</span> off the rabies titre report. Where does that number live so the rules engine can use it — <b>and still scale to 100+ document types?</b> Toggle the two approaches.</div>
+
+  <div class="toggle">
+    <button class="tg bad on" id="tTrap">✖ The trap — a column per value<span class="s">Typed fields on Received Document</span></button>
+    <button class="tg good" id="tPattern">✓ The pattern — catalogued fact rows<span class="s">Facts as rows, defined by a catalogue</span></button>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <!-- FLOW -->
+  <div class="flowsec">
+    <h2>End-to-end — how that one value reaches a decision</h2>
+    <div class="fsub">Following <span class="mono" style="font-family:ui-monospace,Menlo,monospace">titre_value = 0.7</span> from the document to a MET/UNMET outcome.</div>
+    <div class="pipe">
+      <div class="pnode doc"><div class="pt">Received Document</div><div class="pm">RD-1002 · rabies titre report</div><span class="val">📄 File (PDF)</span></div>
+      <div class="parr">→</div>
+      <div class="pnode ai"><div class="pt">Document AI</div><div class="pm">extracts key–values</div><span class="val">"0.7 IU/ml"</span></div>
+      <div class="parr">→</div>
+      <div class="pnode fact"><div class="pt">Fact row (generic store)</div><div class="pm">rabies_titre · +source +provenance</div><span class="val">0.7</span></div>
+      <div class="parr">→</div>
+      <div class="pnode proj"><div class="pt">Projection <span style="color:var(--accent)">(helper, built once)</span></div><div class="pm">assemble typed context</div><span class="val">{ titre_value: 0.7 }</span></div>
+      <div class="parr">→</div>
+      <div class="pnode bre"><div class="pt">Rules Engine</div><div class="pm">expression set</div><span class="val">0.7 ≥ 0.5</span></div>
+      <div class="parr">→</div>
+      <div class="pnode out"><div class="pt">Determination</div><div class="pm">✓ MET</div></div>
+    </div>
+    <div class="builtonce">↑ Only the projection is custom — built once, reused by every document and every rule.</div>
+  </div>
+
+  <div class="keytake" id="keytake">
+    <b>The scaling test:</b> when document #101 arrives, the trap needs <b>new columns and a deployment</b>; the pattern needs <b>one catalogue entry — a config edit</b>. The rules never reference a column; they reference a <span class="mono">fact_type</span>. That's what keeps the model flat as the standards grow.
+  </div>
+</div>
+
+<script>
+function trapView(){
+  return `
+  <div class="rowhd" style="color:var(--bad)">“Received Document” with a field per extracted value</div>
+  <div class="scroller">
+    <table>
+      <tr>
+        <th>Id</th><th>Doc type</th>
+        <th class="trap-th">titre_value</th><th class="trap-th">sample_date</th><th class="trap-th">lab</th>
+        <th class="trap-th">chip_number</th><th class="trap-th">implant_date</th>
+        <th class="trap-th">permit_no</th><th class="trap-th">validity</th>
+        <th class="ghost">heartworm_result</th><th class="ghost">brucella_titre</th><th class="ghost">…</th>
+      </tr>
+      <tr>
+        <td class="mono rdname">RD-1002</td><td>Rabies report</td>
+        <td class="mono">0.7</td><td class="mono">2026-04-22</td><td>AHL</td>
+        <td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="ghost">…</td>
+      </tr>
+      <tr>
+        <td class="mono rdname">RD-1004</td><td>Microchip record</td>
+        <td class="nul">—</td><td class="nul">—</td><td class="nul">—</td>
+        <td class="mono">985141…</td><td class="mono">2026-01-12</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="ghost">…</td>
+      </tr>
+      <tr>
+        <td class="mono rdname">RD-1001</td><td>Import permit</td>
+        <td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td><td class="nul">—</td>
+        <td class="mono">IP-4471</td><td class="mono">2026-08-30</td><td class="nul">—</td><td class="nul">—</td><td class="ghost">…</td>
+      </tr>
+    </table>
+    <div class="fade"></div>
+  </div>
+  <div class="trapnote">
+    <b>Why this fails at scale.</b> Every document type adds its own columns, and every row leaves most of them empty (the <span class="nul">—</span> cells).
+    Across the standards that's hundreds of sparse fields on one object<span class="growchip">+312 columns and counting</span><br>
+    Worse: adding a requirement becomes a <b>schema change and a deployment</b> — reintroducing the exact “changing a standard is painful and risky” problem, now in the data model.
+  </div>`;
+}
+
+function patternView(){
+  return `
+  <div class="pgrid">
+    <div>
+      <div class="cathd">1 · Define it once — the fact catalogue</div>
+      <div class="catcard">
+        <div class="ct">Fact type definition</div>
+        <div class="cn">rabies_titre</div>
+        <div class="kv"><span class="k">Datatype</span><span class="v">Number</span></div>
+        <div class="kv"><span class="k">Unit</span><span class="v">IU/ml</span></div>
+        <div class="kv"><span class="k">Allowed</span><span class="v">≥ 0 (0–100 plausible)</span></div>
+        <div class="kv"><span class="k">Used by</span><span class="v">Req §2.1(3)</span></div>
+        <div class="cattag">Stored as <b>Custom Metadata</b> — config, deployable, versioned. <b>Not schema.</b> New fact = new entry, no fields added.</div>
+      </div>
+    </div>
+    <div>
+      <div class="rowhd">2 · Store the value as a row — one generic fact table</div>
+      <div class="scroller">
+      <table style="width:100%">
+        <tr><th>Fact type</th><th>Value</th><th>Unit</th><th>Source document</th><th>Provenance</th><th>Conf.</th></tr>
+        <tr class="factrow-titre">
+          <td class="mono">rabies_titre</td><td class="mono"><b>0.7</b></td><td>IU/ml</td><td class="mono">RD-1002</td><td><span class="prov auth">authoritative</span></td><td class="mono">0.98</td></tr>
+        <tr>
+          <td class="mono">rabies_sample_date</td><td class="mono">2026-04-22</td><td class="nul">—</td><td class="mono">RD-1002</td><td><span class="prov auth">authoritative</span></td><td class="mono">0.97</td></tr>
+        <tr>
+          <td class="mono">testing_lab</td><td class="mono">AHL</td><td class="nul">—</td><td class="mono">RD-1002</td><td><span class="prov auth">authoritative</span></td><td class="mono">0.95</td></tr>
+        <tr>
+          <td class="mono">microchip_number</td><td class="mono">985141…</td><td class="nul">—</td><td class="mono">RD-1004</td><td><span class="prov auth">authoritative</span></td><td class="mono">0.99</td></tr>
+      </table>
+      </div>
+      <div class="patternnote">
+        <b>Same shape for every fact.</b> The microchip value (from a different document) sits in the very same table — no new columns.
+        Each fact carries its <b>source document</b> and <b>provenance</b>, so the eventual determination is traceable back to the exact evidence.
+      </div>
+    </div>
+  </div>`;
+}
+
+const panel=document.getElementById('panel'),
+  tTrap=document.getElementById('tTrap'),tPattern=document.getElementById('tPattern');
+function show(trap){
+  tTrap.classList.toggle('on',trap);tPattern.classList.toggle('on',!trap);
+  panel.innerHTML=trap?trapView():patternView();
+}
+tTrap.onclick=()=>show(true);
+tPattern.onclick=()=>show(false);
+show(true);
+</script>
+</body>
+</html>
