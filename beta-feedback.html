@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Governor — Beta Feedback</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0; background: #f4f6f9; color: #16325c; line-height: 1.5;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 24px 20px 160px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: #5a6b8c; margin: 0 0 24px; font-size: 14px; }
+  .card {
+    background: #fff; border: 1px solid #dbe0ea; border-radius: 10px;
+    padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  }
+  .card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: #5a6b8c; margin: 0 0 4px; }
+  .card .lead { font-size: 13px; color: #5a6b8c; margin: 0 0 14px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+  input[type=text], input[type=date], input[type=number], select, textarea {
+    width: 100%; padding: 9px 11px; border: 1px solid #c4cdda; border-radius: 6px;
+    font-size: 14px; margin-bottom: 14px; color: #16325c; background: #fff; font-family: inherit;
+  }
+  textarea { resize: vertical; min-height: 64px; }
+  select { appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' fill='none' stroke='%235a6b8c' stroke-width='1.6'/></svg>"); background-repeat: no-repeat; background-position: right 11px center; padding-right: 30px; }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .row > div { flex: 1 1 220px; }
+  button {
+    font: inherit; font-weight: 600; border: none; border-radius: 6px; padding: 10px 18px;
+    cursor: pointer; margin: 0 8px 8px 0;
+  }
+  .primary { background: #0176d3; color: #fff; }
+  .primary:hover { background: #015fab; }
+  .ghost { background: #eef2f8; color: #16325c; }
+  .ghost:hover { background: #e0e7f2; }
+  .hint { font-size: 12px; color: #8a97ad; margin: -8px 0 14px; }
+  table { width: 100%; border-collapse: collapse; margin: 0 0 6px; font-size: 13px; }
+  th, td { text-align: left; padding: 8px 8px; border-bottom: 1px solid #eef1f6; vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .03em; color: #8a97ad; font-weight: 700; }
+  td.id { font-weight: 700; white-space: nowrap; color: #16325c; }
+  td .exp { color: #5a6b8c; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+  td input, td select { margin-bottom: 0; }
+  .frow td { padding: 6px 6px; }
+  .radio-line { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 8px; font-weight: 400; font-size: 14px; }
+  .radio-line input { width: auto; margin: 3px 0 0; }
+  .note {
+    margin: 0 0 16px; padding: 12px 14px; font-size: 13px; line-height: 1.45;
+    background: #fef7e8; border: 1px solid #f5d99a; border-left: 4px solid #e6a817;
+    border-radius: 6px; color: #6b4e0a;
+  }
+  .note strong { color: #4d3906; }
+  .note code, .lead code { background: #f7eccf; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  details { border: 1px solid #dbe0ea; border-radius: 8px; padding: 0; margin: 0 0 14px; background: #fbfcfe; }
+  details > summary { cursor: pointer; padding: 12px 16px; font-weight: 600; font-size: 13px; color: #16325c; list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details > summary::before { content: "▸ "; color: #8a97ad; }
+  details[open] > summary::before { content: "▾ "; }
+  details .body { padding: 0 16px 14px; font-size: 13px; color: #33475b; }
+  details .body table { font-size: 12px; }
+  details .body code { background: #eef2f8; padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+  a { color: #0176d3; }
+  .savebar {
+    position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #dbe0ea;
+    box-shadow: 0 -2px 8px rgba(0,0,0,.05); padding: 12px 20px; z-index: 40;
+  }
+  .savebar .inner { max-width: 820px; margin: 0 auto; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+  .savebar .status { font-size: 12px; color: #8a97ad; margin-left: auto; }
+  #preview { margin-top: 16px; }
+  #previewText {
+    width: 100%; min-height: 240px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px; white-space: pre; overflow-x: auto; background: #f4f6f9; border: 1px solid #e5e9f0;
+  }
+  .ok-flash { color: #056a3b !important; font-weight: 600; }
+  .req { color: #a01919; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Agent Governor — Beta Test Feedback</h1>
+  <p class="sub">Fill this in <strong>as you go</strong>, not from memory at the end. Your entries are
+  saved in this browser automatically, so you can close the tab and come back. When you're done, click
+  <strong>Generate results</strong> at the bottom and send the file back to the author.</p>
+
+  <div class="note">
+    <strong>Nothing you type here is sent anywhere.</strong> This page has no server. It keeps a working
+    copy in your own browser only, and produces a results file at the end that <em>you</em> send back
+    (download, copy, or email). If you clear your browser data before generating the file, your entries
+    are lost — so generate and send when you finish.
+  </div>
+
+  <!-- Reference material, collapsed by default -->
+  <details>
+    <summary>How this works &amp; the ground rules (open me first)</summary>
+    <div class="body">
+      <p>You're the independent beta tester for <strong>Agent Governor</strong>, a server-side traffic
+      controller for an Agentforce / MIAW chat agent. Your job is to <strong>install it from the repo's
+      <code>README.md</code> alone</strong>, exactly as a real adopter would, and report where you got
+      stuck and whether each control works.</p>
+      <ol>
+        <li><strong>Docs only.</strong> For the install use only the repo's <code>README.md</code>. Don't
+        ask the author for help. If the README doesn't say how to do something, that's a finding — log it
+        in the friction section and do your best to proceed.</li>
+        <li><strong>Log everything that isn't obvious</strong> in the friction section, with the README
+        step it relates to. Friction is the most valuable thing you produce.</li>
+        <li><strong>Time-box it</strong> to ~60–90 minutes. Blocked &gt;15 min on one step? Log it as a
+        blocker and move on to what you <em>can</em> still test.</li>
+        <li><strong>Additive only / it's a real org.</strong> Only add things (the deploy, one config
+        record, one Site). Don't delete or modify existing metadata.</li>
+      </ol>
+      <p>Full instructions are in the <strong>Beta Test Packet</strong> the author shared. Test page for
+      Part C Layer 2:
+      <a href="https://mbonaddio-sfdc.github.io/pages/beta-test-page.html" target="_blank" rel="noopener">mbonaddio-sfdc.github.io/pages/beta-test-page.html</a>.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Expected results reference (self-verify — Layer 1 &amp; Layer 2)</summary>
+    <div class="body">
+      <p><strong>Layer 1 — raw JSON from the endpoint URL.</strong> On <code>GO</code> it includes
+      <code>samplingRate</code> (0–1). On <code>STOP</code> it returns just <code>status</code> and
+      <code>reason</code>.</p>
+      <table>
+        <tr><th>Scenario</th><th>Expected JSON</th></tr>
+        <tr><td>Healthy, Sampling 100 (C1b/C2b)</td><td><code>{"status":"GO","reason":"OK","samplingRate":1.0}</code></td></tr>
+        <tr><td>Kill switch off (C1)</td><td><code>{"status":"STOP","reason":"INACTIVE"}</code></td></tr>
+        <tr><td>Unknown/mistyped key (C1c)</td><td><code>{"status":"STOP","reason":"NOTFOUND"}</code></td></tr>
+        <tr><td>Outside operating hours (C2)</td><td><code>{"status":"STOP","reason":"TIME"}</code></td></tr>
+        <tr><td>Weekend excluded, on Sat/Sun (C3)</td><td><code>{"status":"STOP","reason":"WEEKEND"}</code></td></tr>
+        <tr><td>Daily quota exhausted (C4)</td><td><code>{"status":"STOP","reason":"QUOTA"}</code></td></tr>
+        <tr><td>Stale quota from a prior day (C5)</td><td><code>{"status":"GO","reason":"OK","samplingRate":1.0}</code></td></tr>
+      </table>
+      <p><strong>Layer 2 — the test page.</strong> The bubble (bottom-right) appears only on
+      <strong>GO + sampled in</strong>. The shipped greenfield wrapper logs the same outcome to the
+      browser console (F12).</p>
+    </div>
+  </details>
+
+  <!-- 1. Tester & environment -->
+  <div class="card">
+    <h2>1. Tester &amp; environment</h2>
+    <div class="row">
+      <div>
+        <label for="f_tester">Tester name <span class="req">*</span></label>
+        <input type="text" id="f_tester" data-k="tester">
+      </div>
+      <div>
+        <label for="f_date">Date tested</label>
+        <input type="date" id="f_date" data-k="date">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="f_time">Time spent (approx)</label>
+        <input type="text" id="f_time" data-k="time_spent" placeholder="e.g. 75 min">
+      </div>
+      <div>
+        <label for="f_org">Demo org (name/alias)</label>
+        <input type="text" id="f_org" data-k="org">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="f_miaw">Agentforce + MIAW enabled?</label>
+        <select id="f_miaw" data-k="miaw"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+      <div>
+        <label for="f_agent">Working messaging agent + channel available?</label>
+        <select id="f_agent" data-k="agent_channel"><option value="">—</option><option>Yes</option><option>No</option></select>
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="f_commit">Git commit tested (<code>git rev-parse --short HEAD</code>)</label>
+        <input type="text" id="f_commit" data-k="commit">
+      </div>
+      <div>
+        <label for="f_cli">Salesforce CLI version (<code>sf --version</code>)</label>
+        <input type="text" id="f_cli" data-k="cli">
+      </div>
+    </div>
+    <label for="f_browser">Browser used</label>
+    <input type="text" id="f_browser" data-k="browser" placeholder="e.g. Chrome 128 on macOS">
+  </div>
+
+  <!-- 2. Install milestones -->
+  <div class="card">
+    <h2>2. Install milestones (Part A)</h2>
+    <p class="lead">Mark each Pass / Fail / Couldn't tell, and add a note for anything not clean.</p>
+    <table id="milestones">
+      <tr><th style="width:44px">ID</th><th>Milestone</th><th style="width:150px">Result</th><th style="width:38%">Notes</th></tr>
+    </table>
+  </div>
+
+  <!-- 3. Friction log -->
+  <div class="card">
+    <h2>3. Friction log <span style="text-transform:none;color:#8a97ad;font-weight:400;">(the most valuable section)</span></h2>
+    <p class="lead">Every unclear step, missing detail, guess, or error. One row per issue. Add as many
+    as you need.</p>
+    <table id="friction">
+      <tr>
+        <th style="width:22%">README section / step</th>
+        <th>What happened / what was unclear</th>
+        <th style="width:120px">Severity</th>
+        <th style="width:26%">Suggested fix</th>
+      </tr>
+    </table>
+    <button class="ghost" id="addFriction" type="button">+ Add friction row</button>
+  </div>
+
+  <!-- 4. Functional results -->
+  <div class="card">
+    <h2>4. Functional results (Part C)</h2>
+    <p class="lead"><strong>Layer 1 — server decision</strong> (endpoint URL). Record the status &amp;
+    reason you actually saw.</p>
+    <table id="layer1">
+      <tr><th style="width:52px">ID</th><th>Test</th><th style="width:24%">Expected</th><th>Observed status</th><th>Observed reason</th><th style="width:110px">Pass?</th></tr>
+    </table>
+
+    <p class="lead" style="margin-top:20px;"><strong>Layer 2 — wrapper on the test page.</strong></p>
+    <table id="layer2">
+      <tr><th style="width:52px">ID</th><th>Test</th><th style="width:30%">Expected</th><th>Observed</th><th style="width:110px">Pass?</th></tr>
+    </table>
+  </div>
+
+  <!-- 5. Overall verdict -->
+  <div class="card">
+    <h2>5. Overall verdict</h2>
+    <p class="lead">Pick one:</p>
+    <div id="verdict">
+      <label class="radio-line"><input type="radio" name="verdict" value="Ready to publish"> <span><strong>Ready to publish</strong> — I could install and operate it from the docs alone; all controls worked.</span></label>
+      <label class="radio-line"><input type="radio" name="verdict" value="Ready with minor doc fixes"> <span><strong>Ready with minor doc fixes</strong> — controls worked, but the docs need the fixes listed above.</span></label>
+      <label class="radio-line"><input type="radio" name="verdict" value="Not ready"> <span><strong>Not ready</strong> — a blocker stopped a real adopter from succeeding unaided.</span></label>
+    </div>
+    <label style="margin-top:10px;">Top 3 things to fix before publishing</label>
+    <input type="text" data-k="fix1" placeholder="1.">
+    <input type="text" data-k="fix2" placeholder="2.">
+    <input type="text" data-k="fix3" placeholder="3.">
+  </div>
+
+  <!-- 6. Free-text -->
+  <div class="card">
+    <h2>6. Free-text</h2>
+    <label>Could a real adopter install this <strong>unaided</strong> from the current docs? (Yes / No — why?)</label>
+    <textarea data-k="ft_unaided"></textarea>
+    <label>Anything <strong>confusing</strong> about how the four controls behave or are explained?</label>
+    <textarea data-k="ft_confusing"></textarea>
+    <label>Anything you expected to find in the docs that was <strong>missing</strong>?</label>
+    <textarea data-k="ft_missing"></textarea>
+    <label>Anything that <strong>surprised</strong> you (good or bad)?</label>
+    <textarea data-k="ft_surprised"></textarea>
+  </div>
+
+  <div class="card" id="preview" style="display:none;">
+    <h2>Your results</h2>
+    <p class="lead">This is exactly what will be sent. Use the buttons below to download it, copy it, or
+    open a pre-addressed email — then send it to the author.</p>
+    <textarea id="previewText" readonly></textarea>
+  </div>
+</div>
+
+<div class="savebar">
+  <div class="inner">
+    <button class="primary" id="genBtn" type="button">Generate results</button>
+    <button class="ghost" id="dlMd" type="button" style="display:none;">Download .md</button>
+    <button class="ghost" id="dlJson" type="button" style="display:none;">Download .json</button>
+    <button class="ghost" id="copyBtn" type="button" style="display:none;">Copy to clipboard</button>
+    <button class="ghost" id="emailBtn" type="button" style="display:none;">Email to author</button>
+    <button class="ghost" id="clearBtn" type="button">Clear all</button>
+    <span class="status" id="saveStatus">Saved automatically in this browser</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ---- Author email for the "Email to author" button. Leave '' to let the tester pick a recipient. ----
+  var AUTHOR_EMAIL = '';
+
+  var STORAGE_KEY = 'agentGovernorBetaFeedback:v1';
+
+  var MILESTONES = [
+    ['A1', 'Repo cloned + CLI installed'],
+    ['A2', 'Org authorised'],
+    ['A3', 'Source deployed'],
+    ['A4', 'Apex tests passed'],
+    ['A5', 'Permission set assigned'],
+    ['A6', 'Config object/records visible'],
+    ['A7', 'Site + guest Apex endpoint reachable'],
+    ['A8', 'CORS allowlist configured']
+  ];
+
+  var LAYER1 = [
+    ['C1',      'Kill switch off',                  'STOP / INACTIVE'],
+    ['C1b',     'Kill switch on',                   'GO / OK'],
+    ['C1c',     'Unknown/mistyped key',             'STOP / NOTFOUND'],
+    ['C2',      'Hours closed',                     'STOP / TIME'],
+    ['C2b',     'Hours open',                       'GO / OK'],
+    ['C3',      'Exclude weekends',                 'STOP/WEEKEND (Sat/Sun) or n/a'],
+    ['C4',      'Daily limit (read path)',          'STOP / QUOTA'],
+    ['C5',      'Daily-reset self-heal',            'GO / OK'],
+    ['C4-full', 'Daily limit end-to-end (optional)','STOP / QUOTA after 1 chat']
+  ];
+
+  var LAYER2 = [
+    ['C6',  'Shows on GO',        'bubble appears'],
+    ['C7',  'Sampling 0%',        'no bubble (sampled out)'],
+    ['C7b', 'Sampling 100%',      'bubble appears'],
+    ['C8',  'Hides on STOP',      'no bubble'],
+    ['C9',  'Fail-safe on error', 'no bubble, error reported']
+  ];
+
+  var el = function (id) { return document.getElementById(id); };
+
+  function resultSelect(val) {
+    return '<select data-k="' + val + '"><option value="">—</option><option>Pass</option><option>Fail</option><option>Couldn\'t tell</option></select>';
+  }
+  function passSelect(val) {
+    return '<select data-k="' + val + '"><option value="">—</option><option>Pass</option><option>Fail</option><option>n/a</option></select>';
+  }
+  function sevSelect(val) {
+    return '<select data-k="' + val + '"><option value="">—</option><option>Blocker</option><option>Major</option><option>Minor</option></select>';
+  }
+
+  // ---- Build milestone rows ----
+  (function () {
+    var t = el('milestones');
+    MILESTONES.forEach(function (m) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="id">' + m[0] + '</td>' +
+        '<td>' + m[1] + '</td>' +
+        '<td>' + resultSelect('ms_' + m[0] + '_result') + '</td>' +
+        '<td><input type="text" data-k="ms_' + m[0] + '_notes"></td>';
+      t.appendChild(tr);
+    });
+  })();
+
+  // ---- Build Layer 1 rows ----
+  (function () {
+    var t = el('layer1');
+    LAYER1.forEach(function (c) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="id">' + c[0] + '</td>' +
+        '<td>' + c[1] + '</td>' +
+        '<td><span class="exp">' + c[2] + '</span></td>' +
+        '<td><input type="text" data-k="l1_' + c[0] + '_status"></td>' +
+        '<td><input type="text" data-k="l1_' + c[0] + '_reason"></td>' +
+        '<td>' + passSelect('l1_' + c[0] + '_pass') + '</td>';
+      t.appendChild(tr);
+    });
+  })();
+
+  // ---- Build Layer 2 rows ----
+  (function () {
+    var t = el('layer2');
+    LAYER2.forEach(function (c) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td class="id">' + c[0] + '</td>' +
+        '<td>' + c[1] + '</td>' +
+        '<td><span class="exp">' + c[2] + '</span></td>' +
+        '<td><input type="text" data-k="l2_' + c[0] + '_observed"></td>' +
+        '<td>' + passSelect('l2_' + c[0] + '_pass') + '</td>';
+      t.appendChild(tr);
+    });
+  })();
+
+  // ---- Friction rows (dynamic) ----
+  var frictionCount = 0;
+  function addFrictionRow() {
+    frictionCount++;
+    var n = frictionCount;
+    var tr = document.createElement('tr');
+    tr.className = 'frow';
+    tr.innerHTML =
+      '<td><input type="text" data-k="fr_' + n + '_section"></td>' +
+      '<td><input type="text" data-k="fr_' + n + '_what"></td>' +
+      '<td>' + sevSelect('fr_' + n + '_sev') + '</td>' +
+      '<td><input type="text" data-k="fr_' + n + '_fix"></td>';
+    el('friction').appendChild(tr);
+    bindInputs(tr);
+    return tr;
+  }
+
+  // ---- Persistence ----
+  function collect() {
+    var data = {};
+    document.querySelectorAll('[data-k]').forEach(function (node) {
+      data[node.getAttribute('data-k')] = node.value;
+    });
+    var v = document.querySelector('input[name="verdict"]:checked');
+    data.verdict = v ? v.value : '';
+    data._frictionCount = frictionCount;
+    return data;
+  }
+
+  function apply(data) {
+    if (!data) return;
+    // recreate friction rows first
+    var need = data._frictionCount || 0;
+    while (frictionCount < need) { addFrictionRow(); }
+    document.querySelectorAll('[data-k]').forEach(function (node) {
+      var k = node.getAttribute('data-k');
+      if (data[k] !== undefined) { node.value = data[k]; }
+    });
+    if (data.verdict) {
+      var r = document.querySelector('input[name="verdict"][value="' + data.verdict.replace(/"/g, '') + '"]');
+      if (r) { r.checked = true; }
+    }
+  }
+
+  var saveTimer = null;
+  function save() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collect()));
+      flashSaved();
+    } catch (e) { /* storage unavailable — degrade quietly */ }
+  }
+  function flashSaved() {
+    var s = el('saveStatus');
+    s.textContent = 'Saved ✓';
+    s.classList.add('ok-flash');
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () {
+      s.textContent = 'Saved automatically in this browser';
+      s.classList.remove('ok-flash');
+    }, 1200);
+  }
+
+  function bindInputs(scope) {
+    (scope || document).querySelectorAll('[data-k]').forEach(function (node) {
+      if (node._bound) return;
+      node._bound = true;
+      node.addEventListener('input', save);
+      node.addEventListener('change', save);
+    });
+  }
+
+  // ---- Results generation ----
+  function esc(s) { return (s === undefined || s === null || s === '') ? '' : String(s); }
+  function orDash(s) { s = esc(s).trim(); return s === '' ? ' ' : s; }
+
+  function buildMarkdown(d) {
+    var L = [];
+    L.push('# Agent Governor — Beta Test Feedback');
+    L.push('');
+    L.push('_Generated by the hosted feedback page. Send this file back to the author._');
+    L.push('');
+    L.push('## 1. Tester & environment');
+    L.push('');
+    L.push('| Field | Your answer |');
+    L.push('|-------|-------------|');
+    L.push('| Tester name | ' + orDash(d.tester) + ' |');
+    L.push('| Date tested | ' + orDash(d.date) + ' |');
+    L.push('| Time spent (approx) | ' + orDash(d.time_spent) + ' |');
+    L.push('| Demo org (name/alias) | ' + orDash(d.org) + ' |');
+    L.push('| Agentforce + MIAW enabled? | ' + orDash(d.miaw) + ' |');
+    L.push('| Working messaging agent + channel available? | ' + orDash(d.agent_channel) + ' |');
+    L.push('| Git commit tested | ' + orDash(d.commit) + ' |');
+    L.push('| Salesforce CLI version | ' + orDash(d.cli) + ' |');
+    L.push('| Browser used | ' + orDash(d.browser) + ' |');
+    L.push('');
+    L.push('## 2. Install milestones (Part A)');
+    L.push('');
+    L.push('| ID | Milestone | Result | Notes |');
+    L.push('|----|-----------|--------|-------|');
+    MILESTONES.forEach(function (m) {
+      L.push('| ' + m[0] + ' | ' + m[1] + ' | ' + orDash(d['ms_' + m[0] + '_result']) + ' | ' + orDash(d['ms_' + m[0] + '_notes']) + ' |');
+    });
+    L.push('');
+    L.push('## 3. Friction log');
+    L.push('');
+    L.push('| README section / step | What happened / what was unclear | Severity | Suggested fix |');
+    L.push('|-----------------------|----------------------------------|----------|---------------|');
+    var anyFriction = false;
+    for (var i = 1; i <= frictionCount; i++) {
+      var sec = esc(d['fr_' + i + '_section']), what = esc(d['fr_' + i + '_what']),
+          sev = esc(d['fr_' + i + '_sev']), fix = esc(d['fr_' + i + '_fix']);
+      if ((sec + what + sev + fix).trim() === '') continue;
+      anyFriction = true;
+      L.push('| ' + orDash(sec) + ' | ' + orDash(what) + ' | ' + orDash(sev) + ' | ' + orDash(fix) + ' |');
+    }
+    if (!anyFriction) { L.push('| _(none logged)_ |  |  |  |'); }
+    L.push('');
+    L.push('## 4. Functional results (Part C)');
+    L.push('');
+    L.push('### Layer 1 — server decision');
+    L.push('');
+    L.push('| ID | Test | Expected | Observed status | Observed reason | Pass? |');
+    L.push('|----|------|----------|-----------------|-----------------|-------|');
+    LAYER1.forEach(function (c) {
+      L.push('| ' + c[0] + ' | ' + c[1] + ' | ' + c[2] + ' | ' + orDash(d['l1_' + c[0] + '_status']) + ' | ' + orDash(d['l1_' + c[0] + '_reason']) + ' | ' + orDash(d['l1_' + c[0] + '_pass']) + ' |');
+    });
+    L.push('');
+    L.push('### Layer 2 — wrapper on the test page');
+    L.push('');
+    L.push('| ID | Test | Expected | Observed | Pass? |');
+    L.push('|----|------|----------|----------|-------|');
+    LAYER2.forEach(function (c) {
+      L.push('| ' + c[0] + ' | ' + c[1] + ' | ' + c[2] + ' | ' + orDash(d['l2_' + c[0] + '_observed']) + ' | ' + orDash(d['l2_' + c[0] + '_pass']) + ' |');
+    });
+    L.push('');
+    L.push('## 5. Overall verdict');
+    L.push('');
+    L.push('**Verdict:** ' + orDash(d.verdict));
+    L.push('');
+    L.push('**Top 3 things to fix before publishing:**');
+    L.push('');
+    L.push('1. ' + esc(d.fix1));
+    L.push('2. ' + esc(d.fix2));
+    L.push('3. ' + esc(d.fix3));
+    L.push('');
+    L.push('## 6. Free-text');
+    L.push('');
+    L.push('- **Could a real adopter install this unaided?** ' + esc(d.ft_unaided));
+    L.push('- **Anything confusing about the four controls?** ' + esc(d.ft_confusing));
+    L.push('- **Anything missing from the docs?** ' + esc(d.ft_missing));
+    L.push('- **Anything that surprised you?** ' + esc(d.ft_surprised));
+    L.push('');
+    return L.join('\n');
+  }
+
+  function buildJson(d) {
+    var friction = [];
+    for (var i = 1; i <= frictionCount; i++) {
+      var row = {
+        section: esc(d['fr_' + i + '_section']),
+        what: esc(d['fr_' + i + '_what']),
+        severity: esc(d['fr_' + i + '_sev']),
+        fix: esc(d['fr_' + i + '_fix'])
+      };
+      if ((row.section + row.what + row.severity + row.fix).trim() !== '') friction.push(row);
+    }
+    var l1 = {}, l2 = {}, ms = {};
+    MILESTONES.forEach(function (m) { ms[m[0]] = { result: esc(d['ms_' + m[0] + '_result']), notes: esc(d['ms_' + m[0] + '_notes']) }; });
+    LAYER1.forEach(function (c) { l1[c[0]] = { status: esc(d['l1_' + c[0] + '_status']), reason: esc(d['l1_' + c[0] + '_reason']), pass: esc(d['l1_' + c[0] + '_pass']) }; });
+    LAYER2.forEach(function (c) { l2[c[0]] = { observed: esc(d['l2_' + c[0] + '_observed']), pass: esc(d['l2_' + c[0] + '_pass']) }; });
+    return JSON.stringify({
+      generatedAt: new Date().toISOString(),
+      environment: {
+        tester: esc(d.tester), date: esc(d.date), timeSpent: esc(d.time_spent), org: esc(d.org),
+        miawEnabled: esc(d.miaw), agentChannel: esc(d.agent_channel), commit: esc(d.commit),
+        cli: esc(d.cli), browser: esc(d.browser)
+      },
+      milestones: ms,
+      frictionLog: friction,
+      layer1: l1,
+      layer2: l2,
+      verdict: esc(d.verdict),
+      topFixes: [esc(d.fix1), esc(d.fix2), esc(d.fix3)].filter(function (x) { return x.trim() !== ''; }),
+      freeText: {
+        unaided: esc(d.ft_unaided), confusing: esc(d.ft_confusing),
+        missing: esc(d.ft_missing), surprised: esc(d.ft_surprised)
+      }
+    }, null, 2);
+  }
+
+  function safeName(d) {
+    var t = (esc(d.tester) || 'tester').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'tester';
+    var c = (esc(d.commit) || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+    return 'agent-governor-beta-' + t + (c ? '-' + c : '');
+  }
+
+  function download(filename, text, mime) {
+    var blob = new Blob([text], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  var currentMd = '', currentJson = '', currentName = 'agent-governor-beta';
+
+  function generate() {
+    var d = collect();
+    if (!esc(d.tester).trim()) {
+      alert('Please enter your name at the top (Tester name) so the author knows whose results these are.');
+      el('f_tester').focus();
+      return;
+    }
+    currentMd = buildMarkdown(d);
+    currentJson = buildJson(d);
+    currentName = safeName(d);
+    el('previewText').value = currentMd;
+    el('preview').style.display = '';
+    ['dlMd', 'dlJson', 'copyBtn', 'emailBtn'].forEach(function (id) { el(id).style.display = ''; });
+    el('preview').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---- Wire up ----
+  el('addFriction').addEventListener('click', function () { addFrictionRow().querySelector('input').focus(); });
+  el('genBtn').addEventListener('click', generate);
+  el('dlMd').addEventListener('click', function () { download(currentName + '.md', currentMd, 'text/markdown'); });
+  el('dlJson').addEventListener('click', function () { download(currentName + '.json', currentJson, 'application/json'); });
+  el('copyBtn').addEventListener('click', function () {
+    var ta = el('previewText'); ta.focus(); ta.select();
+    var done = function () { var b = el('copyBtn'); var old = b.textContent; b.textContent = 'Copied ✓'; setTimeout(function () { b.textContent = old; }, 1400); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(currentMd).then(done, function () { document.execCommand('copy'); done(); });
+    } else { document.execCommand('copy'); done(); }
+  });
+  el('emailBtn').addEventListener('click', function () {
+    var d = collect();
+    var subject = 'Agent Governor beta feedback — ' + (esc(d.tester) || 'tester') + (esc(d.commit) ? ' (' + esc(d.commit) + ')' : '');
+    var body =
+      'My Agent Governor beta results are below (and/or attached as a downloaded file).\n\n' +
+      'Verdict: ' + (esc(d.verdict) || '(not set)') + '\n\n' +
+      '--- full results ---\n\n' + currentMd;
+    var href = 'mailto:' + encodeURIComponent(AUTHOR_EMAIL) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    // Some mail clients truncate very long mailto bodies; if long, nudge toward the file.
+    if (body.length > 1800) {
+      body = 'My Agent Governor beta results are attached as the downloaded .md file.\n\n' +
+             'Verdict: ' + (esc(d.verdict) || '(not set)') + '\n\n' +
+             '(The full results were too long for an email body — please find the downloaded file attached. ' +
+             'If you did not download it, go back to the page and click "Download .md".)';
+      href = 'mailto:' + encodeURIComponent(AUTHOR_EMAIL) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    }
+    window.location.href = href;
+  });
+  el('clearBtn').addEventListener('click', function () {
+    if (!confirm('Clear all your entries on this page? This cannot be undone.')) return;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+    location.reload();
+  });
+
+  // Restore saved data, then bind inputs so future edits persist.
+  (function init() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch (e) {}
+    if (saved) { apply(saved); }
+    if (frictionCount === 0) { addFrictionRow(); addFrictionRow(); addFrictionRow(); }
+    bindInputs(document);
+  })();
+})();
+</script>
+</body>
+</html>
