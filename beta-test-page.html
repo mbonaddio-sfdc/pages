@@ -5,73 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Agent Governor — Beta Test Page</title>
 <style>
-  :root { color-scheme: light; }
+  :root {
+    color-scheme: light;
+    --ink: #0b2545; --ink-soft: #4a5b78; --ink-faint: #8a97ad;
+    --line: #dce2ec; --line-soft: #edf0f5; --paper: #ffffff; --bg: #eef1f6;
+    --brand: #0176d3; --brand-ink: #0b4a72; --brand-wash: #eaf3fc;
+    --go: #2e844a; --go-wash: #edf7f0; --go-line: #b6e0c4;
+    --stop: #ba0517; --stop-wash: #fdeeef; --stop-line: #f3c2c7;
+    --err-ink: #9a5b00; --err-wash: #fbeee0; --err-line: #f0cfa2;
+    --warn: #e6a817; --warn-wash: #fef7e8; --warn-line: #f5d99a; --warn-ink: #6b4e0a;
+  }
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin: 0; background: #f4f6f9; color: #16325c; line-height: 1.5;
+    margin: 0; background: var(--bg); color: var(--ink); line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 780px; margin: 0 auto; padding: 24px 20px 120px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  .sub { color: #5a6b8c; margin: 0 0 24px; font-size: 14px; }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 26px 20px 130px; }
+
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; color: var(--brand); margin: 0 0 8px; }
+  h1 { font-size: 26px; line-height: 1.15; margin: 0 0 8px; letter-spacing: -.02em; }
+  .sub { color: var(--ink-soft); margin: 0 0 22px; font-size: 15px; max-width: 64ch; }
+  .sub .pill { vertical-align: baseline; }
+
   .card {
-    background: #fff; border: 1px solid #dbe0ea; border-radius: 10px;
-    padding: 18px 20px; margin-bottom: 18px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+    background: var(--paper); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 24px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(11,37,69,.04);
   }
-  .card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: #5a6b8c; margin: 0 0 14px; }
-  label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 4px; }
+  .card h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-faint);
+    font-weight: 800; margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid var(--line-soft);
+  }
+  label { display: block; font-size: 13px; font-weight: 650; margin: 0 0 5px; color: var(--ink); }
   input[type=text], input[type=number] {
-    width: 100%; padding: 9px 11px; border: 1px solid #c4cdda; border-radius: 6px;
-    font-size: 14px; margin-bottom: 14px; color: #16325c;
+    width: 100%; padding: 10px 12px; border: 1px solid #c4cdda; border-radius: 8px;
+    font-size: 14px; margin-bottom: 14px; color: var(--ink); font-family: inherit;
   }
+  input:focus { outline: 2px solid var(--brand); outline-offset: 0; border-color: var(--brand); }
   .row { display: flex; gap: 14px; flex-wrap: wrap; }
   .row > div { flex: 1 1 200px; }
   button {
-    font: inherit; font-weight: 600; border: none; border-radius: 6px; padding: 10px 18px;
-    cursor: pointer; margin: 0 8px 0 0;
+    font: inherit; font-weight: 650; border: none; border-radius: 8px; padding: 11px 18px;
+    cursor: pointer; margin: 0 8px 0 0; font-size: 14px;
   }
-  .primary { background: #0176d3; color: #fff; }
+  .primary { background: var(--brand); color: #fff; }
   .primary:hover { background: #015fab; }
-  .ghost { background: #eef2f8; color: #16325c; }
-  .ghost:hover { background: #e0e7f2; }
-  .panel { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
-  .kv { display: flex; padding: 6px 0; border-bottom: 1px dashed #e5e9f0; }
+  .ghost { background: #e3e9f2; color: var(--ink); }
+  .ghost:hover { background: #d5deea; }
+
+  /* Decision panel */
+  .panel { font-size: 14px; }
+  .kv { display: flex; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--line-soft); }
   .kv:last-child { border-bottom: none; }
-  .kv .k { width: 150px; color: #5a6b8c; flex-shrink: 0; }
-  .kv .v { word-break: break-all; }
-  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; }
-  .go { background: #d7f4e3; color: #056a3b; }
-  .stop { background: #fde2e2; color: #a01919; }
-  .err { background: #fce9d6; color: #8a4b08; }
-  .muted { color: #8a97ad; }
-  pre { background: #f4f6f9; border: 1px solid #e5e9f0; border-radius: 6px; padding: 10px; overflow-x: auto; margin: 8px 0 0; }
-  .hint { font-size: 12px; color: #8a97ad; margin: -8px 0 14px; }
+  .kv .k { width: 168px; color: var(--ink-faint); flex-shrink: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; font-weight: 700; }
+  .kv .v { word-break: break-all; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+
+  /* GO/STOP/ERROR pills — the JS injects <span class="badge go|stop|err"> */
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 3px 11px 3px 9px;
+    border-radius: 999px; font-weight: 800; font-size: 12.5px; letter-spacing: .02em;
+    border: 1px solid; white-space: nowrap; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .badge::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+  .go   { background: var(--go-wash);   color: var(--go);     border-color: var(--go-line); }
+  .go::before   { background: var(--go); }
+  .stop { background: var(--stop-wash); color: var(--stop);   border-color: var(--stop-line); }
+  .stop::before { background: var(--stop); }
+  .err  { background: var(--err-wash);  color: var(--err-ink); border-color: var(--err-line); }
+  .err::before  { background: #cf7a00; }
+  .muted { color: var(--ink-faint); }
+  pre {
+    background: #f6f8fb; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px;
+    overflow-x: auto; margin: 12px 0 0; font-size: 12.5px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .hint { font-size: 12px; color: var(--ink-faint); margin: -8px 0 14px; }
+  code { background: var(--line-soft); padding: 1.5px 6px; border-radius: 5px; font-size: .87em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #1c3d5a; }
   .note {
-    margin: 16px 0 0; padding: 12px 14px; font-size: 13px; line-height: 1.45;
-    background: #fef7e8; border: 1px solid #f5d99a; border-left: 4px solid #e6a817;
-    border-radius: 6px; color: #6b4e0a;
+    margin: 16px 0 0; padding: 13px 16px; font-size: 13.5px; line-height: 1.5;
+    background: var(--warn-wash); border: 1px solid var(--warn-line); border-left: 4px solid var(--warn);
+    border-radius: 9px; color: var(--warn-ink);
   }
   .note strong { color: #4d3906; }
-  .note code { background: #f7eccf; padding: 1px 5px; border-radius: 4px; }
+  .note code { background: #f7eccf; }
+
+  /* signal strip */
+  .signal { display: flex; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 0 0 22px; background: var(--paper); }
+  .signal .cell { flex: 1; padding: 12px 15px; border-right: 1px solid var(--line-soft); }
+  .signal .cell:last-child { border-right: none; }
+  .signal .k { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-faint); font-weight: 700; margin: 0 0 3px; }
+  .signal .v { font-size: 13px; font-weight: 700; }
+  .signal .v.go { color: var(--go); background: none; border: none; padding: 0; }
+  .signal .v.stop { color: var(--stop); background: none; border: none; padding: 0; }
+  .signal .v.err { color: var(--err-ink); background: none; border: none; padding: 0; }
+
   /* placeholder agent bubble */
   #agentBubble {
     position: fixed; right: 22px; bottom: 22px; width: 64px; height: 64px; border-radius: 50%;
-    background: #0176d3; color: #fff; display: none; align-items: center; justify-content: center;
+    background: var(--brand); color: #fff; display: none; align-items: center; justify-content: center;
     box-shadow: 0 6px 18px rgba(1,118,211,.4); cursor: pointer; z-index: 50;
   }
   #agentBubble svg { width: 30px; height: 30px; }
   #agentBubble .tag {
-    position: absolute; bottom: 72px; right: 0; background: #16325c; color: #fff;
+    position: absolute; bottom: 72px; right: 0; background: #0b2545; color: #fff;
     font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 6px; white-space: nowrap;
   }
+  @media (max-width: 620px) { .signal { flex-wrap: wrap; } .signal .cell { flex: 1 1 45%; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Agent Governor — Beta Test Page</h1>
+  <p class="eyebrow">Agent Governor · Part C · Layer 2</p>
+  <h1>Beta Test Page</h1>
   <p class="sub">Mirrors the <strong>greenfield</strong> client wrapper. The placeholder agent bubble
-  (bottom-right) appears <em>only</em> when the wrapper would launch the real agent: <strong>GO</strong>
-  and <strong>sampled in</strong>. Use it for the Part&nbsp;C, Layer&nbsp;2 tests.</p>
+  (bottom-right) appears <em>only</em> when the wrapper would launch the real agent —
+  <span class="badge go">GO</span> <strong>and sampled in</strong>. Use it for the Part&nbsp;C, Layer&nbsp;2 tests.</p>
+
+  <div class="signal" aria-hidden="true">
+    <div class="cell"><p class="k">Verdict</p><p class="v"><span class="go">GO</span> / <span class="stop">STOP</span></p></div>
+    <div class="cell"><p class="k">Sampling roll</p><p class="v">in / out (sticky)</p></div>
+    <div class="cell"><p class="k">On error</p><p class="v err">fail-safe → hide</p></div>
+    <div class="cell"><p class="k">Bubble</p><p class="v">shows only on GO + in</p></div>
+  </div>
 
   <div class="card">
     <h2>Configuration</h2>
