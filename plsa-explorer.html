@@ -1,0 +1,1018 @@
+<!DOCTYPE html><script type="application/json" id="cowork-artifact-meta">
+{
+  "name": "Plsa Vic Pss Explorer",
+  "schemaVersion": 1,
+  "description": "Outside-in target-state Salesforce Public Sector Solutions (PSS) design for the Portable Long Service Authority (PLSA) Victoria — administering portable long service benefits under the Long Service Benefits Portability Act 2018 (Vic) across three schemes (Community Services, Contract Cleaning, Security). Tabs: Overview (worker lifecycle), Service Catalogue (11 services in 6 domains), Process Library (10 processes), Data Model (11 logical entities + ERD + a multi-scheme/multi-employer worked example), PSS Mapping (each logical entity → Salesforce standard/PSS/custom object with junction patterns + architecture callouts), and Domain & Context (3-scheme comparison, actors, open questions). The many-to-many crux — one worker across multiple schemes & employers — is resolved via a Party supertype + associative junction entities (Worker Scheme Membership, Employer Scheme Registration, Employment Engagement). Static design data; no live connectors."
+}
+</script>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLSA Victoria — PSS Solution Explorer</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f4f6fb; color: #16223a; line-height: 1.5; font-size: 14px;
+}
+a { color: #0b5cab; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 20px 64px; }
+header {
+  background: linear-gradient(135deg, #0b3d91 0%, #1264c0 55%, #1b8fd1 100%);
+  color: #fff; padding: 26px 0 20px;
+}
+header .wrap { padding-bottom: 0; }
+.eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .82; font-weight: 600; }
+header h1 { font-size: 25px; font-weight: 700; margin: 4px 0 6px; letter-spacing: -.01em; }
+header p.sub { font-size: 13.5px; opacity: .93; max-width: 940px; }
+.stat-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.stat { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); border-radius: 8px; padding: 8px 13px; }
+.stat b { font-size: 18px; display: block; line-height: 1.1; }
+.stat span { font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; opacity: .85; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 22px 0 18px; border-bottom: 2px solid #dde3ee; }
+.tab {
+  background: none; border: none; padding: 11px 16px; font-size: 13.5px; font-weight: 600;
+  color: #5a6b86; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: inherit;
+}
+.tab:hover { color: #0b3d91; }
+.tab.active { color: #0b3d91; border-bottom-color: #1264c0; }
+.panel { display: none; }
+.panel.active { display: block; animation: fade .25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px);} to {opacity:1;transform:none;} }
+.lede { font-size: 14px; color: #3a4a66; max-width: 940px; margin-bottom: 18px; }
+.lede strong { color: #16223a; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
+.controls input[type=text] {
+  flex: 1 1 240px; padding: 9px 12px; border: 1px solid #cdd6e6; border-radius: 8px; font-size: 13px; font-family: inherit; background:#fff;
+}
+.chip {
+  padding: 6px 12px; border: 1px solid #cdd6e6; background: #fff; border-radius: 20px; font-size: 12px;
+  cursor: pointer; color: #46566f; font-weight: 500; font-family: inherit;
+}
+.chip:hover { border-color: #1264c0; }
+.chip.active { background: #0b3d91; color: #fff; border-color: #0b3d91; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.card {
+  background: #fff; border: 1px solid #e2e8f3; border-radius: 12px; padding: 16px 17px 15px;
+  box-shadow: 0 1px 2px rgba(16,34,58,.04); transition: box-shadow .18s, border-color .18s; position: relative;
+}
+.card:hover { box-shadow: 0 6px 20px rgba(16,34,58,.10); border-color: #c3d2ec; }
+.card .code { font-size: 11px; font-weight: 700; letter-spacing: .05em; color: #1264c0; }
+.card h3 { font-size: 15.5px; margin: 3px 0 8px; color: #12213c; letter-spacing: -.01em; }
+.card p.desc { font-size: 12.8px; color: #46566f; margin-bottom: 11px; }
+.meta { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag {
+  font-size: 10.5px; padding: 3px 8px; border-radius: 5px; font-weight: 600; letter-spacing: .02em;
+  background: #eef2f9; color: #43597e;
+}
+.tag.actor { background: #e7f0fb; color: #14539e; }
+.tag.channel { background: #eaf5ec; color: #2c7a44; }
+.tag.pss { background: #f3ecfb; color: #7a3fb0; }
+.tag.trigger { background: #fdf1e3; color: #a5661b; }
+.tag.domain { background: #e8f6fa; color: #157a91; }
+.tag.scheme { background: #f0ecfb; color: #6b3fb0; }
+.br-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.br {
+  font-size: 10px; font-weight: 700; background: #eef2f9; color: #33456a; padding: 2px 6px; border-radius: 4px;
+  border: 1px solid #dde5f1;
+}
+.br.oq { background: #fff9ee; color: #8a5410; border-color: #f2e2c0; }
+.card .row-label { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: #8494ad; font-weight: 700; margin: 9px 0 3px; }
+.steps { font-size: 12.4px; color: #3a4a66; padding-left: 17px; }
+.steps li { margin-bottom: 3px; }
+.group-head { grid-column: 1/-1; margin: 12px 0 -2px; }
+.group-head h2 { font-size: 15px; color: #0b3d91; border-left: 4px solid #1264c0; padding-left: 10px; letter-spacing: -.01em; }
+.group-head p { font-size: 12.5px; color: #5a6b86; padding-left: 14px; margin-top: 2px; }
+.lifecycle { background:#fff; border:1px solid #e2e8f3; border-radius:12px; padding: 22px 18px; margin-bottom: 20px; overflow-x:auto; }
+.lifecycle h2 { font-size:16px; color:#12213c; margin-bottom:3px; }
+.lifecycle p.cap { font-size:12.5px; color:#5a6b86; margin-bottom:14px; }
+.foot { margin-top: 26px; font-size: 11.5px; color: #8494ad; border-top: 1px solid #e2e8f3; padding-top: 14px; }
+.count { font-size: 12px; color: #8494ad; margin-bottom: 10px; }
+.legend { display:flex; flex-wrap:wrap; gap:14px; font-size:11.5px; color:#5a6b86; margin-bottom:16px; }
+.legend span { display:inline-flex; align-items:center; gap:5px; }
+.dot { width:11px; height:11px; border-radius:3px; display:inline-block; }
+details.note { background:#fff; border:1px solid #e2e8f3; border-radius:10px; padding:12px 15px; margin-bottom:16px; }
+details.note summary { font-weight:600; cursor:pointer; color:#0b3d91; font-size:13px; }
+details.note div { margin-top:9px; font-size:12.8px; color:#46566f; }
+details.note li { margin:3px 0 3px 18px; }
+.erd { background:#fff; border:1px solid #e2e8f3; border-radius:12px; padding:20px 16px; margin-bottom:20px; overflow-x:auto; }
+.erd h2 { font-size:16px; color:#12213c; margin-bottom:3px; }
+.erd p.cap { font-size:12.5px; color:#5a6b86; margin-bottom:12px; }
+.obj-card { background:#fff; border:1px solid #e2e8f3; border-radius:12px; padding:0; overflow:hidden; }
+.obj-card .obj-head { padding:12px 15px 10px; border-bottom:2px solid #eef2f9; }
+.obj-card .obj-head.core { background:linear-gradient(135deg,#0b3d91,#1264c0); }
+.obj-card .obj-head.core h3, .obj-card .obj-head.core .code, .obj-card .obj-head.core p { color:#fff; }
+.obj-card .obj-head.junction { background:#fff4e6; }
+.obj-card .obj-head.txn { background:#eaf3fb; }
+.obj-card .obj-head.ref { background:#f3ecfb; }
+.obj-card .obj-head.party { background:#eaf5ec; }
+.obj-card .code { font-size:10.5px; font-weight:700; letter-spacing:.05em; color:#1264c0; }
+.obj-card h3 { font-size:15px; margin:2px 0 4px; color:#12213c; }
+.obj-card .obj-head p { font-size:11.8px; color:#46566f; margin:0; }
+.obj-card .obj-legacy { font-size:10.5px; color:#8494ad; margin-top:5px; font-style:italic; }
+.obj-card .obj-head.core .obj-legacy { color:rgba(255,255,255,.8); }
+.fld { display:flex; gap:8px; padding:6px 15px; font-size:12px; border-top:1px solid #f2f5fa; align-items:baseline; }
+.fld:first-child { border-top:none; }
+.fld .fname { font-weight:600; color:#24324c; flex:0 0 auto; min-width:120px; }
+.fld .ftype { color:#7a3fb0; font-size:10.5px; font-family:ui-monospace,Menlo,monospace; flex:0 0 auto; }
+.fld .fnote { color:#5a6b86; font-size:11.3px; }
+.fld.key .fname::before { content:"\1F511 "; }
+.fld.fk .fname::before { content:"\1F517 "; }
+.obj-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:14px; align-items:start; }
+table.map { width:100%; border-collapse:collapse; background:#fff; border:1px solid #e2e8f3; border-radius:12px; overflow:hidden; font-size:12.4px; }
+table.map th { background:#0b3d91; color:#fff; text-align:left; padding:9px 11px; }
+table.map td { padding:8px 11px; border-top:1px solid #eef2f7; vertical-align:top; color:#3a4a66; }
+table.map tr:nth-child(even) td { background:#fafbfe; }
+table.map code { font-family:ui-monospace,Menlo,monospace; font-size:11px; color:#7a3fb0; background:#f3ecfb; padding:1px 5px; border-radius:4px; }
+table.map .otype { font-size:10px; font-weight:700; padding:1px 6px; border-radius:4px; white-space:nowrap; }
+.otype.std { background:#e7f0fb; color:#14539e; }
+.otype.pss { background:#eafaf0; color:#1f8a4c; }
+.otype.cust { background:#fff4e6; color:#a5661b; }
+.section-h { font-size:14px; color:#0b3d91; border-left:4px solid #1264c0; padding-left:10px; margin:22px 0 12px; letter-spacing:-.01em; }
+.callout { border-radius:10px; padding:13px 16px; margin-bottom:14px; border:1px solid; }
+.callout h4 { font-size:13px; margin-bottom:4px; display:flex; align-items:center; gap:8px; }
+.callout p { font-size:12.5px; margin:0; }
+.callout.flag { background:#fff6f6; border-color:#f2cccc; }
+.callout.flag h4 { color:#b02121; }
+.callout.flag p { color:#7a3232; }
+.callout.think { background:#fff9ee; border-color:#f2e2c0; }
+.callout.think h4 { color:#8a5410; }
+.callout.think p { color:#6b5220; }
+.callout .pillette { font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:20px; text-transform:uppercase; letter-spacing:.04em; }
+.callout.flag .pillette { background:#b02121; color:#fff; }
+.callout.think .pillette { background:#a5661b; color:#fff; }
+.ctx-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:14px; margin-bottom:18px; }
+.ctx-card { background:#fff; border:1px solid #e2e8f3; border-radius:12px; padding:15px 17px; }
+.ctx-card h3 { font-size:14px; color:#0b3d91; margin-bottom:7px; }
+.ctx-card p { font-size:12.6px; color:#46566f; margin-bottom:7px; }
+.ctx-card .src { font-size:10.5px; color:#8494ad; font-style:italic; }
+.pill { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:8px; letter-spacing:.03em; text-transform:uppercase; }
+.pill.actor { background:#e7f0fb; color:#14539e; }
+.pill.oq { background:#fff4e6; color:#a5661b; }
+.we-wrap { background:#fff; border:1px solid #e2e8f3; border-radius:12px; padding:20px 18px; margin-bottom:20px; overflow-x:auto; }
+.we-wrap h2 { font-size:16px; color:#12213c; margin-bottom:3px; }
+.we-wrap p.cap { font-size:12.6px; color:#5a6b86; margin-bottom:14px; max-width:900px; }
+.we-note { font-size:12.2px; color:#46566f; margin-top:14px; padding-top:12px; border-top:1px solid #eef2f7; }
+.we-note b { color:#0b3d91; }
+table.cmp { width:100%; border-collapse:collapse; background:#fff; border:1px solid #e2e8f3; border-radius:12px; overflow:hidden; font-size:12.6px; margin-bottom:18px; }
+table.cmp th { background:#0b3d91; color:#fff; text-align:left; padding:10px 12px; font-size:12px; }
+table.cmp th:first-child { background:#082f6f; }
+table.cmp td { padding:9px 12px; border-top:1px solid #eef2f7; vertical-align:top; color:#3a4a66; }
+table.cmp td:first-child { font-weight:700; color:#24324c; background:#f7f9fd; }
+table.cmp tr:nth-child(even) td:not(:first-child) { background:#fafbfe; }
+.scheme-tag { display:inline-block; font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; }
+.scheme-tag.cs { background:#e7f0fb; color:#14539e; }
+.scheme-tag.cc { background:#eafaf0; color:#1f8a4c; }
+.scheme-tag.sec { background:#f0ecfb; color:#6b3fb0; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Salesforce Public Sector Solutions · Outside-in Target-State Design · PLSA Victoria</div>
+    <h1>Portable Long Service Authority — Solution Explorer</h1>
+    <p class="sub">An outside-in target-state design for the <strong>Portable Long Service Authority (PLSA) Victoria</strong>, administering portable long service benefits under the <strong>Long Service Benefits Portability Act 2018 (Vic)</strong> across three schemes — <strong>Community Services, Contract Cleaning &amp; Security</strong>. The modelling crux: one <strong>worker</strong> can accrue across <strong>multiple schemes</strong> and <strong>multiple concurrent employers</strong> without cross-contaminating the separate statutory funds — resolved with a single Party identity plus dated associative entities.</p>
+    <div class="stat-row">
+      <div class="stat"><b>400k+</b><span>Registered workers</span></div>
+      <div class="stat"><b>3</b><span>Schemes / funds</span></div>
+      <div class="stat"><b>7 yrs</b><span>Qualifying threshold</span></div>
+      <div class="stat"><b>1 / 60</b><span>Accrual (wk per wk)</span></div>
+      <div class="stat"><b>$801.8M</b><span>Net assets 24-25</span></div>
+      <div class="stat"><b id="svcCount">–</b><span>Catalogue services</span></div>
+      <div class="stat"><b id="procCount">–</b><span>Business processes</span></div>
+      <div class="stat"><b id="objCount">–</b><span>Logical entities</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-panel="overview">Overview</button>
+    <button class="tab" data-panel="catalogue">Service Catalogue</button>
+    <button class="tab" data-panel="processes">Process Library</button>
+    <button class="tab" data-panel="datamodel">Data Model</button>
+    <button class="tab" data-panel="pss">PSS Mapping</button>
+    <button class="tab" data-panel="context">Domain &amp; Context</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="panel active" id="overview">
+    <p class="lede">The Authority's statutory duty under the <strong>Long Service Benefits Portability Act 2018</strong> is to let workers in transient industries accrue long service benefits across <strong>many employers</strong> within a covered industry, rather than needing seven unbroken years with one. The target state expresses that duty as a set of <strong>regulated services</strong> over a single authoritative <strong>worker</strong> and <strong>employer</strong> identity, with the scheme-specific accrual, levy and claim mechanics carried on dated associative entities so the three statutory funds never blend.</p>
+
+    <div class="lifecycle">
+      <h2>Worker service &amp; benefit lifecycle — target-state state machine</h2>
+      <p class="cap">Per <em>scheme membership</em> (a worker holds one of these lifecycles for each industry they work in). Forward transitions are driven by employer quarterly returns (accrual), the 7-year threshold, benefit claims, and the 4-year inactivity rule. Note the split between an <em>active accruing</em> membership and one <em>deactivated</em> by 4 years of inactivity — which forfeits accrued credits.</p>
+      <div id="sm"></div>
+    </div>
+
+    <details class="note" open>
+      <summary>How to read this explorer</summary>
+      <div>
+        <ul>
+          <li><strong>Service Catalogue</strong> — the outward-facing regulated services grouped into six logical domains (Registration, Employer Reporting &amp; Levy, Benefits &amp; Claims, Compliance, Dispute Resolution, Reciprocal Services), each mapped to PSS building blocks.</li>
+          <li><strong>Process Library</strong> — the end-to-end business processes that realise those services, with trigger, actors, steps, state transition and exception handling.</li>
+          <li><strong>Data Model</strong> — the technology-agnostic logical model: a <em>Party</em> supertype (Worker, Employer) plus the three associative junctions that resolve multi-scheme / multi-employer, with an ERD and a concrete <em>worked example</em>.</li>
+          <li><strong>PSS Mapping</strong> — each logical entity mapped to a Salesforce standard, PSS-industry, or custom object, with the junction-object patterns and my architectural callouts where I'd interrogate the research's choices.</li>
+          <li><strong>Domain &amp; Context</strong> — the evidence base: the three-scheme comparison matrix, actors and the open questions the customer must confirm before physical design.</li>
+        </ul>
+        This is a <strong>structured design for stakeholder review</strong>, grounded in PLSA domain research. Where the research asserted something it flagged as uncertain, it is called out rather than treated as settled.
+      </div>
+    </details>
+
+    <details class="note" open>
+      <summary>The crux: one worker, many schemes, many employers</summary>
+      <div>
+        <p style="margin-bottom:8px">The whole design turns on separating <strong>identity</strong> from <strong>participation</strong>:</p>
+        <ul>
+          <li>A <strong>Worker</strong> and an <strong>Employer</strong> are each a single identity record — one natural person, one legal entity — no matter how many schemes or relationships they have.</li>
+          <li>A <strong>Worker Scheme Membership</strong> links a worker to <em>one</em> scheme; the worker's accrual, threshold and claim all live here, so Community Services service can never be blended with Security service to reach seven years.</li>
+          <li>An <strong>Employer Scheme Registration</strong> links an employer to <em>one</em> scheme; it dictates which quarterly returns that employer must file.</li>
+          <li>An <strong>Employment Engagement</strong> ties a worker's scheme membership to an employer's scheme registration over a dated period — this is where concurrent employers and job changes are recorded, always within a single scheme.</li>
+        </ul>
+        <p style="margin-top:8px">See the <strong>Data Model</strong> tab for the ERD and a fully worked concurrent-employment example.</p>
+      </div>
+    </details>
+
+    <details class="note">
+      <summary>Design principles carried into the target state</summary>
+      <div>
+        <ul>
+          <li><strong>Single source of truth for identity.</strong> One Worker (natural person) and one Employer (legal entity), with deduplication as a first-class capability — because a duplicate worker silently splits continuous service and can destroy an entitlement.</li>
+          <li><strong>Scheme funds never blend.</strong> Accrual, the 7-year threshold and claims are all computed per scheme membership; the three statutory funds are financially and mathematically independent.</li>
+          <li><strong>Point-in-time accuracy.</strong> Engagements and service periods are dated so continuous-service and 4-year-inactivity tests can be evaluated at any historical instant.</li>
+          <li><strong>High-volume by design.</strong> A single quarterly return can carry thousands of worker line items; the granular transactional entities are modelled to bulk-load, not to sit on standard assessment objects.</li>
+          <li><strong>Provisional until paid.</strong> Reported service is credited provisionally and only confirmed once the employer's levy is reconciled — the levy funds the future liability.</li>
+          <li><strong>Portability across borders.</strong> Interstate reciprocal recognition is an explicit integration, not a manual re-key, so a worker's cross-border service can count toward a Victorian claim.</li>
+        </ul>
+      </div>
+    </details>
+  </div>
+
+  <!-- CATALOGUE -->
+  <div class="panel" id="catalogue">
+    <p class="lede">Regulated services grouped by logical domain. Each card names the primary <strong>actor</strong>, delivery <strong>channel</strong>, the <strong>schemes</strong> it applies to, indicative <strong>PSS components</strong>, and the processes that realise it.</p>
+    <div class="controls">
+      <input type="text" id="svcSearch" placeholder="Search services, actors, domains…">
+      <span class="chip active" data-filter="svc-domain" data-val="all">All domains</span>
+    </div>
+    <div class="count" id="svcCountLine"></div>
+    <div class="grid" id="svcGrid"></div>
+  </div>
+
+  <!-- PROCESSES -->
+  <div class="panel" id="processes">
+    <p class="lede">Operational business processes that realise the catalogue. Each shows its <strong>trigger</strong>, <strong>actors</strong>, indicative <strong>steps</strong>, resulting <strong>state transition</strong>, and how exceptions are handled.</p>
+    <div class="controls">
+      <input type="text" id="procSearch" placeholder="Search processes, steps, triggers…">
+      <span class="chip active" data-filter="proc-domain" data-val="all">All domains</span>
+    </div>
+    <div class="count" id="procCountLine"></div>
+    <div class="grid" id="procGrid"></div>
+  </div>
+
+  <!-- DATA MODEL -->
+  <div class="panel" id="datamodel">
+    <p class="lede">The technology-agnostic <strong>logical</strong> data model. A <strong>Party</strong> supertype gives one identity for each Worker and Employer; three <strong>associative junctions</strong> — Worker Scheme Membership, Employer Scheme Registration and the dated Employment Engagement — resolve the multi-scheme / multi-employer many-to-many while keeping each scheme's accrual pool separate.</p>
+
+    <div class="erd">
+      <h2>Entity relationship — logical model</h2>
+      <p class="cap">Entities and their relationships with cardinality. Junction entities (amber) resolve the many-to-many relationships; the transactional spine (blue) carries returns, service periods, levies and claims.</p>
+      <div id="erd"></div>
+      <div class="legend" style="margin-top:14px">
+        <span><span class="dot" style="background:#1264c0"></span>Party identity</span>
+        <span><span class="dot" style="background:#f0a53b"></span>Associative junction</span>
+        <span><span class="dot" style="background:#7fb0e0"></span>Transactional</span>
+        <span><span class="dot" style="background:#b98fd8"></span>Financial</span>
+        <span><span class="dot" style="background:#7fc79a"></span>Reference</span>
+      </div>
+      <p class="cap" style="margin-top:12px;margin-bottom:0">Cardinality notation: <b>||</b> one, <b>o{</b> zero-or-many. e.g. one Worker holds zero-or-many Scheme Memberships.</p>
+    </div>
+
+    <h3 class="section-h">Worked example — one worker, two schemes, two concurrent employers</h3>
+    <div class="we-wrap">
+      <h2>Priya: Community Services + Security, at the same time</h2>
+      <p class="cap">Priya works weekdays for a family-violence support service (Community Services) and weekends for an events security firm (Security). One of her Community Services roles changes employer mid-year. This shows how a single identity fans out through the junctions so the two funds accrue independently and continuous service survives the job change.</p>
+      <div id="we"></div>
+      <div class="we-note">
+        <b>Why it holds together:</b> Priya is <em>one</em> Worker. She has <em>two</em> Worker Scheme Memberships — one per fund — and each accrues on its own toward its own 7-year threshold; her Community Services weeks can never top up her Security balance. Her mid-year change of Community Services employer is just a new <em>Employment Engagement</em> under the <em>same</em> membership, so her continuous service in that industry is unbroken. Each employer files its own quarterly return against its own <em>Employer Scheme Registration</em>, and every worker line becomes a <em>Service Period</em> tied to the correct engagement — so the money and the days always land in the right fund.
+      </div>
+    </div>
+
+    <h3 class="section-h">Entities &amp; attributes</h3>
+    <div class="obj-grid" id="objGrid"></div>
+
+    <details class="note" style="margin-top:16px">
+      <summary>Modelling notes &amp; cardinality decisions</summary>
+      <div id="dmNotes"></div>
+    </details>
+  </div>
+
+  <!-- PSS MAPPING -->
+  <div class="panel" id="pss">
+    <p class="lede">Each logical entity mapped to a Salesforce object — <span class="otype std">standard</span>, <span class="otype pss">PSS industry</span>, or <span class="otype cust">custom</span> — with the relationship pattern. Below the table are my <strong>architectural callouts</strong>: places where I'd interrogate the research's choices before committing, in keeping with a design-for-review posture rather than a locked decision.</p>
+    <div id="pssTable"></div>
+
+    <h3 class="section-h">Architectural callouts — where I'd push back or confirm</h3>
+    <div id="calloutList"></div>
+
+    <details class="note" style="margin-top:4px">
+      <summary>Integration &amp; platform notes</summary>
+      <div id="pssNotes"></div>
+    </details>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="panel" id="context">
+    <p class="lede">The evidence base behind the outside-in design, from PLSA domain research (Long Service Benefits Portability Act 2018; Regulations 2020; PLSA annual reports &amp; corporate plan). This is <strong>domain context</strong> — it shapes requirements rather than being a system feature.</p>
+
+    <h3 class="section-h">The three schemes — comparison matrix</h3>
+    <div id="cmpTable"></div>
+    <p class="count" style="margin-top:-8px">Shared accrual maths, three legally &amp; financially distinct funds. The divergences (levy rate, dispute powers, coverage) are what the model must keep separate.</p>
+
+    <h3 class="section-h">Actors &amp; personas</h3>
+    <div class="ctx-grid" id="actorGrid"></div>
+
+    <h3 class="section-h">Open questions — to confirm with PLSA SMEs</h3>
+    <div class="ctx-grid" id="oqGrid"></div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+<script>
+/* ---------- DOMAINS ---------- */
+const DOMAINS = {
+  Registration: "Establishing &amp; maintaining worker and employer identity and scheme participation",
+  "Reporting & Levy": "Quarterly returns, service accrual &amp; the levy that funds the scheme",
+  "Benefits & Claims": "Drawing down accrued benefits — to workers, and reimbursing employers",
+  Compliance: "Coverage determinations, audit &amp; enforcement of the mandatory scheme",
+  "Dispute Resolution": "Statutory mediation of leave-timing disputes (Cleaning &amp; Security only)",
+  Reciprocal: "Cross-border recognition &amp; liability transfer with interstate schemes"
+};
+const DOMAIN_ORDER = ["Registration","Reporting & Levy","Benefits & Claims","Compliance","Dispute Resolution","Reciprocal"];
+
+/* ---------- SERVICES ---------- */
+const services = [
+  { code:"SVC-01", domain:"Registration", name:"Employer Registration &amp; Onboarding",
+    desc:"Assessment and onboarding of an employer legal entity into one or more covered schemes. The scheme-selection fork spawns a distinct scheme registration per industry under the single legal entity, since levies and compliance are tracked per statutory fund.",
+    actor:"Employer", channel:"Public web portal", schemes:["CS","CC","SEC"], trigger:"Employer commences covered work",
+    pss:["Experience Cloud portal","OmniStudio intake","BusinessLicense (per scheme)","Account (Business)"],
+    procs:["PROC-01"] },
+  { code:"SVC-02", domain:"Registration", name:"Worker Registration",
+    desc:"Creation of a worker identity and their scheme membership, most often automatically from an employer's first quarterly return, sometimes via a worker self-service portal.",
+    actor:"Employer / Worker", channel:"Quarterly return / Worker portal", schemes:["CS","CC","SEC"], trigger:"Worker first reported / self-registers",
+    pss:["Person Account","Duplicate/match rules","Worker_Scheme_Membership__c"],
+    procs:["PROC-02"] },
+  { code:"SVC-03", domain:"Registration", name:"Identity Resolution &amp; Merge",
+    desc:"Resolution of duplicate worker profiles so continuous service history is accurately preserved. A duplicate silently splits accrual and can void an entitlement, so this is a first-class regulatory data-quality service, not just admin hygiene.",
+    actor:"Registry Staff", channel:"Back-office (staff console)", schemes:["CS","CC","SEC"], trigger:"System exception / worker request",
+    pss:["Person Account merge","Match rules (TFN+DOB+Name)","Manual review queue"],
+    procs:["PROC-03"] },
+  { code:"SVC-04", domain:"Reporting & Levy", name:"Quarterly Return Lodgement",
+    desc:"Mandatory quarterly submission of each worker's ordinary pay, days worked and termination dates for a defined financial quarter, per scheme. Highest-volume transaction in the Authority — a large employer can report thousands of workers per quarter.",
+    actor:"Employer / Authorized Agent", channel:"Portal (CSV upload / manual / API)", schemes:["CS","CC","SEC"], trigger:"Close of financial quarter",
+    pss:["Quarterly_Return__c","Service_Period__c (bulk)","OmniScript / Bulk API","Worker matching engine"],
+    procs:["PROC-04","PROC-02"] },
+  { code:"SVC-05", domain:"Reporting & Levy", name:"Levy Invoicing &amp; Payment",
+    desc:"Generation of the financial liability (ordinary pay × scheme levy rate) from a validated return, issuing the invoice, and receipting funds. Service days are provisionally credited pending levy reconciliation.",
+    actor:"Employer", channel:"Portal + finance integration", schemes:["CS","CC","SEC"], trigger:"Return approved",
+    pss:["RegulatoryTrxnFee (PSS)","Invoice / payment records","ERP finance integration"],
+    procs:["PROC-05"] },
+  { code:"SVC-06", domain:"Benefits & Claims", name:"Worker Benefit Claim",
+    desc:"Assessment of a worker's application to draw down accrued funds upon reaching the 7-year (≈2,555-day) threshold within a single industry. Service accrued in one scheme cannot be blended with another to meet the threshold.",
+    actor:"Worker", channel:"Portal (guided claim form)", schemes:["CS","CC","SEC"], trigger:"Worker reaches threshold / terminates",
+    pss:["IndividualApplication","OmniStudio guided flow","BenefitAssignment / BenefitDisbursement","Identity verification"],
+    procs:["PROC-06"] },
+  { code:"SVC-07", domain:"Benefits & Claims", name:"Employer Reimbursement",
+    desc:"Assessment of an employer's claim to be reimbursed for long service leave they paid directly to a worker. Reconciled strictly against that employer's historical returns to prevent double-dipping on liabilities held by prior employers.",
+    actor:"Employer", channel:"Portal (claim form)", schemes:["CS","CC","SEC"], trigger:"Employer pays LSL directly, then claims",
+    pss:["BusinessLicenseApplication","Assessment flow","BenefitDisbursement","Return reconciliation"],
+    procs:["PROC-07"] },
+  { code:"SVC-08", domain:"Compliance", name:"Coverage Determination",
+    desc:"Formal regulatory assessment of whether an employer's specific operations legally fall under the Act — e.g. cleaning vs excluded facilities management, or community services vs excluded aged care. Produces a binding decision and, where covered, a mandatory-registration directive.",
+    actor:"Employer / Authority Staff", channel:"General inquiry / audit trigger", schemes:["CS","CC","SEC"], trigger:"Inquiry or audit",
+    pss:["Case (record type)","Assessment / decision flow","Business Rules Engine (coverage tests)"],
+    procs:["PROC-08"] },
+  { code:"SVC-09", domain:"Compliance", name:"Audit &amp; Enforcement Action",
+    desc:"Intelligence-led investigation of suspected non-compliance — unpaid levies, under-reported wages, unregistered entities — using the Registrar's coercive powers, up to debt recovery and court proceedings.",
+    actor:"Compliance Officer", channel:"Back-office / field", schemes:["CS","CC","SEC"], trigger:"Missing return / whistleblower / risk score",
+    pss:["Case + investigation","InspectionAssessmentInd (PSS)","CRM Analytics (risk targeting)","Debt / legal tracking"],
+    procs:["PROC-09"] },
+  { code:"SVC-10", domain:"Dispute Resolution", name:"Leave Timing Dispute",
+    desc:"Formal mediation and binding determination on the timing of when accrued leave may be taken. A statutory power available only for the Contract Cleaning and Security schemes — expressly excluded for Community Services.",
+    actor:"Worker / Employer", channel:"Dispute web form", schemes:["CC","SEC"], trigger:"Employer refuses / disputes leave timing",
+    pss:["Case (Dispute record type)","Mediation workflow","Outcome / directive record"],
+    procs:["PROC-10"] },
+  { code:"SVC-11", domain:"Reciprocal", name:"Interstate Service Recognition",
+    desc:"Verification and mathematical transfer of accrued service blocks to or from a reciprocal interstate scheme (QLeave, LSC NSW, SA, TasBuild) under corresponding-laws agreements, so cross-border service can count toward a claim.",
+    actor:"Worker / Reciprocal Authority", channel:"Inter-agency integration", schemes:["CS","CC","SEC"], trigger:"Worker relocates / claims with cross-border service",
+    pss:["MuleSoft integration","Service_Period__c (Interstate record type)","Certified service exchange"],
+    procs:["PROC-11"] }
+];
+/* ---------- PROCESSES ---------- */
+const processes = [
+  { code:"PROC-01", domain:"Registration", name:"Employer Registration &amp; Onboarding", svc:"SVC-01",
+    trigger:"Employer commences operations in a covered industry", actor:"Employer → Authority",
+    channel:"Public portal", transition:"— → Registered (one registration per selected scheme)",
+    steps:["Employer supplies entity details (ABN, legal name, entity type)","Scheme-selection fork: declare each covered industry operated in","System spawns a distinct scheme registration per selected scheme under the one legal entity","Authority verifies entity data; approves registration","Portal credentials issued to manage obligations"],
+    exceptions:["ABN invalid / entity not verifiable → held for review","Operates in a scheme but did not select it → coverage determination (SVC-08)"], oq:[] },
+  { code:"PROC-02", domain:"Registration", name:"Worker Matching &amp; Creation", svc:"SVC-02",
+    trigger:"Worker line item arrives on a return (or self-registration)", actor:"System / Employer",
+    channel:"Return processing / portal", transition:"— → Active membership (new) or appended to existing",
+    steps:["Deterministic match on TFN + Date of Birth + Name against existing workers","Match found → append new service to existing worker identity","No match → create new worker identity + scheme membership for the industry","Concurrent employment → separate membership per scheme, single natural person"],
+    exceptions:["TFN missing/withheld → fuzzy match on Name+DOB, route ambiguous cases to manual review (see OQ-1)","Possible duplicate created → Identity Resolution (PROC-03)"], oq:["OQ-1"] },
+  { code:"PROC-03", domain:"Registration", name:"Resolve &amp; Merge Duplicate Worker", svc:"SVC-03",
+    trigger:"Duplicate worker suspected", actor:"Registry Staff",
+    channel:"Back-office", transition:"Two identities → one; memberships & service re-linked",
+    steps:["Identity-proof the conflicting records","Confirm they are the same natural person","Merge to the surviving worker identity","Re-link all scheme memberships, engagements & service periods","Recompute accrual so continuous service is preserved"],
+    exceptions:["Not actually the same person → mark as distinct, suppress future match","Merge would blend schemes → memberships kept separate per scheme"], oq:[] },
+  { code:"PROC-04", domain:"Reporting & Levy", name:"Quarterly Return Submission &amp; Levy Assessment", svc:"SVC-04",
+    trigger:"Close of financial quarter", actor:"Employer / Authorized Agent",
+    channel:"Portal (CSV / API)", transition:"— → Submitted → Assessed (service provisionally credited)",
+    steps:["Employer uploads CSV per scheme (workers bucketed by industry)","For each line: match/creates worker (PROC-02)","Append a Service Period to the correct Employment Engagement","Concurrent employment yields separate service blocks per scheme membership","Levy = declared ordinary pay × that scheme's levy rate → invoice","Service days credited provisionally, pending levy reconciliation"],
+    exceptions:["Worker in wrong scheme bucket → reject line, flag","Ordinary-pay vs exempt-allowance mismatch → validation error","Boundary/proportion worker (e.g. 40% cleaning) → predominant-activity handling (see OQ-5)"], oq:["OQ-2","OQ-5"] },
+  { code:"PROC-05", domain:"Reporting & Levy", name:"Invoice &amp; Reconcile Levy", svc:"SVC-05",
+    trigger:"Return assessed", actor:"Employer → Authority (Finance)",
+    channel:"Portal + ERP integration", transition:"Provisional service → Confirmed on payment",
+    steps:["Generate levy invoice from assessed return","Issue to employer; sync to Victorian Govt ERP general ledger","Receipt payment; reconcile against invoice","Confirm the provisionally-credited service days","Overdue → debt/compliance path (SVC-09)"],
+    exceptions:["Underpayment / part-payment → ledger balance retained, follow-up","Non-payment → escalate to Audit & Enforcement"], oq:[] },
+  { code:"PROC-06", domain:"Benefits & Claims", name:"Benefit Claim &amp; Assessment", svc:"SVC-06",
+    trigger:"Worker believes they've crossed the 7-year threshold in one industry", actor:"Worker → Assessment Officer",
+    channel:"Portal + back-office", transition:"Claim lodged → Assessed → Disbursed (days deducted)",
+    steps:["Worker lodges claim via portal for a specific scheme membership","System aggregates all service blocks in that scheme only","Officer checks for any inactivity gap > 4 years (would void continuous service)","Validate identity + bank details (fraud mitigation)","Benefit = accrued weeks × current ordinary weekly pay","Authorise EFT disbursement; deduct claimed days from balance"],
+    exceptions:["Cross-scheme blending attempted → rejected (funds independent)","4-year inactivity gap found → service forfeited, claim adjusted/denied","Fractional-day rounding at aggregate vs line item (see OQ-2)"], oq:["OQ-2"] },
+  { code:"PROC-07", domain:"Benefits & Claims", name:"Employer Reimbursement", svc:"SVC-07",
+    trigger:"Employer paid LSL directly and seeks the PLSA-funded portion", actor:"Employer → Assessment Officer",
+    channel:"Portal (claim form)", transition:"Reimbursement lodged → Assessed → Disbursed to employer",
+    steps:["Employer uploads evidence (payslips, bank transfer receipts)","Officer reconciles against that employer's historical returns for the worker","Calculate the exact liability PLSA holds for that worker/employer","Prevent double-dip on liabilities held by prior employers","Reimburse to employer's nominated account"],
+    exceptions:["Claim exceeds employer's funded portion → reduced to entitlement","No matching returns → rejected pending evidence"], oq:[] },
+  { code:"PROC-08", domain:"Compliance", name:"Coverage Determination", svc:"SVC-08",
+    trigger:"Coverage inquiry or audit finding", actor:"Authority Staff",
+    channel:"Case management", transition:"— → Binding coverage decision",
+    steps:["Capture business-activity descriptions, award classifications, contracts","Apply the modern-award-linked coverage test (post-2020, no predominance test)","Determine covered vs excluded (e.g. cleaning vs facilities management)","Issue binding decision; if covered, direct mandatory registration"],
+    exceptions:["Boundary case → escalate for legal determination","Employer disputes → review / appeal path"], oq:["OQ-5"] },
+  { code:"PROC-09", domain:"Compliance", name:"Audit &amp; Enforcement", svc:"SVC-09",
+    trigger:"Missing return, whistleblower report or risk score", actor:"Compliance Officer",
+    channel:"Back-office / field", transition:"— → Findings → Enforcement / recovery",
+    steps:["Risk-score and target using reporting anomalies","Compel production of payroll records; investigate","Quantify under-reporting / unpaid levy","Issue enforcement notice; commence debt recovery","Escalate to court proceedings where warranted"],
+    exceptions:["Entity unregistered → mandatory registration + back-levy","Dispute of findings → tribunal / legal (see OQ-4)"], oq:["OQ-4"] },
+  { code:"PROC-10", domain:"Dispute Resolution", name:"Mediate Leave-Timing Dispute", svc:"SVC-10",
+    trigger:"Worker/employer dispute over timing of leave (Cleaning/Security only)", actor:"Worker / Employer → Authority",
+    channel:"Dispute web form + mediation", transition:"— → Binding outcome / directive",
+    steps:["Capture evidence of leave request & employer refusal justification","Confirm scheme is Cleaning or Security (excluded for Community Services)","Mediate between the parties","Issue binding determination / directive"],
+    exceptions:["Community Services dispute → out of statutory scope, redirect","Mediation fails → tribunal referral & outcome tracking (see OQ-4)"], oq:["OQ-4"] },
+  { code:"PROC-11", domain:"Reciprocal", name:"Recognise Interstate Service", svc:"SVC-11",
+    trigger:"Worker relocates or claims using cross-border service", actor:"Worker / Reciprocal Authority",
+    channel:"Inter-agency integration", transition:"— → Adjusted service balance + liability transfer",
+    steps:["Authenticate worker identity across agencies","Request/receive certified service history from the reciprocal scheme","Map certified blocks into the worker's membership (Interstate record type)","Adjust service balance; arrange financial liability transfer"],
+    exceptions:["Corresponding-laws mismatch → manual reconciliation","Liability transfer timing — at recording vs at claim (see OQ-3)"], oq:["OQ-3"] }
+];
+/* ---------- LOGICAL ENTITIES ---------- */
+const objects = [
+  { api:"Worker", label:"Worker (Person Identity)", cls:"core", role:"core",
+    legacy:"Party supertype — natural person",
+    desc:"The singular natural person. Single source of truth for identity, regardless of how many schemes or employers they engage with.",
+    fields:[
+      {n:"Worker ID", t:"PK", note:"Surrogate identity key", key:true},
+      {n:"First / Last Name", t:"Text", note:"Legal name"},
+      {n:"Date of Birth", t:"Date", note:"Matching attribute"},
+      {n:"Tax File Number", t:"Text (secure)", note:"Primary match key; may be withheld"},
+      {n:"Email / Mobile", t:"Text", note:"Portal contact & notifications"},
+      {n:"Residential Address", t:"Address", note:"Correspondence"}
+    ]},
+  { api:"Employer", label:"Employer (Legal Entity)", cls:"core", role:"core",
+    legacy:"Party supertype — legal entity",
+    desc:"The singular legal entity conducting business. Single source of truth for corporate identity across all schemes it operates in.",
+    fields:[
+      {n:"Employer ID", t:"PK", note:"Surrogate identity key", key:true},
+      {n:"ABN", t:"Text (natural key)", note:"Australian Business Number — integration key"},
+      {n:"ACN", t:"Text", note:"Company number where applicable"},
+      {n:"Legal / Trading Name", t:"Text", note:"Registered & trading names"},
+      {n:"Entity Type", t:"Picklist", note:"Sole trader / partnership / corporation / non-profit"},
+      {n:"Primary Contact", t:"FK → Contact", note:"Responsible officer", fk:true}
+    ]},
+  { api:"Scheme", label:"Scheme", cls:"ref", role:"ref",
+    legacy:"Reference / configuration",
+    desc:"The regulatory framework instance established by the Act. Holds the global configuration that differs per fund.",
+    fields:[
+      {n:"Scheme ID", t:"PK", note:"Community Services / Cleaning / Security", key:true},
+      {n:"Name", t:"Text", note:"Scheme name"},
+      {n:"Current Levy Rate", t:"Percent", note:"e.g. 1.65% CS · 1.80% CC & SEC"},
+      {n:"Statutory Accrual Rate", t:"Ratio", note:"1 week per 60 weeks (all schemes)"},
+      {n:"Dispute Powers?", t:"Checkbox", note:"Leave-timing mediation — CC & SEC only"},
+      {n:"Active Date", t:"Date", note:"Scheme commencement (1 Jul 2019)"}
+    ]},
+  { api:"Worker Scheme Membership", label:"Worker Scheme Membership", cls:"junction", role:"junction",
+    legacy:"JUNCTION — Worker ⇄ Scheme",
+    desc:"Resolves the many-to-many between a Worker and Schemes. A worker's lifelong enrolment in ONE industry — accrual, threshold and claims all compute here, so funds never blend.",
+    fields:[
+      {n:"Membership ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Worker", t:"FK → Worker", note:"The natural person", fk:true},
+      {n:"Scheme", t:"FK → Scheme", note:"The one industry this membership covers", fk:true},
+      {n:"Status", t:"Picklist", note:"Active / Inactive / Deactivated (4-yr rule)"},
+      {n:"Total Accrued Days", t:"Number", note:"Roll-up across this membership's service"},
+      {n:"Total Claimed Days", t:"Number", note:"Drawn down via benefit claims"},
+      {n:"Last Service Date", t:"Date", note:"Drives the 4-year inactivity test"}
+    ]},
+  { api:"Employer Scheme Registration", label:"Employer Scheme Registration", cls:"junction", role:"junction",
+    legacy:"JUNCTION — Employer ⇄ Scheme",
+    desc:"Resolves the many-to-many between an Employer and Schemes. Dictates which quarterly returns an employer is legally obligated to file, per fund.",
+    fields:[
+      {n:"Registration ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Employer", t:"FK → Employer", note:"The legal entity", fk:true},
+      {n:"Scheme", t:"FK → Scheme", note:"The one industry this registration covers", fk:true},
+      {n:"Registration Date", t:"Date", note:"When registered for this scheme"},
+      {n:"Status", t:"Picklist", note:"Registered / Deregistered"}
+    ]},
+  { api:"Employment Engagement", label:"Employment Engagement", cls:"junction", role:"junction",
+    legacy:"JUNCTION — Membership ⇄ Registration (dated)",
+    desc:"The critical dated link tying a worker's scheme membership to a specific employer's scheme registration over a period. Where concurrent employers and job changes live — always within one scheme.",
+    fields:[
+      {n:"Engagement ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Worker Scheme Membership", t:"FK", note:"Ties to worker + scheme", fk:true},
+      {n:"Employer Scheme Registration", t:"FK", note:"Ties to employer + same scheme", fk:true},
+      {n:"Start / End Date", t:"Date", note:"Dated period; End null = current"},
+      {n:"Status", t:"Picklist", note:"Active / Ended"}
+    ]},
+  { api:"Return Period", label:"Return Period", cls:"ref", role:"ref",
+    legacy:"Reference — statutory calendar",
+    desc:"The temporal container defining the statutory reporting quarters.",
+    fields:[
+      {n:"Period ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Financial Year", t:"Text", note:"e.g. 2025-26"},
+      {n:"Quarter Number", t:"Number", note:"1–4"},
+      {n:"Start / End Date", t:"Date", note:"Quarter bounds"},
+      {n:"Statutory Due Date", t:"Date", note:"Lodgement deadline"}
+    ]},
+  { api:"Employer Return Header", label:"Employer Return Header", cls:"txn", role:"txn",
+    legacy:"Transactional — submission instance",
+    desc:"The submission instance for a specific employer, specific scheme and specific period. The parent of the granular service lines.",
+    fields:[
+      {n:"Return ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Employer Scheme Registration", t:"FK", note:"Who is reporting, for which fund", fk:true},
+      {n:"Return Period", t:"FK", note:"Which quarter", fk:true},
+      {n:"Total Ordinary Pay Declared", t:"Currency", note:"Sum across lines"},
+      {n:"Levy Assessed", t:"Currency", note:"Ordinary pay × scheme rate"},
+      {n:"Submission Status", t:"Picklist", note:"Draft / Submitted / Assessed / Reconciled"}
+    ]},
+  { api:"Service Period", label:"Service Period (Line Item)", cls:"txn", role:"txn",
+    legacy:"Transactional — most granular",
+    desc:"The individual block of service accrued by a worker in a specific quarter with a specific employer. The highest-volume entity — thousands per large return.",
+    fields:[
+      {n:"Service Period ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Employer Return Header", t:"FK", note:"Parent return (source)", fk:true},
+      {n:"Employment Engagement", t:"FK", note:"Which worker+employer+scheme it accrues to", fk:true},
+      {n:"Days Worked", t:"Number", note:"Recognised service days in the quarter"},
+      {n:"Ordinary Pay", t:"Currency", note:"Levy & payout multiplier"},
+      {n:"Leave Taken", t:"Number", note:"LSL taken in the period"},
+      {n:"Calculated Accrual", t:"Number", note:"Days credited (1/60 basis)"}
+    ]},
+  { api:"Levy Invoice & Payment", label:"Levy Invoice &amp; Payment", cls:"fin", role:"fin",
+    legacy:"Financial — collection",
+    desc:"Financial artifacts governing collection of levy funds from employers. Payment reconciliation confirms provisional service.",
+    fields:[
+      {n:"Invoice ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Employer Return Header", t:"FK", note:"Return being invoiced", fk:true},
+      {n:"Amount Due", t:"Currency", note:"Assessed levy"},
+      {n:"Issue Date", t:"Date", note:"Invoice date"},
+      {n:"Payment Status", t:"Picklist", note:"Issued / Part-paid / Paid / Overdue"},
+      {n:"Receipt Number", t:"Text", note:"On receipt; syncs to ERP GL"}
+    ]},
+  { api:"Benefit Claim", label:"Benefit Claim", cls:"fin", role:"fin",
+    legacy:"Financial — disbursement",
+    desc:"The application for disbursement — either direct to a worker, or reimbursement to an employer. Two claim types, one entity.",
+    fields:[
+      {n:"Claim ID", t:"PK", note:"Surrogate key", key:true},
+      {n:"Claim Type", t:"Picklist", note:"Worker Benefit / Employer Reimbursement"},
+      {n:"Worker Scheme Membership", t:"FK (worker claim)", note:"Source of accrued days", fk:true},
+      {n:"Employer Scheme Registration", t:"FK (reimbursement)", note:"Reimbursed party", fk:true},
+      {n:"Total Claimed Days", t:"Number", note:"Days drawn down"},
+      {n:"Calculated Amount", t:"Currency", note:"Weeks × current ordinary weekly pay"},
+      {n:"Assessment Status", t:"Picklist", note:"Lodged / Assessed / Approved / Disbursed / Rejected"}
+    ]}
+];
+
+const dmNotesHtml = `<ul>
+  <li><strong>Party supertype is the linchpin.</strong> Worker and Employer are each a single identity; every scheme relationship hangs off junctions, never off a second copy of the person or company. This is what lets accrual survive job changes and lets an employer span schemes cleanly.</li>
+  <li><strong>Three junctions, three jobs.</strong> <em>Worker Scheme Membership</em> (Worker⇄Scheme) is where accrual lives; <em>Employer Scheme Registration</em> (Employer⇄Scheme) is where the filing obligation lives; <em>Employment Engagement</em> (Membership⇄Registration, dated) is where the actual working relationship lives. Engagement deliberately sits <em>beneath</em> the two scheme-specific junctions so a service period can only ever attach to one fund.</li>
+  <li><strong>Cardinality that matters:</strong> Worker <b>1 : 0..n</b> Membership · Scheme <b>1 : 0..n</b> Membership · Membership <b>1 : 0..n</b> Engagement · Registration <b>1 : 0..n</b> Engagement · Engagement <b>1 : 0..n</b> Service Period · Return Header <b>1 : 0..n</b> Service Period. A Service Period therefore has exactly one engagement (one worker, one employer, one scheme) and one parent return.</li>
+  <li><strong>Two parents on Service Period, on purpose.</strong> It rolls up to the <em>Return</em> (the money/source view) and to the <em>Engagement</em> (the worker-accrual view). Both are needed: the levy is assessed per return, but the 7-year test aggregates per membership via engagements.</li>
+  <li><strong>Benefit Claim is polymorphic by type.</strong> A worker claim references a membership; an employer reimbursement references a registration. Kept as one entity with a type discriminator to unify assessment, but see the PSS tab — I'd split these on the platform.</li>
+  <li><strong>Time is first-class.</strong> Engagement and Service Period dating is what makes the 4-year inactivity test and continuous-service evaluation computable at any point in time.</li>
+</ul>`;
+
+/* ---------- PSS MAPPING ---------- */
+const pssMap = [
+  { entity:"Worker", type:"std", obj:"Account (Person Account)", pattern:"Person Account record type", notes:"B2C identity for Experience Cloud portal (Customer Community Plus). Native dedup/matching on TFN + Name + DOB." },
+  { entity:"Employer", type:"std", obj:"Account (Business)", pattern:"Business record type", notes:"ABN as external ID / natural key for integration." },
+  { entity:"Scheme", type:"pss", obj:"RegulatoryAuthority or Scheme__c", pattern:"Reference / config", notes:"PSS RegulatoryAuthority, or a lean custom object holding levy rates & flags. Small volume." },
+  { entity:"Employer Scheme Registration", type:"pss", obj:"BusinessLicense", pattern:"Account 1:n BusinessLicense", notes:"PSS explicitly supports one Account holding many licenses — cleanly gives multi-scheme registration." },
+  { entity:"Worker Scheme Membership", type:"cust", obj:"Worker_Scheme_Membership__c", pattern:"Lookup → Person Account & Scheme", notes:"Custom, not ProgramEnrollment — lifelong accrual roll-ups need bespoke Apex recalculation." },
+  { entity:"Employment Engagement", type:"cust", obj:"Employment_Engagement__c", pattern:"M:N bridge: BusinessLicense ⇄ Worker_Scheme_Membership__c", notes:"Date-effective junction resolving one-worker / many-employers / multi-scheme." },
+  { entity:"Return Period", type:"cust", obj:"Return_Period__c", pattern:"Reference", notes:"Small config-like table of statutory quarters." },
+  { entity:"Employer Return Header", type:"cust", obj:"Quarterly_Return__c", pattern:"Lookup → BusinessLicense", notes:"Custom — standard PSS assessment objects at this volume are an anti-pattern (data skew, bulk API failures)." },
+  { entity:"Service Period", type:"cust", obj:"Service_Period__c", pattern:"Master-Detail → Quarterly_Return__c; Lookup → Employment_Engagement__c", notes:"Custom for bulk CSV/API ingest. Interstate blocks arrive as an 'Interstate Recognition' record type." },
+  { entity:"Levy Invoice & Payment", type:"pss", obj:"RegulatoryTrxnFee", pattern:"Linked to BusinessLicense", notes:"PSS fee object natively tracks fee assessment; payment/receipt syncs to Govt ERP GL." },
+  { entity:"Benefit Claim (worker)", type:"std", obj:"IndividualApplication → BenefitAssignment / BenefitDisbursement", pattern:"OmniStudio guided flow", notes:"OOTB PSS benefits stack for constituent claims + identity docs." },
+  { entity:"Benefit Claim (employer reimbursement)", type:"std", obj:"BusinessLicenseApplication", pattern:"Distinct workflow", notes:"Differentiates the reimbursement journey from a worker claim." },
+  { entity:"Coverage / Audit / Dispute", type:"std", obj:"Case (record types) + InspectionAssessmentInd", pattern:"Case per record type; PSS inspection for field", notes:"Compliance, audits and statutory leave-timing disputes as segmented Cases." }
+];
+
+/* ---------- ARCHITECTURAL CALLOUTS (interrogate-and-flag) ---------- */
+const callouts = [
+  { kind:"flag", tag:"Push back", title:"Person Account at 400k+ workers × millions of service lines",
+    body:"The research maps Worker → Person Account for portal login, which is right for B2C identity. But Person Accounts are heavy (dual Account+Contact under the hood) and the real volume lives in Service_Period__c — potentially tens of millions of rows. I'd confirm the sharing model and skinny-table/large-data-volume strategy early, and pressure-test whether every worker truly needs a login or only claimants do. Portal licences at 400k+ are also a material cost line to size up front." },
+  { kind:"think", tag:"Confirm", title:"One 'Benefit Claim' entity vs two objects",
+    body:"The logical model unifies worker benefit and employer reimbursement into one Benefit Claim with a type discriminator, but the PSS mapping then splits them (IndividualApplication vs BusinessLicenseApplication). That's a reasonable platform divergence — different actors, forms, sharing and disbursement paths — but it means the 'one entity' view is logical-only. I'd make that split explicit with the customer so reporting and SLAs are defined per claim type, not on a blended object." },
+  { kind:"think", tag:"Confirm", title:"Master-Detail vs Lookup on Service Period",
+    body:"Service Period is Master-Detail to the Return (good for roll-ups and bulk delete on re-submission) but only Lookup to Employment Engagement. That's the right call — an engagement shouldn't cascade-delete service — but it means membership-level accrual roll-ups can't use native roll-up summary fields and will need Apex or a rollup framework. Worth confirming the recalculation approach (trigger vs async/batch) given the volume." },
+  { kind:"flag", tag:"Push back", title:"Roll-up of accrual across millions of rows",
+    body:"'Total Accrued Days' on the membership is a sum over that worker's service periods across all their engagements. Doing this synchronously in triggers will not scale on bulk quarterly loads. I'd design accrual as an async/batch recalculation with an audit of the calculation, and treat the stored total as a materialised value — not the source of truth — so a recompute is always possible. This also de-risks the fractional-rounding question (OQ-2)." },
+  { kind:"think", tag:"Confirm", title:"Identity matching when TFN is absent (OQ-1)",
+    body:"Deterministic TFN+DOB+Name matching is clean when the TFN is present, but employers frequently withhold it. The fallback weighting on Name+DOB is exactly where duplicate workers get created — and a duplicate silently splits continuous service. I'd invest in a proper match/merge capability (review queue, survivorship rules) and treat Identity Resolution (SVC-03) as core, not edge. This is the highest data-integrity risk in the whole design." },
+  { kind:"think", tag:"Confirm", title:"Interstate liability transfer timing (OQ-3)",
+    body:"Whether PLSA moves money to/from QLeave et al. at the point service is recorded, or only at final claim, materially changes the financial data model (a liability-transfer ledger vs a claim-time settlement). I'd resolve this before physical design — it decides whether we need reciprocal-settlement records at all, and how solvency reporting treats cross-border service." }
+];
+
+const pssNotesHtml = `<ul>
+  <li><strong>Integration.</strong> Interstate reciprocal recognition via MuleSoft: certified cross-border blocks map into Service_Period__c under an 'Interstate Recognition' record type. Payroll agents submit via bulk CSV or API against multiple employer accounts.</li>
+  <li><strong>Finance.</strong> Levy receipts and benefit disbursements need bidirectional integration to the Victorian Government's central ERP (Oracle/SAP) for general-ledger synchronisation.</li>
+  <li><strong>Portal.</strong> Experience Cloud with OmniStudio guided flows for worker claims and employer returns; Customer Community Plus licensing for workers, partner-style access for authorised agents acting across many employers.</li>
+  <li><strong>Object-type key:</strong> <span class="otype std">standard</span> = core Salesforce; <span class="otype pss">PSS</span> = Public Sector Solutions industry object; <span class="otype cust">custom</span> = purpose-built for volume or bespoke logic.</li>
+  <li><em>PSS object availability varies by org edition/licensing — confirm the target org actually provisions BusinessLicense, RegulatoryTrxnFee, BenefitAssignment/Disbursement and the Inspection objects before committing the mapping.</em></li>
+</ul>`;
+
+/* ---------- CONTEXT: SCHEME COMPARISON ---------- */
+const schemeCmp = {
+  headers:["Parameter","Community Services","Contract Cleaning","Security"],
+  rows:[
+    ["Statutory accrual rate","1 week / 60 weeks","1 week / 60 weeks","1 week / 60 weeks"],
+    ["Eligibility threshold","7 years continuous","7 years continuous","7 years continuous"],
+    ["Employer levy rate","1.65% of ordinary pay","1.80% of ordinary pay","1.80% of ordinary pay"],
+    ["Leave-timing dispute powers","Excluded","Authorised","Authorised"],
+    ["Key inclusions / exclusions","Incl. private-residence home care; excl. general health/aged care","Excl. waste removal, groundskeeping, gardening","Relies on modern security award definitions"],
+    ["Maximum inactivity gap","4 years","4 years","4 years"],
+    ["Reporting cadence","Quarterly","Quarterly","Quarterly"]
+  ]
+};
+/* ---------- CONTEXT: ACTORS ---------- */
+const actors = [
+  { name:"Worker / Scheme Member", role:"Individuals in community services, cleaning or security. May hold multiple concurrent employers and multiple scheme memberships. Wants to monitor accruing credits, verify employer reporting, and lodge a claim at the 7-year threshold.", src:"LSBP Act 2018" },
+  { name:"Employer", role:"Sole traders to corporations & non-profits funding the scheme. Register entities, onboard workers, submit quarterly returns, remit levies. May span multiple schemes. Also act as claimants for reimbursement. Penalties can exceed $19,000.", src:"LSBP Act 2018 · PLSA" },
+  { name:"Authorized Agent", role:"Third-party payroll providers, bookkeepers, accountants acting under delegated authority. Rely on bulk CSV / API to submit returns across many employer accounts at once.", src:"PLSA operations" },
+  { name:"Interstate Reciprocal Operators", role:"QLeave (QLD), SA Portable LSL, TasBuild, Long Service Corporation (NSW) — operate corresponding laws. Require secure standardised exchange to authenticate identity, verify service blocks and transfer liability.", src:"Corresponding-laws agreements" },
+  { name:"Registry & Customer Service Officers", role:"Front line — manual registrations, coverage inquiries, and delicate data remediation such as merging duplicate worker profiles to preserve continuous service.", src:"PLSA · Customer Service & Operations" },
+  { name:"Assessment Officers", role:"Adjudicate worker benefit claims and employer reimbursements — aggregate historical service, validate against the 4-year inactivity rule, apply pro-rata rules, authorise disbursement.", src:"PLSA · Claims & Benefits" },
+  { name:"Compliance & Enforcement Officers", role:"Intelligence-led, risk-based. Identify unregistered employers, audit reporting anomalies, recover debt, and exercise the Registrar's investigative powers.", src:"PLSA · Registrar's powers" },
+  { name:"Governing Board & Registrar", role:"Set levy rates (s38), monitor scheme solvency (target funding ratio 110%), report to the Minister for Industrial Relations. The CEO concurrently holds the statutory office of Registrar.", src:"LSBP Act 2018 s38" }
+];
+/* ---------- CONTEXT: OPEN QUESTIONS ---------- */
+const openQuestions = [
+  { id:"OQ-1", title:"Identity matching when TFN is missing", body:"Exact deterministic fallback when the TFN is withheld on a bulk return: what weighting on Name + Date of Birth prevents erroneous duplicate Person Accounts, and what routes to manual review?" },
+  { id:"OQ-2", title:"Fractional-day / week rounding", body:"How are partial days and fractional weeks rounded when aggregating thousands of micro service periods to the 2,555-day threshold — at the line-item level, or only at the final aggregate?" },
+  { id:"OQ-3", title:"Reciprocal financial liability transfers", body:"Under corresponding-laws agreements, is fiat transferred to/from the reciprocal authority at the point service is recorded, or only settled at the final benefit claim? Decides whether we model a settlement ledger." },
+  { id:"OQ-4", title:"Dispute escalation pathways", body:"For leave-timing disputes (Cleaning/Security), what is the systematic hand-off when PLSA mediation fails — does the Case become a tribunal-referral payload, and must external tribunal outcomes be tracked back into the CRM?" },
+  { id:"OQ-5", title:"Boundary / proportion workers", body:"How are workers at a scheme boundary handled (e.g. 40% contract cleaning, 60% general facilities)? Does the return schema need a per-line 'predominant activity' flag, or does the employer pre-calculate the eligible proportion?" }
+];
+
+/* ---------- WORKED EXAMPLE MODEL ---------- */
+const workedExample = {
+  worker:{ label:"Priya", sub:"one Worker identity" },
+  memberships:[
+    { id:"m1", label:"Membership — Community Services", scheme:"cs", accrual:"accrues toward CS 7-yr threshold" },
+    { id:"m2", label:"Membership — Security", scheme:"sec", accrual:"accrues toward Security 7-yr threshold" }
+  ],
+  engagements:[
+    { id:"e1", membership:"m1", employer:"Family Violence Support Co", reg:"CS registration", period:"Jan–Jun", note:"changed employer mid-year" },
+    { id:"e2", membership:"m1", employer:"Community Care Alliance", reg:"CS registration", period:"Jul–Dec", note:"same membership → continuous service" },
+    { id:"e3", membership:"m2", employer:"Events Security Pty Ltd", reg:"Security registration", period:"all year (weekends)", note:"concurrent with CS work" }
+  ]
+};
+/* ================= RENDER ================= */
+/* ---------- STATE MACHINE (membership lifecycle) ---------- */
+function renderSM(){
+  const states = [
+    {label:"Registered", sub:"membership created", cls:"#8894ad"},
+    {label:"Active / Accruing", sub:"returns add service", cls:"#1264c0"},
+    {label:"Threshold Met", sub:"≥ 7 yrs · claimable", cls:"#2c8a4a"},
+    {label:"Claim in Progress", sub:"assessed & disbursed", cls:"#0b8a8f"},
+    {label:"Deactivated", sub:"4-yr gap · forfeited", cls:"#b02121"}
+  ];
+  const boxW=158, boxH=60, gapX=78, y=96;
+  const W = 10 + states.length*boxW + (states.length-1)*gapX + 10;
+  const H = 250;
+  states.forEach((s,i)=>{ s.x = 10 + i*(boxW+gapX); });
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:1080px" font-family="inherit">`;
+  s+=`<defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#5a6b86"/></marker>`;
+  s+=`<marker id="arrR" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#b02121"/></marker></defs>`;
+  const labels=[["first","return"],["7-yr","reached"],["lodge","claim"],["balance","remains"]];
+  for(let i=0;i<states.length-1;i++){
+    const x1=states[i].x+boxW, x2=states[i+1].x, midX=(x1+x2)/2;
+    s+=`<line x1="${x1}" y1="${y+boxH/2}" x2="${x2-2}" y2="${y+boxH/2}" stroke="#5a6b86" stroke-width="1.6" marker-end="url(#arr)"/>`;
+    const lines=labels[i];
+    const baseY = y+boxH/2 - 10 - (lines.length-1)*11;
+    lines.forEach((ln,j)=>{
+      s+=`<text x="${midX}" y="${baseY+j*11}" text-anchor="middle" font-size="10" fill="#43597e" font-weight="600">${ln}</text>`;
+    });
+  }
+  // claim-in-progress loops back to active/accruing (balance remains, keeps accruing)
+  s+=`<path d="M ${states[3].x+boxW/2} ${y} C ${states[3].x+boxW/2} ${y-46}, ${states[1].x+boxW/2} ${y-46}, ${states[1].x+boxW/2} ${y-2}" fill="none" stroke="#0b8a8f" stroke-width="1.4" stroke-dasharray="4,3" marker-end="url(#arr)"/>`;
+  s+=`<text x="${(states[1].x+states[3].x)/2+boxW/2}" y="${y-52}" text-anchor="middle" font-size="10" fill="#0b8a8f" font-weight="600">partial claim — keeps accruing</text>`;
+  // active -> deactivated (4-yr inactivity), red
+  s+=`<path d="M ${states[1].x+boxW/2} ${y+boxH} C ${states[1].x+boxW/2} ${y+boxH+56}, ${states[4].x+boxW/2} ${y+boxH+56}, ${states[4].x+boxW/2} ${y+boxH+2}" fill="none" stroke="#b02121" stroke-width="1.4" stroke-dasharray="5,4" marker-end="url(#arrR)"/>`;
+  s+=`<text x="${(states[1].x+states[4].x)/2+boxW/2}" y="${y+boxH+72}" text-anchor="middle" font-size="10" fill="#b02121" font-weight="600">no recognised service for 4 years → registration deactivated, credits forfeited</text>`;
+  states.forEach(st=>{
+    s+=`<rect x="${st.x}" y="${y}" width="${boxW}" height="${boxH}" rx="10" fill="#fff" stroke="${st.cls}" stroke-width="2"/>`;
+    s+=`<text x="${st.x+boxW/2}" y="${y+25}" text-anchor="middle" font-size="12.5" font-weight="700" fill="${st.cls}">${st.label}</text>`;
+    s+=`<text x="${st.x+boxW/2}" y="${y+43}" text-anchor="middle" font-size="10" fill="#5a6b86">${st.sub}</text>`;
+  });
+  s+=`<text x="10" y="30" font-size="11" fill="#8494ad">One lifecycle PER scheme membership · Quarterly returns drive accrual · the 7-year threshold unlocks claims · a 4-year inactivity gap forfeits accrued credits</text>`;
+  s+=`</svg>`;
+  document.getElementById('sm').innerHTML=s;
+}
+
+/* ---------- build domain chips ---------- */
+function buildChips(){
+  ["svc","proc"].forEach(pfx=>{
+    const bar = document.querySelector('#'+(pfx==='svc'?'catalogue':'processes')+' .controls');
+    DOMAIN_ORDER.forEach(d=>{
+      const c=document.createElement('span');
+      c.className='chip'; c.dataset.filter=pfx+'-domain'; c.dataset.val=d; c.innerHTML=d;
+      bar.appendChild(c);
+    });
+  });
+}
+
+/* ---------- SCHEME TAG HELPER ---------- */
+const SCHEME_LABEL={CS:"Community Svcs",CC:"Cleaning",SEC:"Security"};
+const SCHEME_CLS={CS:"cs",CC:"cc",SEC:"sec"};
+function schemeTags(arr){
+  return (arr||[]).map(x=>`<span class="scheme-tag ${SCHEME_CLS[x]}">${SCHEME_LABEL[x]}</span>`).join(' ');
+}
+
+/* ---------- CARD RENDER ---------- */
+function svcCard(sv){
+  const searchStr=(sv.code+' '+sv.name+' '+sv.desc+' '+sv.actor+' '+sv.domain+' '+(sv.procs||[]).join(' ')).toLowerCase().replace(/&amp;/g,'&');
+  return `<div class="card" data-domain="${sv.domain}" data-search="${searchStr}">
+    <div class="code">${sv.code}</div>
+    <h3>${sv.name}</h3>
+    <p class="desc">${sv.desc}</p>
+    <div class="meta">
+      <span class="tag domain">${sv.domain}</span>
+      <span class="tag actor">${sv.actor}</span>
+      <span class="tag channel">${sv.channel}</span>
+    </div>
+    <div class="row-label">Applies to schemes</div>
+    <div class="meta">${schemeTags(sv.schemes)}</div>
+    <div class="row-label">PSS components</div>
+    <div class="meta">${sv.pss.map(p=>`<span class="tag pss">${p}</span>`).join('')}</div>
+    <div class="row-label">Realised by</div>
+    <div class="br-list">${(sv.procs||[]).map(p=>`<span class="br">${p}</span>`).join('')}</div>
+  </div>`;
+}
+function procCard(p){
+  const searchStr=(p.code+' '+p.name+' '+p.steps.join(' ')+' '+p.trigger+' '+p.domain).toLowerCase().replace(/&amp;/g,'&');
+  return `<div class="card" data-domain="${p.domain}" data-search="${searchStr}">
+    <div class="code">${p.code} · realises ${p.svc}</div>
+    <h3>${p.name}</h3>
+    <div class="meta">
+      <span class="tag domain">${p.domain}</span>
+      <span class="tag actor">${p.actor}</span>
+      <span class="tag channel">${p.channel}</span>
+    </div>
+    <div class="row-label">Trigger</div>
+    <div class="meta"><span class="tag trigger">${p.trigger}</span></div>
+    <div class="row-label">Steps</div>
+    <ol class="steps">${p.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+    <div class="row-label">State transition</div>
+    <div class="meta"><span class="tag">${p.transition}</span></div>
+    <div class="row-label">Exceptions</div>
+    <ul class="steps">${p.exceptions.map(e=>`<li>${e}</li>`).join('')}</ul>
+    ${(p.oq&&p.oq.length)?`<div class="row-label">Open questions</div><div class="br-list">${p.oq.map(o=>`<span class="br oq" title="See Domain & Context tab">${o}</span>`).join('')}</div>`:''}
+  </div>`;
+}
+function renderSvc(){
+  const groups={}; services.forEach(s=>{(groups[s.domain]=groups[s.domain]||[]).push(s);});
+  let html='';
+  DOMAIN_ORDER.forEach(d=>{ if(!groups[d])return;
+    html+=`<div class="group-head" data-domain="${d}"><h2>${d}</h2><p>${DOMAINS[d]}</p></div>`;
+    html+=groups[d].map(svcCard).join('');
+  });
+  document.getElementById('svcGrid').innerHTML=html;
+}
+function renderProc(){
+  const groups={}; processes.forEach(s=>{(groups[s.domain]=groups[s.domain]||[]).push(s);});
+  let html='';
+  DOMAIN_ORDER.forEach(d=>{ if(!groups[d])return;
+    html+=`<div class="group-head" data-domain="${d}"><h2>${d}</h2><p>${DOMAINS[d]}</p></div>`;
+    html+=groups[d].map(procCard).join('');
+  });
+  document.getElementById('procGrid').innerHTML=html;
+}
+/* ---------- ERD ---------- */
+function renderERD(){
+  const W=980,H=560;
+  const N={
+    worker:{x:60, y:20, w:180,h:50,label:"WORKER",sub:"natural person",fill:"#0b3d91",fg:"#fff",stroke:"#0b3d91"},
+    emp:   {x:740,y:20, w:180,h:50,label:"EMPLOYER",sub:"legal entity",fill:"#0b3d91",fg:"#fff",stroke:"#0b3d91"},
+    scheme:{x:400,y:20, w:180,h:50,label:"SCHEME",sub:"CS / CC / SEC",fill:"#eaf5ec",fg:"#12213c",stroke:"#7fc79a"},
+    wsm:   {x:120,y:150,w:190,h:50,label:"WORKER_SCHEME_\nMEMBERSHIP",sub:"junction · accrual",fill:"#fff4e6",fg:"#12213c",stroke:"#f0a53b"},
+    esr:   {x:670,y:150,w:190,h:50,label:"EMPLOYER_SCHEME_\nREGISTRATION",sub:"junction · filing obligation",fill:"#fff4e6",fg:"#12213c",stroke:"#f0a53b"},
+    eng:   {x:395,y:270,w:190,h:50,label:"EMPLOYMENT_\nENGAGEMENT",sub:"dated junction",fill:"#fff4e6",fg:"#12213c",stroke:"#f0a53b"},
+    period:{x:60, y:390,w:170,h:48,label:"RETURN_PERIOD",sub:"statutory quarter",fill:"#eaf5ec",fg:"#12213c",stroke:"#7fc79a"},
+    rethdr:{x:395,y:390,w:190,h:50,label:"EMPLOYER_RETURN_\nHEADER",sub:"submission",fill:"#eaf3fb",fg:"#12213c",stroke:"#7fb0e0"},
+    svcp:  {x:395,y:485,w:190,h:50,label:"SERVICE_PERIOD",sub:"line item · granular",fill:"#eaf3fb",fg:"#12213c",stroke:"#7fb0e0"},
+    inv:   {x:720,y:400,w:190,h:48,label:"LEVY_INVOICE_\n& PAYMENT",sub:"financial",fill:"#f3ecfb",fg:"#12213c",stroke:"#b98fd8"},
+    claim: {x:110,y:270,w:180,h:50,label:"BENEFIT_CLAIM",sub:"worker / reimbursement",fill:"#f3ecfb",fg:"#12213c",stroke:"#b98fd8"}
+  };
+  const cx=n=>n.x+n.w/2, cy=n=>n.y+n.h/2;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:940px" font-family="inherit">`;
+  // relationships with crow's-foot-ish "1..n" mid labels
+  const rels=[
+    ["worker","wsm","holds"],["scheme","wsm","governs"],
+    ["emp","esr","holds"],["scheme","esr","governs"],
+    ["wsm","eng","engages"],["esr","eng","provides"],
+    ["esr","rethdr","submits"],["period","rethdr","defines"],
+    ["rethdr","svcp","contains"],["eng","svcp","accrues"],
+    ["rethdr","inv","generates"],
+    ["wsm","claim","initiates"],["esr","claim","reimburses"]
+  ];
+  rels.forEach(([a,b,lbl])=>{const na=N[a],nb=N[b];
+    s+=`<line x1="${cx(na)}" y1="${cy(na)}" x2="${cx(nb)}" y2="${cy(nb)}" stroke="#c3cee0" stroke-width="1.3"/>`;
+    const mx=(cx(na)+cx(nb))/2, my=(cy(na)+cy(nb))/2;
+    s+=`<rect x="${mx-lbl.length*3.0}" y="${my-8}" width="${lbl.length*6.0}" height="13" rx="3" fill="#fff" opacity="0.9"/>`;
+    s+=`<text x="${mx}" y="${my+2}" text-anchor="middle" font-size="9" fill="#7a8aa3">${lbl}</text>`;
+  });
+  Object.values(N).forEach(n=>{
+    s+=`<rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="9" fill="${n.fill}" stroke="${n.stroke}" stroke-width="2"/>`;
+    const parts=n.label.split('\n');
+    const fg=n.fg, subfg = fg==='#fff'?'rgba(255,255,255,.85)':'#5a6b86';
+    if(parts.length>1){
+      s+=`<text x="${cx(n)}" y="${n.y+18}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${fg}" font-family="ui-monospace,Menlo,monospace">${parts[0]}</text>`;
+      s+=`<text x="${cx(n)}" y="${n.y+30}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${fg}" font-family="ui-monospace,Menlo,monospace">${parts[1]}</text>`;
+      s+=`<text x="${cx(n)}" y="${n.y+44}" text-anchor="middle" font-size="9.5" fill="${subfg}">${n.sub}</text>`;
+    } else {
+      s+=`<text x="${cx(n)}" y="${n.y+22}" text-anchor="middle" font-size="11.5" font-weight="700" fill="${fg}" font-family="ui-monospace,Menlo,monospace">${n.label}</text>`;
+      s+=`<text x="${cx(n)}" y="${n.y+38}" text-anchor="middle" font-size="9.5" fill="${subfg}">${n.sub}</text>`;
+    }
+  });
+  s+=`</svg>`;
+  document.getElementById('erd').innerHTML=s;
+}
+/* ---------- WORKED EXAMPLE SVG ---------- */
+function renderWE(){
+  const W=960,H=360;
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:900px" font-family="inherit">`;
+  s+=`<defs><marker id="wa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#8494ad"/></marker></defs>`;
+  // Worker node (center-left top)
+  const wx=40,wy=150,ww=140,wh=60;
+  s+=`<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" rx="12" fill="#0b3d91" stroke="#0b3d91"/>`;
+  s+=`<text x="${wx+ww/2}" y="${wy+27}" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">Priya</text>`;
+  s+=`<text x="${wx+ww/2}" y="${wy+45}" text-anchor="middle" font-size="10.5" fill="rgba(255,255,255,.85)">one Worker identity</text>`;
+  // membership nodes
+  const memb=[
+    {x:280,y:60,scheme:"cs",label:"Worker Scheme Membership",sub:"Community Services fund"},
+    {x:280,y:240,scheme:"sec",label:"Worker Scheme Membership",sub:"Security fund"}
+  ];
+  const mColor={cs:"#14539e",sec:"#6b3fb0"};
+  const mFill={cs:"#e7f0fb",sec:"#f0ecfb"};
+  memb.forEach(m=>{
+    s+=`<rect x="${m.x}" y="${m.y}" width="210" height="62" rx="10" fill="${mFill[m.scheme]}" stroke="${mColor[m.scheme]}" stroke-width="2"/>`;
+    s+=`<text x="${m.x+105}" y="${m.y+22}" text-anchor="middle" font-size="11.5" font-weight="700" fill="${mColor[m.scheme]}">${m.label}</text>`;
+    s+=`<text x="${m.x+105}" y="${m.y+38}" text-anchor="middle" font-size="11" fill="${mColor[m.scheme]}">${m.sub}</text>`;
+    s+=`<text x="${m.x+105}" y="${m.y+53}" text-anchor="middle" font-size="9.5" fill="#5a6b86">accrues to its own 7-yr threshold</text>`;
+    // worker -> membership
+    s+=`<line x1="${wx+ww}" y1="${wy+wh/2}" x2="${m.x-2}" y2="${m.y+31}" stroke="#8494ad" stroke-width="1.5" marker-end="url(#wa)"/>`;
+  });
+  // engagement nodes
+  const eng=[
+    {x:560,y:20,m:0,emp:"Family Violence Support Co",per:"Jan–Jun",tag:"CS registration"},
+    {x:560,y:98,m:0,emp:"Community Care Alliance",per:"Jul–Dec",tag:"CS registration"},
+    {x:560,y:242,m:1,emp:"Events Security Pty Ltd",per:"weekends, all year",tag:"Security registration"}
+  ];
+  eng.forEach(e=>{
+    const my = memb[e.m].y+31;
+    s+=`<rect x="${e.x}" y="${e.y}" width="230" height="60" rx="9" fill="#fff4e6" stroke="#f0a53b" stroke-width="1.8"/>`;
+    s+=`<text x="${e.x+115}" y="${e.y+18}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#a5661b">Employment Engagement</text>`;
+    s+=`<text x="${e.x+115}" y="${e.y+34}" text-anchor="middle" font-size="10.5" fill="#8a5410">${e.emp}</text>`;
+    s+=`<text x="${e.x+115}" y="${e.y+50}" text-anchor="middle" font-size="9.5" fill="#8a5410">${e.per} · ${e.tag}</text>`;
+    s+=`<line x1="${memb[e.m].x+210}" y1="${my}" x2="${e.x-2}" y2="${e.y+30}" stroke="#8494ad" stroke-width="1.5" marker-end="url(#wa)"/>`;
+  });
+  // brace note between the two CS engagements
+  s+=`<path d="M 800 50 C 815 50, 815 108, 800 108" fill="none" stroke="#2c8a4a" stroke-width="1.4"/>`;
+  s+=`<text x="822" y="82" font-size="10" fill="#2c8a4a" font-weight="600">continuous</text>`;
+  s+=`<text x="822" y="95" font-size="10" fill="#2c8a4a" font-weight="600">service kept</text>`;
+  s+=`</svg>`;
+  document.getElementById('we').innerHTML=s;
+}
+function objCard(o){
+  return `<div class="obj-card">
+    <div class="obj-head ${o.cls}">
+      <div class="code">${o.api}</div>
+      <h3>${o.label}</h3>
+      <p>${o.desc}</p>
+      <div class="obj-legacy">${o.legacy}</div>
+    </div>
+    ${o.fields.map(f=>`<div class="fld${f.key?' key':''}${f.fk?' fk':''}">
+      <span class="fname">${f.n}</span><span class="ftype">${f.t}</span><span class="fnote">${f.note}</span></div>`).join('')}
+  </div>`;
+}
+function renderDataModel(){
+  renderERD();
+  renderWE();
+  document.getElementById('objGrid').innerHTML=objects.map(objCard).join('');
+  document.getElementById('dmNotes').innerHTML=dmNotesHtml;
+}
+/* ---------- PSS MAPPING RENDER ---------- */
+function renderPSS(){
+  const tlabel={std:"standard",pss:"PSS",cust:"custom"};
+  let m=`<table class="map"><thead><tr>
+     <th style="width:210px">Logical entity</th><th style="width:70px">Type</th>
+     <th style="width:250px">Salesforce object</th><th style="width:220px">Relationship pattern</th><th>Notes</th></tr></thead><tbody>`;
+  m+=pssMap.map(r=>`<tr>
+     <td style="font-weight:700;color:#24324c">${r.entity}</td>
+     <td><span class="otype ${r.type}">${tlabel[r.type]}</span></td>
+     <td><code>${r.obj}</code></td>
+     <td style="color:#43597e">${r.pattern}</td>
+     <td>${r.notes}</td></tr>`).join('');
+  m+='</tbody></table>';
+  document.getElementById('pssTable').innerHTML=m;
+
+  document.getElementById('calloutList').innerHTML=callouts.map(c=>`
+    <div class="callout ${c.kind}">
+      <h4><span class="pillette">${c.tag}</span> ${c.title}</h4>
+      <p>${c.body}</p>
+    </div>`).join('');
+  document.getElementById('pssNotes').innerHTML=pssNotesHtml;
+}
+/* ---------- CONTEXT RENDER ---------- */
+function renderContext(){
+  // scheme comparison
+  let c=`<table class="cmp"><thead><tr>${schemeCmp.headers.map((h,i)=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+  c+=schemeCmp.rows.map(row=>`<tr>${row.map((cell,i)=>`<td>${cell}</td>`).join('')}</tr>`).join('');
+  c+='</tbody></table>';
+  document.getElementById('cmpTable').innerHTML=c;
+
+  document.getElementById('actorGrid').innerHTML=actors.map(a=>`
+    <div class="ctx-card"><span class="pill actor">Actor</span><h3>${a.name}</h3><p>${a.role}</p><div class="src">${a.src}</div></div>`).join('');
+  document.getElementById('oqGrid').innerHTML=openQuestions.map(q=>`
+    <div class="ctx-card"><span class="pill oq">${q.id}</span><h3>${q.title}</h3><p>${q.body}</p></div>`).join('');
+}
+/* ---------- FOOT ---------- */
+document.getElementById('foot').innerHTML =
+  `Sources: PLSA domain research — <em>Long Service Benefits Portability Act 2018 (Vic)</em>; <em>Long Service Benefits Portability Regulations 2020</em>; PLSA Annual Reports 2019-20 to 2024-25 and Corporate Plan 2023-26; Business Victoria & vic.gov.au long-service-leave guidance; interstate corresponding-laws (QLeave, LSC NSW, SA, TasBuild). Salesforce PSS object mapping is indicative, for stakeholder review, and depends on target-org licensing. This is a structured outside-in design, not a build specification — items marked OQ are open questions for PLSA SMEs.`;
+
+/* ---------- FILTER / SEARCH ---------- */
+function applyFilter(gridId, searchVal, domainVal){
+  const grid=document.getElementById(gridId);
+  const cards=grid.querySelectorAll('.card');
+  let visible=0; const shownDomains=new Set();
+  cards.forEach(c=>{
+    const okD = domainVal==='all' || c.dataset.domain===domainVal;
+    const okS = !searchVal || c.dataset.search.includes(searchVal.toLowerCase());
+    const show=okD&&okS;
+    c.style.display=show?'':'none';
+    if(show){visible++;shownDomains.add(c.dataset.domain);}
+  });
+  grid.querySelectorAll('.group-head').forEach(g=>{ g.style.display = shownDomains.has(g.dataset.domain)?'':'none'; });
+  return visible;
+}
+const svcState={search:'',domain:'all'};
+const procState={search:'',domain:'all'};
+function refreshSvc(){const n=applyFilter('svcGrid',svcState.search,svcState.domain);document.getElementById('svcCountLine').textContent=`${n} service${n!==1?'s':''} shown`;}
+function refreshProc(){const n=applyFilter('procGrid',procState.search,procState.domain);document.getElementById('procCountLine').textContent=`${n} process${n!==1?'es':''} shown`;}
+
+/* ---------- WIRE UP ---------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById(t.dataset.panel).classList.add('active');
+  });
+});
+function wireChips(){
+  document.querySelectorAll('.chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      const f=c.dataset.filter,v=c.dataset.val;
+      document.querySelectorAll(`.chip[data-filter="${f}"]`).forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      if(f==='svc-domain'){svcState.domain=v;refreshSvc();}
+      if(f==='proc-domain'){procState.domain=v;refreshProc();}
+    });
+  });
+}
+document.getElementById('svcSearch').addEventListener('input',e=>{svcState.search=e.target.value;refreshSvc();});
+document.getElementById('procSearch').addEventListener('input',e=>{procState.search=e.target.value;refreshProc();});
+
+/* INIT */
+buildChips(); wireChips();
+renderSM();renderSvc();renderProc();renderDataModel();renderPSS();renderContext();
+refreshSvc();refreshProc();
+document.getElementById('svcCount').textContent=services.length;
+document.getElementById('procCount').textContent=processes.length;
+document.getElementById('objCount').textContent=objects.length;
+</script>
+</body>
+</html>
