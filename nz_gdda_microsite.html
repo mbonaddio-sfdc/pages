@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NZ Government Digital Services — A Working Proposal</title>
+<style>
+  :root {
+    color-scheme: light;
+    --navy: #001E5B;
+    --navy-2: #002775;
+    --blue-primary: #066AFE;
+    --blue-secondary: #0250D9;
+    --cloud-blue: #00B3FF;
+    --cloud-blue-light: #90D0FE;
+    --bg-light: #EAF5FE;
+    --bg-lighter: #CFE9FE;
+    --white: #FFFFFF;
+    --teal: #06A59A;
+    --pink: #B60554;
+    --yellow: #E4A201;
+    --violet: #730394;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-light);
+    font-family: "Salesforce Sans", "Calibri", "Helvetica Neue", Arial, sans-serif;
+    color: var(--navy);
+    scroll-behavior: smooth;
+    line-height: 1.7;
+  }
+
+  /* ---------- STICKY NAV ---------- */
+  nav.top {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(0, 30, 91, 0.96);
+    backdrop-filter: blur(8px);
+    color: var(--white);
+    padding: 10px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 2px 8px rgba(0,30,91,0.15);
+    font-size: 13.5px;
+  }
+  nav.top .brand {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    font-size: 14px;
+  }
+  nav.top .brand .accent { color: var(--cloud-blue-light); }
+  nav.top ul {
+    list-style: none;
+    display: flex;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
+    overflow-x: auto;
+    flex: 1;
+  }
+  nav.top a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    padding: 5px 9px;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 13px;
+    transition: background 0.15s, color 0.15s;
+  }
+  nav.top a:hover, nav.top a.active {
+    background: rgba(255,255,255,0.12);
+    color: var(--white);
+  }
+  nav.top a .num {
+    color: var(--cloud-blue-light);
+    font-weight: 700;
+    margin-right: 4px;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    background: linear-gradient(135deg, #001E5B 0%, #002775 60%, #0250D9 100%);
+    color: var(--white);
+    padding: 80px 44px 100px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0, 179, 255, 0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+  .hero .kicker {
+    font-size: 13.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--cloud-blue-light);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 52px;
+    line-height: 1.05;
+    color: var(--white);
+    margin: 0 0 20px 0;
+    letter-spacing: -0.015em;
+    max-width: 950px;
+  }
+  .hero h1 .accent { color: var(--cloud-blue-light); }
+  .hero .subtitle {
+    font-size: 20px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+    margin: 0;
+    max-width: 900px;
+  }
+  .hero .meta {
+    margin-top: 32px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.8);
+  }
+  .hero .meta strong { color: var(--white); font-weight: 700; }
+
+  /* ---------- CONTENTS ---------- */
+  .contents-wrap {
+    background: var(--white);
+    padding: 40px 44px 48px;
+    border-bottom: 1px solid rgba(0,30,91,0.08);
+  }
+  .contents-inner { max-width: 1200px; margin: 0 auto; }
+  .contents-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--blue-primary);
+    margin: 0 0 20px 0;
+    font-weight: 700;
+  }
+  .contents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .contents-item {
+    background: var(--bg-light);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: var(--navy);
+    transition: transform 0.15s, box-shadow 0.15s;
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .contents-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(6, 106, 254, 0.15);
+  }
+  .contents-item .num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 20px;
+    color: var(--blue-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .contents-item .item-body h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    margin: 0 0 3px 0;
+    font-size: 15.5px;
+    color: var(--navy);
+  }
+  .contents-item .item-body p {
+    margin: 0;
+    font-size: 13.5px;
+    color: rgba(0,30,91,0.78);
+    line-height: 1.65;
+  }
+  .contents-item .item-body .reading-time {
+    color: var(--blue-primary);
+    font-weight: 700;
+    font-size: 12.5px;
+    margin-left: 4px;
+  }
+
+  /* ---------- MAIN SECTIONS ---------- */
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 44px 60px; }
+
+  section.chapter {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 40px 44px 44px;
+    margin-bottom: 28px;
+    box-shadow: 0 3px 12px rgba(6, 106, 254, 0.06);
+    scroll-margin-top: 70px;
+  }
+
+  section.chapter > .chap-kicker {
+    font-size: 12.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue-primary);
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+  section.chapter > .chap-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 34px;
+    line-height: 1.15;
+    color: var(--navy);
+    margin: 0 0 8px 0;
+    letter-spacing: -0.01em;
+  }
+  section.chapter > .chap-title .accent { color: var(--blue-primary); }
+  section.chapter > .chap-title .num {
+    color: var(--blue-primary);
+    font-weight: 700;
+    margin-right: 16px;
+  }
+  section.chapter > .chap-subtitle {
+    font-size: 17.5px;
+    line-height: 1.65;
+    color: var(--navy-2);
+    margin: 0 0 24px 0;
+    max-width: 950px;
+  }
+  section.chapter .reading-time-hero {
+    font-size: 12.5px;
+    color: rgba(0,30,91,0.7);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(0,30,91,0.08);
+  }
+  section.chapter .reading-time-hero strong { color: var(--navy); }
+
+  /* ---------- PROSE ---------- */
+  .prose p {
+    font-size: 16.5px;
+    line-height: 1.7;
+    color: var(--navy);
+    margin: 0 0 16px 0;
+    max-width: 900px;
+  }
+  .prose p .accent { color: var(--blue-primary); font-weight: 600; }
+  .prose p em { color: var(--navy-2); font-style: italic; }
+  .prose p strong { color: var(--navy); font-weight: 700; }
+  .prose ul {
+    padding: 0;
+    margin: 0 0 16px 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 900px;
+  }
+  .prose ul li {
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--navy);
+    padding-left: 20px;
+    position: relative;
+  }
+  .prose ul li::before {
+    content: "";
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--blue-primary);
+    position: absolute; left: 4px; top: 9px;
+  }
+  .prose ul li strong { color: var(--blue-primary); }
+
+  /* ---------- CALLOUTS ---------- */
+  .callout {
+    background: linear-gradient(90deg, var(--bg-light) 0%, var(--bg-lighter) 100%);
+    border-left: 4px solid var(--blue-primary);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 15.5px;
+    line-height: 1.7;
+    color: var(--navy);
+  }
+  .callout strong { color: var(--blue-primary); }
+  .callout em { font-style: italic; color: var(--navy-2); }
+
+  .callout-dark {
+    background: linear-gradient(90deg, #066AFE 0%, #0250D9 100%);
+    color: var(--white);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .callout-dark h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cloud-blue-light);
+    margin: 0 0 8px 0;
+  }
+  .callout-dark p {
+    font-size: 16.5px;
+    line-height: 1.7;
+    color: var(--white);
+    margin: 0;
+  }
+  .callout-dark p strong { color: var(--cloud-blue-light); }
+
+  /* ---------- DETAILS / DEEP DIVE ---------- */
+  details.deep {
+    background: var(--bg-light);
+    border-radius: 10px;
+    padding: 0;
+    margin: 24px 0 0 0;
+    border: 1px solid rgba(6, 106, 254, 0.15);
+  }
+  details.deep > summary {
+    padding: 14px 20px;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--blue-primary);
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    user-select: none;
+  }
+  details.deep > summary::-webkit-details-marker { display: none; }
+  details.deep > summary::before {
+    content: "▸";
+    color: var(--blue-primary);
+    font-size: 15.5px;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  details.deep[open] > summary::before {
+    transform: rotate(90deg);
+  }
+  details.deep > summary .hint {
+    color: rgba(0, 30, 91, 0.7);
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-left: auto;
+  }
+  details.deep > .deep-content {
+    padding: 4px 20px 24px;
+  }
+
+  /* ---------- GRID LAYOUTS ---------- */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+
+  /* ---------- CARDS ---------- */
+  .card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(6, 106, 254, 0.08);
+    border-top: 3px solid var(--blue-primary);
+  }
+  .card.navy { border-top-color: var(--navy); }
+  .card.teal { border-top-color: var(--teal); }
+  .card.pink { border-top-color: var(--pink); }
+  .card.yellow { border-top-color: var(--yellow); }
+  .card h4 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 15px;
+    color: var(--navy);
+    margin: 0 0 8px 0;
+    letter-spacing: 0.01em;
+  }
+  .card p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--navy);
+    margin: 0 0 8px 0;
+  }
+  .card p:last-child { margin-bottom: 0; }
+  .card .card-tag {
+    display: inline-block;
+    font-size: 11.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--blue-primary);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card ul {
+    margin: 4px 0 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .card li {
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--navy);
+    padding-left: 12px;
+    position: relative;
+  }
+  .card li::before {
+    content: "";
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--blue-primary);
+    position: absolute; left: 0; top: 7px;
+  }
+  .card code {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 12.5px;
+    background: var(--bg-light);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--navy-2);
+  }
+
+  /* ---------- TIER BADGES ---------- */
+  .tier-badge {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .tier-badge.ref { background: var(--blue-primary); }
+  .tier-badge.alt { background: var(--teal); }
+  .tier-badge.assessing { background: var(--yellow); }
+  .tier-badge.divergent { background: var(--pink); }
+  .tier-badge.national { background: var(--navy); }
+
+  /* ---------- TIER CARDS ---------- */
+  .tiers-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .tier-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .tier-card .tier-name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14.5px;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .tier-card p {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--navy-2);
+    margin: 0;
+  }
+
+  /* ---------- COE MINI DIAGRAM ---------- */
+  .coe-mini {
+    background: var(--bg-light);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+  }
+  .coe-mini .horizontals {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .coe-band {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 6px 12px;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 10px;
+    align-items: center;
+    font-size: 12.5px;
+    line-height: 1.35;
+  }
+  .coe-band.dark { background: var(--navy); color: var(--white); }
+  .coe-band.eda {
+    background: linear-gradient(90deg, var(--navy-2) 0%, var(--blue-secondary) 100%);
+    color: var(--white);
+  }
+  .coe-band .band-name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .coe-band .band-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .coe-band .chip {
+    background: var(--bg-lighter);
+    color: var(--navy);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+  }
+  .coe-band.dark .chip, .coe-band.eda .chip {
+    background: rgba(255,255,255,0.14);
+    color: var(--white);
+  }
+  .coe-cols-mini {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 3px;
+    margin-top: 8px;
+  }
+  .coe-col-mini {
+    background: var(--white);
+    border-radius: 6px;
+    padding: 8px 6px;
+    text-align: center;
+    border-top: 3px solid var(--blue-primary);
+  }
+  .coe-col-mini.navy { border-top-color: var(--navy); }
+  .coe-col-mini.teal { border-top-color: var(--teal); }
+  .coe-col-mini.pink { border-top-color: var(--pink); }
+  .coe-col-mini.yellow { border-top-color: var(--yellow); }
+  .coe-col-mini.violet { border-top-color: var(--violet); }
+  .coe-col-mini .col-name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    color: var(--navy);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .coe-col-mini .col-refs {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .coe-col-mini .col-ref {
+    font-size: 11px;
+    color: var(--navy);
+    padding: 2px 4px;
+    background: var(--bg-light);
+    border-radius: 4px;
+    line-height: 1.3;
+  }
+  .coe-col-mini .col-ref.ref { color: var(--blue-primary); font-weight: 700; }
+
+  /* ---------- TABLES ---------- */
+  table.data {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(6, 106, 254, 0.06);
+    font-size: 13.5px;
+    margin: 10px 0;
+  }
+  table.data thead th {
+    background: var(--navy);
+    color: var(--white);
+    text-align: left;
+    padding: 9px 12px;
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  table.data tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0,30,91,0.06);
+    line-height: 1.65;
+    color: var(--navy);
+    vertical-align: top;
+  }
+  table.data tbody tr:last-child td { border-bottom: none; }
+  table.data tbody tr:nth-child(even) td { background: #F5FAFE; }
+  table.data code {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 12.5px;
+    background: var(--bg-light);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--navy-2);
+  }
+
+  /* ---------- COUNTS ---------- */
+  .counts {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .count-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px 12px;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+    text-align: center;
+  }
+  .count-card .num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 28px;
+    color: var(--blue-primary);
+    font-weight: 700;
+    line-height: 1;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .count-card .label {
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0,30,91,0.78);
+    font-weight: 700;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer.doc-footer {
+    background: var(--navy);
+    color: var(--white);
+    padding: 40px 44px 44px;
+    margin-top: 40px;
+  }
+  footer.doc-footer .footer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  footer.doc-footer h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 15.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cloud-blue-light);
+    margin: 0 0 16px 0;
+  }
+  footer.doc-footer p {
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.88);
+    margin: 0 0 10px 0;
+    max-width: 900px;
+  }
+  footer.doc-footer .sig {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.72);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  footer.doc-footer .sig strong { color: var(--white); }
+
+  /* ---------- LINK OUT ---------- */
+  a.link-out {
+    display: inline-block;
+    background: var(--white);
+    color: var(--blue-primary);
+    border: 1px solid var(--blue-primary);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    margin-top: 6px;
+    transition: background 0.15s, color 0.15s;
+  }
+  a.link-out:hover {
+    background: var(--blue-primary);
+    color: var(--white);
+  }
+
+  /* ---------- ASKS ---------- */
+  .asks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  .ask {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 14px;
+    align-items: center;
+  }
+  .ask .ask-num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 24px;
+    color: var(--blue-primary);
+    font-weight: 700;
+    line-height: 1;
+  }
+  .ask .ask-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--navy);
+  }
+  .ask .ask-body strong { color: var(--blue-primary); }
+
+  /* ---------- PRINT ---------- */
+  @media print {
+    nav.top { display: none; }
+    .hero { padding: 30px; page-break-after: always; }
+    section.chapter { page-break-inside: avoid; box-shadow: none; margin: 0 0 30px 0; padding: 20px; }
+    details.deep { border: none; background: transparent; }
+    details.deep[open] { border: 1px solid #ccc; }
+    details.deep > summary { display: none; }
+    details.deep > .deep-content { padding: 0; }
+    details.deep .deep-content > * { page-break-inside: avoid; }
+    body { background: white; }
+    .callout-dark { background: #001E5B !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+
+  @media (max-width: 900px) {
+    .contents-grid { grid-template-columns: 1fr; }
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .tiers-strip { grid-template-columns: 1fr 1fr; }
+    .counts { grid-template-columns: 1fr 1fr 1fr; }
+    section.chapter { padding: 24px 20px; }
+    section.chapter > .chap-title { font-size: 26px; }
+    .hero h1 { font-size: 36px; }
+    .hero .subtitle { font-size: 17.5px; }
+    .coe-cols-mini { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== STICKY NAV ==================== -->
+<nav class="top">
+  <div class="brand">NZ Govt Digital Services · <span class="accent">Working Proposal</span></div>
+  <ul>
+    <li><a href="#context"><span class="num">01</span>Context</a></li>
+    <li><a href="#pattern"><span class="num">02</span>Pattern</a></li>
+    <li><a href="#certification"><span class="num">03</span>Certification</a></li>
+    <li><a href="#reference-architecture"><span class="num">04</span>Reference Arch</a></li>
+    <li><a href="#three-ministries"><span class="num">05</span>Three Ministries</a></li>
+    <li><a href="#one-platform"><span class="num">06</span>One Platform</a></li>
+    <li><a href="#grants-deep"><span class="num">07</span>Grants Deep Dive</a></li>
+    <li><a href="#how-to-build"><span class="num">08</span>How to Build</a></li>
+    <li><a href="#operating"><span class="num">09</span>Operating</a></li>
+    <li><a href="#appendix"><span class="num">A</span>Artefacts</a></li>
+  </ul>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Working Proposal · For GDDA Consideration</div>
+    <h1>NZ Government Digital Services — <span class="accent">a certified reference architecture</span></h1>
+    <p class="subtitle">
+      Standards. Investment. Signalling. A proposed mechanism for delivering the back-office reform and <em>Driving Down the Cost of Digital</em> — by concentrating central investment on platforms that meet published criteria, and letting agencies choose from a transparent, competitive certified list.
+    </p>
+    <div class="meta">
+      <div><strong>Version</strong> 0.1 · working document</div>
+      <div><strong>Date</strong> July 2026</div>
+      <div><strong>Prepared for</strong> GDDA</div>
+      <div><strong>Reading time</strong> Overview 15 min · Full 60 min</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONTENTS ==================== -->
+<div class="contents-wrap">
+  <div class="contents-inner">
+    <div class="contents-title">Contents</div>
+    <div class="contents-grid">
+      <a class="contents-item" href="#context">
+        <div class="num">01</div>
+        <div class="item-body"><h3>Where we are</h3><p>The Cabinet mandates and the questions they leave open. <span class="reading-time">3 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#pattern">
+        <div class="num">02</div>
+        <div class="item-body"><h3>The pattern we see</h3><p>Three architectural moves that fit the ask. <span class="reading-time">3 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#certification">
+        <div class="num">03</div>
+        <div class="item-body"><h3>Certification framework</h3><p>Standards + investment + signalling. Four tiers, six criteria. <span class="reading-time">5 min · 15 min full</span></p></div>
+      </a>
+      <a class="contents-item" href="#reference-architecture">
+        <div class="num">04</div>
+        <div class="item-body"><h3>Reference architecture</h3><p>Horizontal governance and nine capability domains. <span class="reading-time">5 min · 20 min full</span></p></div>
+      </a>
+      <a class="contents-item" href="#three-ministries">
+        <div class="num">05</div>
+        <div class="item-body"><h3>Three ministries</h3><p>MPP, MfW, Whaikaha on the reference stack. <span class="reading-time">4 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#one-platform">
+        <div class="num">06</div>
+        <div class="item-body"><h3>One platform per process</h3><p>Why splitting a business process across two platforms mid-flight never works. <span class="reading-time">4 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#grants-deep">
+        <div class="num">07</div>
+        <div class="item-body"><h3>Deep dive — grants common process</h3><p>MPP process architecture and Toloa Fund L4 drilldown. <span class="reading-time">8 min · 25 min full</span></p></div>
+      </a>
+      <a class="contents-item" href="#how-to-build">
+        <div class="num">08</div>
+        <div class="item-body"><h3>How to build it</h3><p>Salesforce PSS stack, three-layer packaging, sprint zero. <span class="reading-time">5 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#operating">
+        <div class="num">09</div>
+        <div class="item-body"><h3>Operating the certification body</h3><p>RACI, lifecycle, establishment path. <span class="reading-time">5 min</span></p></div>
+      </a>
+      <a class="contents-item" href="#appendix">
+        <div class="num">A</div>
+        <div class="item-body"><h3>Appendix — full artefact library</h3><p>The nine standalone artefacts underlying this document. <span class="reading-time">Reference</span></p></div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MAIN ==================== -->
+<main>
+
+<!-- ============ SECTION 01: CONTEXT ============ -->
+<section class="chapter" id="context">
+  <div class="chap-kicker">Section 01 · Context</div>
+  <h2 class="chap-title"><span class="num">01</span>Where we are</h2>
+  <p class="chap-subtitle">Two Cabinet papers have set a direction that's more ambitious and time-pressured than most peer-jurisdiction reforms. The <em>how</em> is still open — and worth engaging on.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 3 minutes</div>
+
+  <div class="prose">
+    <p>The back-office mandate and <em>Driving Down the Cost of Digital</em> commit government to <span class="accent">$13.9B of digital spend over ten years with a $3.9B savings expectation</span>, and an ESM capability operational to agencies by <span class="accent">July 2027</span>. At this scale, marketplace listings and standards documents alone don't move the needle — the mechanism has to actually redirect investment.</p>
+    <p>GDDA is deliberately moving away from the &ldquo;shared service&rdquo; framing, recognising that agencies vary in capability, maturity, and legitimate need. The signalling toward clusters, common digital services, and eventual convergence rather than up-front unification is the right instinct. The sensitivity around cluster language — machinery-of-government versus digital-service clusters, agencies in multiple — reflects a maturity that central agencies elsewhere don't always bring.</p>
+  </div>
+
+  <div class="callout">
+    <strong>What we sensed as still open — and worth engaging on.</strong> How does GDDA give agencies a fast, low-risk path to modern capability while preserving legitimate autonomy? How does it deliver Cabinet's cost mandate without funding a decade of duplicated consolidation projects? How does it engage the market fairly, while still expressing clear preferences?
+  </div>
+
+  <div class="prose">
+    <p>What follows is a proposed answer to those questions — not a solution proposal, but an operating model. If any of it lands, we would be happy to develop it further with your team.</p>
+  </div>
+</section>
+
+<!-- ============ SECTION 02: PATTERN ============ -->
+<section class="chapter" id="pattern">
+  <div class="chap-kicker">Section 02 · The Pattern</div>
+  <h2 class="chap-title"><span class="num">02</span>The pattern we see fitting</h2>
+  <p class="chap-subtitle">Three architectural moves that connect. Each reinforces the others.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 3 minutes</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-tag">Move 01</div>
+      <h4>A certification framework as the operating model</h4>
+      <p>Standards, investment, and tiered signalling combined. GDDA publishes technology-agnostic interop patterns through the Enterprise Design Authority, certifies platforms against them in tiers (Reference, Approved, Assessing), and concentrates central investment on the certified list. Agencies pick; vendors compete; the mechanism through which Cabinet's cost-of-digital savings actually get delivered.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Move 02</div>
+      <h4>A capability-domain Centre of Excellence</h4>
+      <p>Structure within a structure. Horizontal governance (Exec Sponsorship, Strategy Office, Enterprise Design Authority, AI Enablement, Support &amp; Enablement) applies across every technology. Under it, capability domains — Citizen Service, Content, Integration, Data Platform, Staff Service Management, HR, Finance, Productivity, Identity — each have a certified reference platform and certified alternates.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Move 03</div>
+      <h4>One platform per end-to-end citizen-facing process</h4>
+      <p>Reference-certified for Citizen Service Delivery owns intake, assessment, decision, fulfilment, notification, and closure — end to end. It integrates out to other systems for capability the process consumes (payments, records, finance) but never hands off mid-flight. This is the difference between architectures where a single platform owns the process end-to-end — patterns that repeatedly succeed in practice — and the two-platform &ldquo;experience-front / delivery-back&rdquo; split that has consistently failed across peer implementations.</p>
+    </div>
+  </div>
+
+  <div class="callout-dark">
+    <h3>The load-bearing move</h3>
+    <p>The three ideas connect. The certification framework decides <strong>which</strong> platforms get invested in. The CoE describes <strong>how</strong> the invested capability is organised. The one-platform-per-process rule describes <strong>how</strong> agencies actually deliver on the invested capability. Take any one out and the others weaken. Together, they let GDDA say to agencies: <em>"here is a certified reference stack, delivered end-to-end on one platform per process, and here is how it lowers your cost of getting there."</em></p>
+  </div>
+</section>
+
+<!-- ============ SECTION 03: CERTIFICATION ============ -->
+<section class="chapter" id="certification">
+  <div class="chap-kicker">Section 03 · Certification Framework</div>
+  <h2 class="chap-title"><span class="num">03</span>The <span class="accent">certification framework</span></h2>
+  <p class="chap-subtitle">Not a compliance stamp. Not a vendor endorsement. An <em>investment mechanism</em>.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> Overview 5 min · Full 15 min</div>
+
+  <div class="prose">
+    <p>GDDA publishes technology-agnostic interop patterns, assesses platforms against them, and <strong>concentrates central investment on the platforms that meet the criteria</strong> — thereby lowering the marginal cost for every agency that chooses certified. Three components have to work together.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-tag">Component 01</div>
+      <h4>Standards</h4>
+      <p>Technology-agnostic interop patterns published by the Enterprise Design Authority — identity, canonical data, event contracts, security posture, sovereignty.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Component 02</div>
+      <h4>Investment</h4>
+      <p>Central spend on shared infrastructure per certified platform — reference blueprint library, shared talent pool, release pipeline, sandbox environments. The piece today's marketplace and standards regimes are missing.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Component 03</div>
+      <h4>Tiered signalling</h4>
+      <p>A market-legible label — Reference, Approved, Assessing, Divergent — that tells an agency what depth of centralised support it will get if it adopts a given platform.</p>
+    </div>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 18px; color: var(--navy); margin: 28px 0 10px 0;">The four tiers</h3>
+
+  <div class="tiers-strip">
+    <div class="tier-card">
+      <span class="tier-badge ref">Reference</span>
+      <div class="tier-name">Reference-certified</div>
+      <p>Deepest centralised investment. Comprehensive blueprint library. Shared CoE, talent pool, release pipeline. Fastest onboarding, lowest lifecycle cost.</p>
+    </div>
+    <div class="tier-card">
+      <span class="tier-badge alt">Approved</span>
+      <div class="tier-name">Approved-certified</div>
+      <p>Conformant to the same standards. Blueprint library partial and growing; investment scales with adoption. A genuine second option.</p>
+    </div>
+    <div class="tier-card">
+      <span class="tier-badge assessing">Assessing</span>
+      <div class="tier-name">Under assessment</div>
+      <p>Vendor in flight through the certification lifecycle. Agencies may pilot but should expect divergent-cost profile until certification is granted.</p>
+    </div>
+    <div class="tier-card">
+      <span class="tier-badge divergent">Divergent</span>
+      <div class="tier-name">Non-certified</div>
+      <p>Agency choice permitted as long as the platform conforms to interop patterns and can participate in DPI. Agency owns full lifecycle cost.</p>
+    </div>
+  </div>
+
+  <details class="deep">
+    <summary>Read the full framework — criteria, governance, lifecycle, precedents<span class="hint">15 min · deep detail</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_certification_framework.html" target="_blank">Open the full standalone artefact →</a>
+      <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 20px 0 10px;">The six criteria — what platforms are assessed against</h3>
+      <p style="font-size: 14.5px; color: var(--navy-2); margin: 0 0 12px 0;">Two are <em>gate</em> criteria — pass/fail. Four are <em>stratifying</em> — they determine whether a platform holds Reference or Approved status.</p>
+
+      <table class="data">
+        <thead>
+          <tr><th style="width:10%">Type</th><th style="width:22%">Criterion</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="tier-badge divergent">Gate</span></td><td><strong>Interop conformance</strong></td><td>Federated identity, canonical data schema, event contracts, API standards, security posture. Can the platform participate in DPI at the level the EDA defines?</td></tr>
+          <tr><td><span class="tier-badge divergent">Gate</span></td><td><strong>Sovereignty &amp; residency</strong></td><td>Where does the data live? Who has access? What's the sub-processor chain? Does the platform accommodate NZ Government data sovereignty and foreign-access constraints?</td></tr>
+          <tr><td><span class="tier-badge ref">Strat</span></td><td><strong>Accessibility</strong></td><td>WCAG 2.2 AA as a floor. Native pathways for NZSL, Te Reo, Easy Read, assistive technology. Assessed at the platform level.</td></tr>
+          <tr><td><span class="tier-badge ref">Strat</span></td><td><strong>Reference blueprint contribution</strong></td><td>Can the vendor deposit reusable patterns, configurations, accelerators into the shared library? Depth here stratifies Reference from Approved.</td></tr>
+          <tr><td><span class="tier-badge ref">Strat</span></td><td><strong>Skills availability in NZ</strong></td><td>Can agencies hire people to run this? Local partner ecosystem, certified practitioners, training pipeline.</td></tr>
+          <tr><td><span class="tier-badge ref">Strat</span></td><td><strong>Roadmap &amp; commercial transparency</strong></td><td>Platform roadmap visible to GDDA. Pricing model public. No differential pricing between agencies.</td></tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 24px 0 10px;">Three governance bodies</h3>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-tag">Technical body</div>
+          <h4>Enterprise Design Authority</h4>
+          <p>Publishes interop patterns. Runs conformance assessments. Grants and revokes certification. Vendor-neutral, independent from any single agency.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Commercial body</div>
+          <h4>Investment Committee</h4>
+          <p>Decides how much central investment goes to each certified platform based on adoption, criticality, and roadmap. Reports to Cabinet through GDDA leadership.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Consultation body</div>
+          <h4>Vendor Advisory Panel</h4>
+          <p>Certified vendors input on standards evolution and roadmap alignment. Consultative only — no decision rights. Keeps standards technically realistic without allowing vendor capture.</p>
+        </div>
+      </div>
+
+      <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 24px 0 10px;">Precedents</h3>
+      <p style="font-size: 14.5px; color: var(--navy-2); margin: 0 0 12px 0;">Certification as a market mechanism has 20+ years of precedent across peer jurisdictions. This framework is a synthesis, not an invention.</p>
+
+      <div class="prose">
+        <ul>
+          <li><strong>UK Government — G-Cloud + Digital Marketplace + Service Standard.</strong> Tiered platform framework with published assessments and agency reuse. Directly analogous.</li>
+          <li><strong>Australia — DTA Cloud Services Panel and the earlier Certified Cloud Services List.</strong> Federal-level tier system for cloud vendors with associated investment.</li>
+          <li><strong>India — India Stack certified integrators (NPCI).</strong> Private-sector implementers certified to build on national public infrastructure.</li>
+          <li><strong>United States — FedRAMP.</strong> &ldquo;Certify once, reuse many&rdquo; pattern for cloud security across federal agencies.</li>
+          <li><strong>NZ Health &amp; Education sector accreditation regimes.</strong> Domestic precedent for standards + investment + public tiering.</li>
+        </ul>
+      </div>
+
+      <div class="callout-dark" style="margin-top: 24px;">
+        <h3>Why this delivers Cabinet's ask</h3>
+        <p>The Cabinet paper <em>Driving Down the Cost of Digital</em> asks government to stop repeating investment across agencies for the same capability. Certification is the mechanism that operationalises that ask. <strong>Central investment concentrated on a small number of certified platforms</strong> replaces distributed spend on agency-by-agency rebuilds. <strong>Agencies choose from a transparent tier</strong> instead of running duplicate procurement processes. <strong>Vendors compete on published criteria</strong> instead of on relationships.</p>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 04: REFERENCE ARCHITECTURE ============ -->
+<section class="chapter" id="reference-architecture">
+  <div class="chap-kicker">Section 04 · Reference Architecture</div>
+  <h2 class="chap-title"><span class="num">04</span>The <span class="accent">reference architecture</span></h2>
+  <p class="chap-subtitle">Horizontal governance spans every technology. Under it, nine capability domains — each with a certified reference platform and alternates.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> Overview 5 min · Full 20 min</div>
+
+  <div class="prose">
+    <p>The Centre of Excellence has a <strong>structure within a structure</strong>. Horizontal enterprise governance and design authority applies across every technology. Under it, each capability domain has its own certified reference stack, blueprints, release pipeline, and enablement — glued together by the Enterprise Design Authority's technology-agnostic interop patterns.</p>
+  </div>
+
+  <div class="coe-mini">
+    <div class="horizontals">
+      <div class="coe-band dark">
+        <div class="band-name">Executive Sponsorship</div>
+        <div class="band-chips">
+          <span class="chip">Cabinet oversight</span>
+          <span class="chip">Ministerial governance</span>
+          <span class="chip">Chief Executives forum</span>
+          <span class="chip">Portfolio investment committee</span>
+        </div>
+      </div>
+      <div class="coe-band">
+        <div class="band-name">Strategy Office</div>
+        <div class="band-chips">
+          <span class="chip">Vision &amp; strategy</span>
+          <span class="chip">Certification portfolio</span>
+          <span class="chip">Roadmap</span>
+          <span class="chip">Budget &amp; investment allocation</span>
+          <span class="chip">Cost-of-divergence tracking</span>
+        </div>
+      </div>
+      <div class="coe-band eda">
+        <div class="band-name">Enterprise Design Authority · The certification body</div>
+        <div class="band-chips">
+          <span class="chip">Interop patterns</span>
+          <span class="chip">Canonical schema</span>
+          <span class="chip">Event contracts</span>
+          <span class="chip">Security posture</span>
+          <span class="chip">Sovereignty</span>
+          <span class="chip">Conformance assessment</span>
+          <span class="chip">Certification lifecycle</span>
+        </div>
+      </div>
+      <div class="coe-band">
+        <div class="band-name">AI Enablement</div>
+        <div class="band-chips">
+          <span class="chip">AI strategy &amp; governance</span>
+          <span class="chip">MCP / open agent standards</span>
+          <span class="chip">Trust &amp; red-team patterns</span>
+          <span class="chip">Model &amp; provider portability</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="coe-cols-mini">
+      <div class="coe-col-mini navy">
+        <div class="col-name">Digital Identity</div>
+        <div class="col-refs">
+          <div class="col-ref"><span class="tier-badge national" style="font-size:8px; padding:1px 5px;">Nat</span> NZ Digital ID / MATTR</div>
+        </div>
+      </div>
+      <div class="coe-col-mini teal">
+        <div class="col-name">Content &amp; Digital Presence</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: NZ SDP</div>
+          <div class="col-ref">Alt: Contentful / AEM</div>
+        </div>
+      </div>
+      <div class="coe-col-mini">
+        <div class="col-name">Citizen Service Delivery</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: Salesforce PSS</div>
+          <div class="col-ref">Alt: MS Dynamics 365</div>
+          <div class="col-ref">Assess: ServiceNow CSM</div>
+        </div>
+      </div>
+      <div class="coe-col-mini">
+        <div class="col-name">Integration Fabric</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: MuleSoft</div>
+          <div class="col-ref">Alt: Azure APIM</div>
+          <div class="col-ref">Assess: Boomi</div>
+        </div>
+      </div>
+      <div class="coe-col-mini">
+        <div class="col-name">Enterprise Data &amp; Analytics</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: Snowflake · Databricks</div>
+          <div class="col-ref ref">Ref (CDP): SF Data Cloud</div>
+          <div class="col-ref">Alt: MS Fabric</div>
+        </div>
+      </div>
+      <div class="coe-col-mini violet">
+        <div class="col-name">Staff Service Mgmt</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: ServiceNow</div>
+          <div class="col-ref">Alt: Dynamics ITSM / Jira</div>
+        </div>
+      </div>
+      <div class="coe-col-mini pink">
+        <div class="col-name">HR &amp; Workforce</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: Workday</div>
+          <div class="col-ref">Alt: SuccessFactors / Oracle HCM</div>
+        </div>
+      </div>
+      <div class="coe-col-mini yellow">
+        <div class="col-name">Finance &amp; ERP</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: TechOne · Oracle</div>
+          <div class="col-ref">Alt: SAP S/4HANA</div>
+        </div>
+      </div>
+      <div class="coe-col-mini navy">
+        <div class="col-name">Productivity &amp; Records</div>
+        <div class="col-refs">
+          <div class="col-ref ref">Ref: Microsoft 365</div>
+          <div class="col-ref">Alt: Google Workspace</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The strategic honesty.</strong> Salesforce holds Reference status in three domains — Citizen Service Delivery, Integration (via MuleSoft), and the operational CDP workload within Data &amp; Analytics — because those are the domains where the criteria naturally favour our depth. We don't hold Reference in HR, Finance, Staff Service Management, Productivity, Identity, or analytical data warehousing. Those go to Workday, Oracle/TechOne, ServiceNow, Microsoft, DIA/MATTR, and Snowflake/Databricks respectively. This is what makes the framework survive procurement scrutiny.
+  </div>
+
+  <details class="deep">
+    <summary>Read the full architecture — every domain, every blueprint, every alternate<span class="hint">20 min · deep detail</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_coe_sketch_v2.html" target="_blank">Open the full standalone artefact →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 12px 0;">The full CoE artefact is available as a standalone document. Below is the essential structural summary — the nine domain columns with their certified reference platforms, alternates, and each domain's reference blueprint highlights.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-tag">Domain 01 · Digital Identity</div>
+          <h4>NZ Digital Identity / MATTR</h4>
+          <p><strong>National tier — no alternates.</strong> Digital identity + assurance levels, verifiable credential issuance, consent &amp; entitlement register, agency federation (OIDC / SAML). Sovereignty-critical.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 02 · Content &amp; Digital Presence</div>
+          <h4>NZ Single Digital Presence</h4>
+          <p><strong>Reference:</strong> NZ SDP (shared headless CMS + design system). <strong>Alternate:</strong> Contentful / Adobe Experience Manager. Blueprints: agency tenant onboarding, WCAG 2.2 AA, Te Reo &amp; Pacific language content packs.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 03 · Citizen Service Delivery</div>
+          <h4>Salesforce Public Sector Solutions</h4>
+          <p><strong>Reference:</strong> Salesforce PSS. <strong>Alternate:</strong> Microsoft Dynamics 365 Customer Service. <strong>Assessing:</strong> ServiceNow CSM. Blueprints: Person + Business Hub (whakapapa/aiga relationship model), Grants &amp; Funding, Regulation &amp; Enforcement, Case Management, Rules Library.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 04 · Integration Fabric</div>
+          <h4>MuleSoft</h4>
+          <p><strong>Reference:</strong> MuleSoft. <strong>Alternate:</strong> Azure APIM + Logic Apps. <strong>Assessing:</strong> Boomi. Blueprints: canonical Person / Business schema, DPI Services Exchange patterns, AsyncAPI event contracts, agency onboarding integration pack.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 05 · Enterprise Data &amp; Analytics</div>
+          <h4>Snowflake · Databricks · Salesforce Data Cloud</h4>
+          <p><strong>Reference (analytical):</strong> Snowflake, Databricks. <strong>Reference (operational CDP):</strong> Salesforce Data Cloud (Data 360). <strong>Alternate:</strong> Microsoft Fabric. <strong>Assessing:</strong> BigQuery, Redshift. Two sub-workloads: warehouse/lakehouse (analytical) and CDP (real-time operational). Zero-copy federation between them.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 06 · Staff Service Management</div>
+          <h4>ServiceNow</h4>
+          <p><strong>Reference:</strong> ServiceNow. <strong>Alternate:</strong> MS Dynamics 365 ITSM, Jira Service Management. Blueprints: agency service desk, incident/problem/change, asset &amp; CMDB, ITOM integration. <em>Explicitly not for citizen service delivery.</em></p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 07 · HR &amp; Workforce</div>
+          <h4>Workday</h4>
+          <p><strong>Reference:</strong> Workday. <strong>Alternate:</strong> SAP SuccessFactors, Oracle HCM. Blueprints: NZ Govt HR baseline, workforce planning, learning &amp; capability, payroll integration to central.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 08 · Finance &amp; ERP</div>
+          <h4>TechOne · Oracle</h4>
+          <p><strong>Reference:</strong> TechOne (small/mid), Oracle Cloud (large). <strong>Alternate:</strong> SAP S/4HANA, MS Dynamics 365 Finance. Blueprints: common chart of accounts, procurement, grants disbursement integration, whole-of-Govt spend analytics.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 09 · Productivity &amp; Records</div>
+          <h4>Microsoft 365</h4>
+          <p><strong>Reference:</strong> Microsoft 365 (One Desktop for Govt). <strong>Alternate:</strong> Google Workspace. Blueprints: agency workspace baseline, Purview records &amp; retention, secure collaboration, Copilot governance.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 05: THREE MINISTRIES ============ -->
+<section class="chapter" id="three-ministries">
+  <div class="chap-kicker">Section 05 · A Practical View</div>
+  <h2 class="chap-title"><span class="num">05</span>Three ministries on the reference stack</h2>
+  <p class="chap-subtitle">Pacific Peoples, Women, and Whaikaha (Disabled People). Small &ldquo;people ministries&rdquo;. ~80% shared across all three; the differences are agency-specific overlays on the same blueprints.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 4 minutes</div>
+
+  <div class="grid-3">
+    <div class="card navy">
+      <div class="card-tag">~100 FTE</div>
+      <h4>Ministry for Pacific Peoples</h4>
+      <p>Principal advisor to the Crown on Pacific policy and interventions. Small policy shop with some direct-delivery programmes.</p>
+      <ul>
+        <li>Toloa Fund &amp; community grants</li>
+        <li>Pacific stakeholder register &amp; engagement</li>
+        <li>Language Week events coordination</li>
+      </ul>
+    </div>
+    <div class="card navy">
+      <div class="card-tag">Small policy ministry</div>
+      <h4>Ministry for Women</h4>
+      <p>Advocacy, advice, targeted funding. Small policy shop.</p>
+      <ul>
+        <li>Nominations Service (board appointments)</li>
+        <li>Prevention grants program</li>
+        <li>Public consultation &amp; submissions</li>
+      </ul>
+    </div>
+    <div class="card navy">
+      <div class="card-tag">Advisory + oversight</div>
+      <h4>Ministry for Disabled People (Whaikaha)</h4>
+      <p>Advisory + oversight following DSS transfer to MSD.</p>
+      <ul>
+        <li>Provider contract oversight &amp; monitoring</li>
+        <li>Accessibility feedback &amp; complaints</li>
+        <li>Community engagement register</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The pattern.</strong> All three ministries would run on the certified reference stack: NZ Single Digital Presence for content, central digital identity, Salesforce PSS for citizen service delivery, MuleSoft for integration, Workday for HR, TechOne / Oracle for finance, ServiceNow for staff ITSM, Microsoft 365 for productivity. Roughly 80% shared services consumed identically. Agency-specific overlays — the Whakapapa relationship model for MPP, matching workflow for MfW, accessibility-first UX and Enabling Good Lives principles for Whaikaha — sit inside the citizen-service platform.
+  </div>
+
+  <details class="deep">
+    <summary>Read the full stack blueprints — every layer, every platform, every agency-specific overlay<span class="hint">Full artefact</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_agency_stacks.html" target="_blank">Open the full standalone artefact →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 12px 0;">Nine architectural layers per ministry, side-by-side. Discovery &amp; Content → Identity &amp; Assurance → Citizen Service Delivery → Rules Library → Notifications &amp; Payments → Integration Fabric → Back Office (HR/Finance/ITSM/Productivity) → Data &amp; Analytics → AI &amp; Agents. Each layer names the certified reference platform and, where relevant, the agency-specific overlay.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <h4>Discovery &amp; Content</h4>
+          <ul>
+            <li>All three: NZ Single Digital Presence tenant site with shared CMS + design system</li>
+            <li>MPP overlay: Pacific language content packs (Samoan, Tongan, Cook Islands Māori, Niuean, Tokelauan, Fijian)</li>
+            <li>Whaikaha overlay: Accessibility-first UX overlay (Easy Read, NZSL video)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Citizen Service Delivery (Salesforce)</h4>
+          <ul>
+            <li>Common: Grants blueprint, Case, Contact Centre, Digital Engagement</li>
+            <li>MPP-specific: Toloa Fund config, Whakapapa/aiga relationship model</li>
+            <li>MfW-specific: Nominations matching engine, Consultation blueprint</li>
+            <li>Whaikaha-specific: Enabling Good Lives case model, Contract Oversight</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Back Office (shared cluster services)</h4>
+          <ul>
+            <li>Workday shared tenant — NZ Govt HR baseline</li>
+            <li>TechOne shared cluster — common chart of accounts</li>
+            <li>ServiceNow shared — staff ITSM</li>
+            <li>Microsoft 365 — One Desktop for Govt</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 06: ONE PLATFORM PER PROCESS ============ -->
+<section class="chapter" id="one-platform">
+  <div class="chap-kicker">Section 06 · One Platform Per Process</div>
+  <h2 class="chap-title"><span class="num">06</span>One platform owns each end-to-end process</h2>
+  <p class="chap-subtitle">The recurring two-platform failure mode across government digital transformations — and the pattern that consistently succeeds when adopted.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 4 minutes</div>
+
+  <div class="prose">
+    <p>The instinct that a customer-facing service should live on a &ldquo;customer experience&rdquo; platform and be handed off to a &ldquo;service delivery&rdquo; platform for the back-end is the single most common architectural mistake in government digital transformation. It has been attempted repeatedly across peer jurisdictions, and the seam between the two platforms is consistently where state, context, and accountability get lost.</p>
+    <p><strong>A business process is one process.</strong> If you cut it across two platforms with different data models, workflow engines, and UX paradigms, the seam is where the state, context, and accountability get lost. What actually works is one platform owning the end-to-end process — intake, assessment, decision, fulfilment, notification, status, closure — and <em>calling out to</em> other systems for capability the process consumes.</p>
+  </div>
+
+  <div class="callout-dark">
+    <h3>The principle</h3>
+    <p>Salesforce owns the citizen-facing process end-to-end. Payments, records, finance postings, HR data, cross-agency data exchange are <strong>called out to</strong> via APIs and events. They are <em>not</em> handed the process. This is the pattern that has succeeded consistently in peer implementations — and its absence is the failure mode we've seen repeat across government transformations for the last decade.</p>
+  </div>
+
+  <div class="prose">
+    <p>Under this pattern, three different processes across the three ministries — <strong>Toloa Fund grant application</strong> for MPP, <strong>Nominations Service</strong> for MfW, <strong>accessibility complaint and provider oversight</strong> for Whaikaha — each run end-to-end on Salesforce as the anchor. All three exercise different process shapes (grants, matching, stewardship) on the same reference blueprint with agency-specific overlays.</p>
+  </div>
+
+  <details class="deep">
+    <summary>Read the three process walkthroughs — end-to-end swim-lane views<span class="hint">Full artefact</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_process_walkthroughs.html" target="_blank">Open the full standalone artefact →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 16px 0;">Each of the three processes has a full swim-lane walkthrough showing citizen action, SDP content layer, digital identity, Salesforce (the anchor, present in every step), integration fabric, notifications, payments, records, finance, and data lanes. The visual pattern in every case: Salesforce present in every substantive process step; every other lane intermittent — called when needed, empty otherwise. That's what &ldquo;one platform owns the process&rdquo; looks like once you draw it.</p>
+
+      <div class="grid-3">
+        <div class="card">
+          <h4>MPP · Toloa Fund grant</h4>
+          <p><em>Grants pattern.</em> Applicant discovers on SDP → RealMe sign-in → application in Salesforce → validation via Rules Library → assessment by MPP officer with Agentforce assist → decision recorded → payment via central payments → milestone tracking → outcome reporting → close.</p>
+        </div>
+        <div class="card">
+          <h4>MfW · Nominations Service</h4>
+          <p><em>Matching pattern.</em> Nominee discovers on SDP → RealMe sign-in → nomination profile in Salesforce → enrichment from public sources → matching engine scores vs vacancies → curator short-lists → PSC/minister recommendation → appointment recorded → ongoing engagement.</p>
+        </div>
+        <div class="card">
+          <h4>Whaikaha · Accessibility complaint</h4>
+          <p><em>Stewardship / oversight pattern.</em> Complainant reports via accessible SDP form → Agentforce triage → Rules-based routing (Whaikaha or referral to MSD DSS/HDC) → investigation → provider engagement → resolution → provider contract adjustment → outcome fed to Enabling Good Lives analytics.</p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top: 16px;">
+        <strong>What to notice.</strong> In every process, Salesforce is present at every substantive step. Every other system is called intermittently. The empty cells in other lanes are where a two-platform &ldquo;experience-front / delivery-back&rdquo; architecture would light up a second row and hand the process across — with all the state, context, and data-transfer problems that implies.
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 07: GRANTS DEEP DIVE ============ -->
+<section class="chapter" id="grants-deep">
+  <div class="chap-kicker">Section 07 · Grants Deep Dive</div>
+  <h2 class="chap-title"><span class="num">07</span>Deep dive — the <span class="accent">common process</span> for grants</h2>
+  <p class="chap-subtitle">MPP's full process architecture at Level 3 (~129 processes across 8 domains) and the grants lifecycle at Level 4 (58 sub-processes end-to-end).</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> Overview 8 min · Full 25 min</div>
+
+  <div class="prose">
+    <p>Ministry for Pacific Peoples has roughly 129 Level 3 processes across 8 domains of activity — from policy advice and community investment through to corporate services. Nine of those processes appear near-identically across MPP, MfW, and Whaikaha. Those nine are the strongest candidates for centralised reference blueprints.</p>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 20px 0 10px 0;">Common process candidates across small people-ministries</h3>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Grants &amp; funding lifecycle</h4>
+      <p>End-to-end grant administration — design, intake, eligibility, merit assessment, award, disbursement, milestone tracking, outcome reporting. Every small ministry does variants of this. <code>Salesforce PSS Grants</code></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Stakeholder register &amp; engagement</h4>
+      <p>Person and Business Hub with relationship models, engagement history, community forum coordination. Agency-specific overlays (Whakapapa, etc.) sit on top. <code>Salesforce Person + Business Hub</code></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Ministerial servicing</h4>
+      <p>Correspondence, OIA requests, briefings, PQs, Select Committee support. Highest-value first blueprint — every ministry does this every day. <code>Salesforce case + M365</code></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Consultation &amp; submissions</h4>
+      <p>Public consultation event runs, submission intake, feedback synthesis. Same shape whether it's Pacific policy or gender policy. <code>Salesforce + NZ SDP</code></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Contract &amp; partner management</h4>
+      <p>Delivery partner selection, contract negotiation, performance monitoring, closure. Common to every ministry funding external delivery. <code>Salesforce + TechOne</code></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Blueprint</div>
+      <h4>Cross-agency outcomes reporting</h4>
+      <p>Data collection from other agencies, harmonisation, dashboarding. Same shape whether the lens is Pacific, women, or disabled people. <code>Data Cloud + MuleSoft</code></p>
+    </div>
+  </div>
+
+  <div class="callout-dark">
+    <h3>The strategic insight</h3>
+    <p>GDDA's common-process work is oriented toward documenting processes at 8 levels of policy detail. <strong>The alternative is to specify processes at Level 4 as configuration on a certified reference blueprint.</strong> Not eight levels of nested policy — one L4 specification, expressed as configuration, running on a shared platform. The reference blueprint <em>is</em> the common process.</p>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 24px 0 10px 0;">Toloa Fund grant lifecycle — Level 4 specification, summary counts</h3>
+
+  <div class="counts">
+    <div class="count-card"><span class="num">58</span><span class="label">L4 sub-processes</span></div>
+    <div class="count-card"><span class="num">8</span><span class="label">Phases end-to-end</span></div>
+    <div class="count-card"><span class="num">15</span><span class="label">Data entities</span></div>
+    <div class="count-card"><span class="num">24</span><span class="label">Rules invoked</span></div>
+    <div class="count-card"><span class="num">17</span><span class="label">DPI events</span></div>
+    <div class="count-card"><span class="num">9</span><span class="label">Personas</span></div>
+  </div>
+
+  <div class="prose">
+    <p>The grants lifecycle end-to-end runs across eight phases — <strong>Discover, Apply, Validate &amp; Route, Assess, Decide, Disburse &amp; Communicate, Monitor, Close &amp; Learn</strong>. Each phase decomposes into 5–10 Level 4 sub-processes. Every sub-process is assigned to a persona, a certified platform component, a data entity, a rule, and a published event. Every element is <em>executable</em>.</p>
+  </div>
+
+  <details class="deep">
+    <summary>Read the full Level 4 drill-down — all 58 sub-processes<span class="hint">25 min · full specification</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_grants_process_drilldown.html" target="_blank">Open the full L4 drill-down →</a>
+      <a class="link-out" href="nz_gdda_mpp_process_architecture.html" target="_blank" style="margin-left: 8px;">Open the MPP process architecture →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 12px 0;">The full L4 artefact is available as a standalone document. Below is the phase-by-phase summary of what each phase contains and the key data entities and events it touches. Every phase's full row-by-row detail lives in the standalone artefact.</p>
+
+      <table class="data">
+        <thead>
+          <tr><th>Phase</th><th>Sub-processes</th><th>Key data entities</th><th>Key events</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>01 Discover</strong></td><td>5</td><td><code>ServiceCatalogueEntry</code>, <code>OutcomeSummary</code>, <code>EligibilityCheck</code></td><td><code>eligibility.checked</code>, <code>identity.session.opened</code></td></tr>
+          <tr><td><strong>02 Apply</strong></td><td>10</td><td><code>Person</code>, <code>GrantApplication</code>, <code>ProjectDetail</code>, <code>BudgetLineItem</code>, <code>EvidenceDocument</code>, <code>Endorsement</code></td><td><code>grant.application.created</code>, <code>evidence.uploaded</code>, <code>endorsement.requested</code>, <code>grant.application.submitted</code></td></tr>
+          <tr><td><strong>03 Validate &amp; Route</strong></td><td>6</td><td><code>EligibilityResult</code>, <code>CrossAgencyAwards</code>, <code>FraudSignal</code>, <code>CaseAssignment</code></td><td><code>eligibility.verified</code>, <code>cross-agency.checked</code>, <code>assessment.assigned</code></td></tr>
+          <tr><td><strong>04 Assess</strong></td><td>8</td><td><code>AssessmentCase</code>, <code>AssessmentScore</code>, <code>CompositeScore</code>, <code>PeerAssessment</code></td><td><code>assessment.started</code>, <code>assessment.scored</code>, <code>assessment.completed</code></td></tr>
+          <tr><td><strong>05 Decide</strong></td><td>7</td><td><code>DecisionPortfolio</code>, <code>FundingEnvelope</code>, <code>GrantDecision</code>, <code>AwardLetter</code>, <code>DecisionRecord</code></td><td><code>grant.decision.recorded</code>, <code>grant.decision.signed-off</code>, <code>grant.outcome.published</code></td></tr>
+          <tr><td><strong>06 Disburse &amp; Communicate</strong></td><td>7</td><td><code>BankAccount</code>, <code>Encumbrance</code>, <code>PaymentRequest</code>, <code>GLPosting</code>, <code>MilestoneSchedule</code></td><td><code>encumbrance.posted</code>, <code>payment.requested</code>, <code>payment.confirmed</code>, <code>gl.posted</code>, <code>milestones.created</code></td></tr>
+          <tr><td><strong>07 Monitor</strong></td><td>9</td><td><code>MilestoneReport</code>, <code>MilestoneReview</code>, <code>ComplianceCheck</code>, <code>VariationRequest</code>, <code>OutcomeReport</code></td><td><code>milestone.reported</code>, <code>variation.requested</code>, <code>outcome.captured</code>, <code>outcome.registered</code></td></tr>
+          <tr><td><strong>08 Close &amp; Learn</strong></td><td>6</td><td><code>ArchivedRecord</code>, <code>ProgramDashboard</code>, <code>PacificOutcomesRegister</code>, <code>ProgramFeedback</code></td><td><code>grant.closed</code>, <code>record.archived</code>, <code>pacific-outcome.updated</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top: 16px;">
+        <strong>Reuse arithmetic.</strong> Ministry for Women's Nominations Service reuses most of this same L4 specification — replacing eligibility rules, merit rubric, and milestone template. Whaikaha's provider oversight reuses ~70%, substituting the merit-scoring lane with an oversight-monitoring lane. That's the difference between three separate ~18-month builds and one shared foundation with two ~2-3 month overlays.
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 08: HOW TO BUILD IT ============ -->
+<section class="chapter" id="how-to-build">
+  <div class="chap-kicker">Section 08 · How To Build It</div>
+  <h2 class="chap-title"><span class="num">08</span>How to build it on Salesforce PSS</h2>
+  <p class="chap-subtitle">The technical foundation, data model, packaging strategy, and sprint zero. ~85% configuration, ~15% custom.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 5 minutes</div>
+
+  <div class="prose">
+    <p>Salesforce Public Sector Solutions is a bundle, not a single product. Every capability described in the previous sections is either a native PSS product (Grants Management, OmniStudio, Business Rules Engine, Flow Orchestration, Experience Cloud, Agentforce) or a standard Salesforce mechanism (Platform Events, CDC, Unlocked Packages, Shield). The technical risk lives in the integrations, not the platform.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-tag">Core platform</div>
+      <h4>The stack</h4>
+      <ul>
+        <li>Sales &amp; Service Cloud (base CRM)</li>
+        <li>PSS data model (<code>Individual</code>, <code>Party Relationship Group</code>)</li>
+        <li>Salesforce Grants Management (<code>FundingProgram</code>, <code>FundingRequest</code>, <code>FundingAward</code>)</li>
+        <li>Experience Cloud (LWR applicant portal)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-tag">Low-code &amp; logic</div>
+      <h4>Configuration surface</h4>
+      <ul>
+        <li>OmniStudio — OmniScript, FlexCard, DataRaptor</li>
+        <li>Business Rules Engine — eligibility, scoring, decisioning</li>
+        <li>Flow &amp; Flow Orchestration — end-to-end automation</li>
+        <li>Approval Processes — delegation authority</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-tag">Integration, data &amp; AI</div>
+      <h4>The connective tissue</h4>
+      <ul>
+        <li>Platform Events — outbound DPI event publishing</li>
+        <li>MuleSoft — integration fabric to DPI Services Exchange</li>
+        <li>Data Cloud — cross-agency harmonised view</li>
+        <li>Agentforce — AI agents, Trust Layer, Prompt Builder</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 24px 0 10px 0;">Three-layer packaging — the reference blueprint pattern</h3>
+
+  <div class="prose">
+    <p>Everything above is packaged as three stacked Salesforce Unlocked Packages. The Common Foundation is versioned centrally by the certification body EDA. The NZ Government Overlay adds the shared services connections and is versioned by GDDA. The Agency Overlay is where agency-specific configuration lives. Upgrades to the shared layers do not break agency overlays if package boundaries are respected.</p>
+  </div>
+
+  <div class="grid-3">
+    <div class="card navy">
+      <div class="card-tag">Layer 1</div>
+      <h4>Common Foundation</h4>
+      <p>Maintained by EDA. Versioned quarterly. Deployed identically to every certified agency.</p>
+      <ul>
+        <li>Individual + Party Relationship model</li>
+        <li>Common FundingProgram metadata</li>
+        <li>Base BRE + Flow templates</li>
+        <li>Common Platform Event definitions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-tag">Layer 2</div>
+      <h4>NZ Government Overlay</h4>
+      <p>Maintained by GDDA. Versioned semi-annually. Deployed to every NZ agency choosing the certified reference stack.</p>
+      <ul>
+        <li>RealMe Auth Provider config</li>
+        <li>NZ design system LWCs</li>
+        <li>MuleSoft connector Named Credentials</li>
+        <li>DPI event mapping</li>
+        <li>Te Reo &amp; Pacific language packs</li>
+      </ul>
+    </div>
+    <div class="card pink">
+      <div class="card-tag">Layer 3</div>
+      <h4>Agency Overlay</h4>
+      <p>Maintained by the agency. Agency owns cadence. Only agency-specific config lives here.</p>
+      <ul>
+        <li>Program variant records</li>
+        <li>Agency-specific eligibility rules</li>
+        <li>Agency-specific merit rubric</li>
+        <li>Endorsement / relationship overlays</li>
+        <li>Agency portal branding</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>What sprint zero looks like.</strong> The smallest end-to-end vertical slice that proves the pattern: an applicant authenticates with RealMe, completes a partial application, and it appears in Salesforce with the right data model, publishing a Platform Event to a MuleSoft stub. Sandbox provisioning, Layer 1/2/3 skeleton packages, first OmniScript intake screen, first Platform Event definition, Experience Cloud site skeleton, first CI/CD deploy. Nothing else — everything else follows.
+  </div>
+
+  <details class="deep">
+    <summary>Read the full technical build recipe — data model, integration events, packaging, team, delivery<span class="hint">Full artefact</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_technical_build_recipe.html" target="_blank">Open the full standalone artefact →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 16px 0;">The full technical recipe covers eleven sections: PSS foundation stack, three-layer data model, applicant experience (Experience Cloud + OmniStudio), assessor experience (Lightning App + Agentforce), business logic (BRE + Flow Orchestration), integration &amp; DPI events (nine Platform Events specified), Agentforce agents (four agents with tight bounds), packaging strategy, security &amp; compliance, ~10-person team composition with FTE, five-tier environment flow, and sprint-zero deliverables.</p>
+
+      <div class="grid-2">
+        <div class="card">
+          <h4>Team composition (~10 FTE)</h4>
+          <ul>
+            <li>Solution architect / tech lead</li>
+            <li>Salesforce PSS SME</li>
+            <li>OmniStudio developer (1–2)</li>
+            <li>BRE / Flow developer</li>
+            <li>Integration developer (MuleSoft)</li>
+            <li>UX / accessibility specialist (0.5)</li>
+            <li>Data / Agentforce engineer</li>
+            <li>QA / test engineer</li>
+            <li>Product owner / BA</li>
+            <li>DevOps / release engineer (0.5)</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h4>Delivery timeline</h4>
+          <ul>
+            <li><strong>Six months</strong> for first agency (MPP with Toloa) — greenfield build</li>
+            <li><strong>Two months</strong> for second agency (MfW with Nominations) — Layer 3 overlay only</li>
+            <li><strong>Three months</strong> for third agency (Whaikaha) — Layer 3 overlay plus oversight-lane extensions</li>
+            <li>Two-week sprints, reference blueprint versioned quarterly</li>
+            <li>Feature flags via Custom Metadata for progressive rollout</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top: 16px;">
+        <strong>The reuse arithmetic in delivery terms.</strong> First agency ~6 months; second and third agencies collapse to 2–3 months each because Layers 1 &amp; 2 are already built and versioned. Multiply across the ten small agencies Mel identified and the arithmetic against <em>Driving Down the Cost of Digital</em> becomes measurable.
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ SECTION 09: OPERATING MODEL ============ -->
+<section class="chapter" id="operating">
+  <div class="chap-kicker">Section 09 · Operating Model</div>
+  <h2 class="chap-title"><span class="num">09</span>Operating the certification body</h2>
+  <p class="chap-subtitle">How the certification framework runs day-to-day. RACI, lifecycle, cadence, and establishment path.</p>
+  <div class="reading-time-hero"><strong>Reading time:</strong> 5 minutes</div>
+
+  <div class="prose">
+    <p>Standing up the certification body is a 12–18 month exercise, phased so first certifications can be granted in Year 1 while the framework matures. It fits inside GDDA's existing back-office mandate, using existing budget lines, without needing new legislation.</p>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 20px 0 10px 0;">Certification lifecycle</h3>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-tag">Stage 01</div>
+      <h4>Submit</h4>
+      <p>Vendor lodges intent, conformance evidence pack, roadmap, pricing schedule. Rolling intake.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Stage 02</div>
+      <h4>Assess</h4>
+      <p>EDA runs conformance testing against published patterns. Two-stage: gates first, then stratifying criteria. Target 90 days.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Stage 03</div>
+      <h4>Certify &amp; invest</h4>
+      <p>Tier decision published to register. Investment Committee funds shared infrastructure at the appropriate tier.</p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Stage 04</div>
+      <h4>Operate &amp; recert</h4>
+      <p>Agencies adopt through shared CoE, blueprints, talent pool. Annual recertification. Sunset pathway when criteria no longer met.</p>
+    </div>
+  </div>
+
+  <h3 style="font-family: 'Avant Garde Demi SFDC', 'Bookman Old Style', 'Cambria', serif; font-size: 17.5px; color: var(--navy); margin: 24px 0 10px 0;">Establishment — 18 months across three phases</h3>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-tag">Months 0–6</div>
+      <h4>Phase 1 — Foundation</h4>
+      <ul>
+        <li>Publish interop pattern library v1.0</li>
+        <li>Establish Investment Committee TOR</li>
+        <li>Stand up Vendor Advisory Panel</li>
+        <li>Publish criteria &amp; scoring rubric</li>
+        <li>Open rolling submission intake</li>
+        <li>First cohort of assessments in flight</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-tag">Months 6–12</div>
+      <h4>Phase 2 — Certification</h4>
+      <ul>
+        <li>First tier decisions published</li>
+        <li>Blueprint library scaffolding stood up</li>
+        <li>Shared talent pool established</li>
+        <li>Agency onboarding pathway published</li>
+        <li>First reference deployments (POC ministries) launched</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-tag">Months 12–18</div>
+      <h4>Phase 3 — Operate &amp; extend</h4>
+      <ul>
+        <li>Full quarterly rhythm operating</li>
+        <li>First annual recertification cycle complete</li>
+        <li>Public annual report published</li>
+        <li>Extension to Crown entities considered</li>
+        <li>Framework v1.1 published</li>
+      </ul>
+    </div>
+  </div>
+
+  <details class="deep">
+    <summary>Read the full operating model — RACI, assessment methodology, investment scaling, tier movement, appeals, transparency<span class="hint">Full artefact</span></summary>
+    <div class="deep-content">
+      <a class="link-out" href="nz_gdda_certification_operating_model.html" target="_blank">Open the full standalone artefact →</a>
+      <p style="font-size: 15px; line-height: 1.6; color: var(--navy-2); margin: 16px 0 16px 0;">The full operating model covers decision rights across twelve certification decisions (with a complete RACI table spanning EDA, Investment Committee, GDDA Leadership, Vendor Advisory Panel, Vendors, and Agencies), the two-stage assessment methodology, investment allocation approach with tier scaling triggers, four tier-movement patterns (promotion, demotion, decertification, sunset), the appeals process with independent panel, public register &amp; disclosure requirements, and the nested cadence of weekly / monthly / quarterly / annual operations.</p>
+
+      <div class="callout">
+        <strong>Independence is designed in, not asserted.</strong> The Enterprise Design Authority makes technical assessments; the Investment Committee decides commercial investment; the Vendor Advisory Panel consults on standards evolution but holds no decision rights; the independent appeals panel can overturn certification outcomes. Appeals are heard by a body that is not the EDA and not the Investment Committee. That's the mechanism that makes the framework legitimate.
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ============ APPENDIX: FULL ARTEFACT LIBRARY ============ -->
+<section class="chapter" id="appendix">
+  <div class="chap-kicker">Appendix · Full Artefact Library</div>
+  <h2 class="chap-title"><span class="num">A</span>Full artefact library</h2>
+  <p class="chap-subtitle">The nine standalone artefacts underlying this document. Each is designed to be readable on its own for anyone who wants to go deeper than the summaries above.</p>
+  <div class="reading-time-hero"><strong>Use as:</strong> reference · standalone reading · working documents for co-development</div>
+
+  <div class="grid-2">
+    <a class="card" href="nz_gdda_pitch_narrative.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">01 · Memo</div>
+      <h4>Pitch narrative</h4>
+      <p>Working note memo covering context, what we've heard, the pattern we see, POC shape, what Salesforce brings, next steps. The covering document.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_certification_framework.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">02 · Framework</div>
+      <h4>Certification framework</h4>
+      <p>Standards + investment + signalling. Four tiers, six criteria, three governance bodies, six-stage lifecycle. The core concept, in full.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_certification_operating_model.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">03 · Operating model</div>
+      <h4>Certification body operating model</h4>
+      <p>RACI, submission and assessment process, investment allocation, tier movement, appeals, transparency register, cadence, 18-month establishment path.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_coe_sketch_v2.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">04 · Reference architecture</div>
+      <h4>Centre of Excellence · certified reference architecture</h4>
+      <p>Horizontal governance bands and nine capability domains with their certified reference platforms, alternates, blueprints, and cost-of-divergence indicators.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_agency_stacks.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">05 · Stack blueprints</div>
+      <h4>Agency reference stacks — three ministries</h4>
+      <p>Pacific Peoples, Women, and Whaikaha side-by-side. Nine architectural layers each. Shared vs agency-specific overlays highlighted.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_process_walkthroughs.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">06 · Process walkthroughs</div>
+      <h4>End-to-end process walkthroughs</h4>
+      <p>Three swim-lane process flows: grants (MPP), matching (MfW), stewardship (Whaikaha). Salesforce owning each process end-to-end.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_mpp_process_architecture.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">07 · Process architecture</div>
+      <h4>Ministry for Pacific Peoples — process architecture</h4>
+      <p>Holistic outside-in service catalogue and process library. Eight domains, 22 categories, ~129 Level 3 processes. Common process candidates highlighted.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_grants_process_drilldown.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">08 · L4 drill-down</div>
+      <h4>Grants lifecycle — Level 4 drill-down</h4>
+      <p>The Toloa Fund grants process specified at Level 4. 58 sub-processes across 8 phases with persona, platform, data entity, rule, and event per row.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+    <a class="card" href="nz_gdda_technical_build_recipe.html" style="text-decoration:none; color:inherit; display:block;">
+      <div class="card-tag">09 · Build recipe</div>
+      <h4>Technical build recipe — Salesforce PSS</h4>
+      <p>How to build it. Data model, applicant experience, business logic, integration events, Agentforce, three-layer packaging, team, sprint zero.</p>
+      <span class="link-out">Open document →</span>
+    </a>
+  </div>
+</section>
+
+</main>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="doc-footer">
+  <div class="footer-inner">
+    <h3>Working proposal · developed for dialogue with the Government Digital Agency</h3>
+    <p>This document is not a formal proposal. It is a working note developed as part of an ongoing engagement between Salesforce and GDDA on the direction of back-office reform and delivery of the <em>Driving Down the Cost of Digital</em> Cabinet mandate. Every element of the framework is offered for discussion, refinement, or rejection.</p>
+    <p>The nine standalone artefacts underlying this document — pitch narrative, certification framework, operating model, CoE reference architecture, agency stack blueprints, process walkthroughs, MPP process architecture, grants L4 drill-down, technical build recipe — are available separately for readers who want to go deeper than the summaries above.</p>
+    <div class="sig">
+      <div><strong>Salesforce</strong> — enterprise architecture &amp; public sector team, ANZ</div>
+      <div>Version 0.1 · July 2026 · Working document</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll spy for nav active state
+  const sections = document.querySelectorAll('main section.chapter');
+  const navLinks = document.querySelectorAll('nav.top a[href^="#"]');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-40% 0px -55% 0px', threshold: 0 });
+
+  sections.forEach(section => observer.observe(section));
+</script>
+
+</body>
+</html>
