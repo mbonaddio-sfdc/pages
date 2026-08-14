@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NZ Government — Reference Agency Technology Stacks</title>
+<style>
+  :root { color-scheme: light; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #EAF5FE;
+    font-family: "Salesforce Sans", "Calibri", "Helvetica Neue", Arial, sans-serif;
+    color: #001E5B;
+  }
+  .page { max-width: 1780px; margin: 0 auto; padding: 36px 44px 60px; }
+
+  header.title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,30,91,0.15);
+    margin-bottom: 8px;
+  }
+  header.title h1 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 34px;
+    line-height: 1.1;
+    color: #001E5B;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.title h1 .accent { color: #066AFE; }
+  header.title .caption {
+    font-size: 12px;
+    color: rgba(0,30,91,0.6);
+    text-align: right;
+    line-height: 1.4;
+  }
+  header.title .caption strong { color: #001E5B; }
+
+  .lede {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #022AC0;
+    margin: 12px 0 8px;
+    max-width: 1150px;
+  }
+  .principle {
+    background: #FFFFFF;
+    border-left: 4px solid #066AFE;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 6px 0 18px;
+    font-size: 13px;
+    color: #001E5B;
+    line-height: 1.55;
+    max-width: 1150px;
+  }
+  .principle strong { color: #066AFE; }
+
+  /* ---------- Legend ---------- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.65);
+    border-radius: 10px;
+    font-size: 12px;
+    color: #002775;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .legend .item { display: flex; align-items: center; gap: 6px; }
+  .legend .swatch {
+    width: 14px; height: 14px; border-radius: 3px; display: inline-block;
+    border: 1px solid rgba(0,30,91,0.15);
+  }
+
+  /* ---------- Agency headers row ---------- */
+  .agency-headers {
+    display: grid;
+    grid-template-columns: 180px repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .row-label {
+    display: flex;
+    align-items: center;
+  }
+  .agency-header {
+    background: linear-gradient(90deg, #001E5B 0%, #002775 100%);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .agency-header .name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 18px;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+  .agency-header .meta {
+    font-size: 11px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+  .agency-header .services {
+    font-size: 12px;
+    margin-top: 8px;
+    color: #90D0FE;
+    line-height: 1.45;
+  }
+  .agency-header .services strong { color: #FFFFFF; font-weight: 600; }
+
+  /* ---------- Stack rows ---------- */
+  .stack-row {
+    display: grid;
+    grid-template-columns: 180px repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .row-label-inner {
+    background: #001E5B;
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+  }
+  .row-label-inner .tag {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #90D0FE;
+    margin-bottom: 4px;
+  }
+  .row-label-inner .name {
+    font-size: 13.5px;
+    line-height: 1.25;
+    font-weight: 600;
+  }
+  .row-label-inner .desc {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 4px;
+    line-height: 1.4;
+  }
+
+  .cell {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 100%;
+    box-shadow: 0 2px 5px rgba(6,106,254,0.06);
+  }
+  .cell.shared {
+    background: #DCEBFD;
+    border: 1px dashed rgba(2,42,192,0.3);
+  }
+
+  .cell .platform {
+    font-weight: 700;
+    font-size: 13px;
+    color: #001E5B;
+    line-height: 1.25;
+  }
+  .cell .role {
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0,30,91,0.55);
+  }
+  .cell.shared .role { color: #066AFE; }
+  .cell ul {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .cell li {
+    font-size: 11.5px;
+    line-height: 1.35;
+    color: #001E5B;
+    padding-left: 10px;
+    position: relative;
+  }
+  .cell li::before {
+    content: "";
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #066AFE;
+    position: absolute; left: 0; top: 6px;
+  }
+  .cell.shared li::before { background: #0250D9; }
+
+  .cell li.overlay {
+    color: #B60554;
+    font-weight: 600;
+  }
+  .cell li.overlay::before { background: #B60554; }
+
+  .cell .footer-note {
+    margin-top: 6px;
+    font-size: 10.5px;
+    color: rgba(0,30,91,0.55);
+    line-height: 1.35;
+    font-style: italic;
+  }
+
+  /* ---------- Section labels ---------- */
+  .section-header {
+    grid-column: 1 / -1;
+    background: #002775;
+    color: #FFFFFF;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 12px 0 4px;
+  }
+
+  /* ---------- Footer ---------- */
+  .footer-note-block {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 12px;
+    font-size: 12px;
+    color: #001E5B;
+    line-height: 1.5;
+    max-width: 1300px;
+  }
+  .footer-note-block strong { color: #001E5B; font-weight: 700; }
+  .footer-note-block .accent { color: #066AFE; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <h1>Reference Agency <span class="accent">Technology Stacks</span></h1>
+    <div class="caption">
+      <strong>Three ministries · greenfield</strong><br>
+      Working sketch · v0.1 · for dialogue
+    </div>
+  </header>
+
+  <p class="lede">
+    Three small &ldquo;people ministries&rdquo; on the <strong>certified reference stack</strong> in a greenfield build. Every layer below is a capability domain served by the platform holding <em>Reference</em> certification under the NZ Government CoE framework. Around 80% of each stack is shared services consumed identically; the differences sit inside the agency-specific overlays on the citizen-service platform and the community relationship model.
+  </p>
+
+  <div class="principle">
+    <strong>Guiding principle.</strong> One platform owns each end-to-end citizen-facing business process — intake, assessment, decision, fulfilment, notification, closure. It calls out to other systems for capability the process consumes (payments, records, finance postings, HR data). It <em>never</em> hands a live process across a platform boundary mid-flight.
+    <br><br>
+    <strong>How this connects to the CoE.</strong> Every platform named below is Reference-certified for its capability domain. An agency could substitute a certified alternate (e.g. MS Dynamics for Citizen Service Delivery, SAP SuccessFactors for HR) — they would still integrate into the same shared services and conform to the same interop patterns, but would carry the cost of divergence documented in the certification framework.
+  </div>
+
+  <div class="legend">
+    <div class="item"><span class="swatch" style="background:#FFFFFF; border-color:rgba(0,30,91,0.15)"></span>Agency instance of a Reference-certified platform</div>
+    <div class="item"><span class="swatch" style="background:#DCEBFD; border-style:dashed"></span>Shared service (consumed identically by all agencies)</div>
+    <div class="item"><span class="swatch" style="background:#B60554"></span>Agency-specific overlay on shared blueprint</div>
+    <div class="item"><span class="swatch" style="background:#001E5B"></span>Capability domain / enterprise stack layer</div>
+  </div>
+
+  <!-- ===== AGENCY HEADERS ===== -->
+  <div class="agency-headers">
+    <div class="row-label"></div>
+
+    <div class="agency-header">
+      <div class="name">Ministry for Pacific Peoples</div>
+      <div class="meta">~100 FTE · Principal advisor to the Crown on Pacific policy and interventions</div>
+      <div class="services">
+        <strong>In scope for this blueprint:</strong>
+        Toloa Fund &amp; community grants · Pacific stakeholder register &amp; engagement · Language Week events coordination
+      </div>
+    </div>
+
+    <div class="agency-header">
+      <div class="name">Ministry for Women</div>
+      <div class="meta">Small policy ministry · advocacy, advice, targeted funding</div>
+      <div class="services">
+        <strong>In scope for this blueprint:</strong>
+        Nominations Service (board appointments) · Prevention grants program · Public consultation &amp; submissions
+      </div>
+    </div>
+
+    <div class="agency-header">
+      <div class="name">Ministry for Disabled People (Whaikaha)</div>
+      <div class="meta">Advisory + oversight following DSS transfer to MSD</div>
+      <div class="services">
+        <strong>In scope for this blueprint:</strong>
+        Provider contract oversight &amp; monitoring · Accessibility feedback &amp; complaints · Community engagement register
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SECTION: CITIZEN-FACING ===== -->
+  <div class="stack-row">
+    <div class="section-header">Citizen-facing surface — the front door and the authenticated experience</div>
+  </div>
+
+  <!-- Row: Discovery & Content -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 1</div>
+      <div class="name">Discovery &amp; Content</div>
+      <div class="desc">Unauthenticated public site &amp; service catalogue</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Single Digital Presence</div>
+      <div class="role">Shared · Headless CMS + design system</div>
+      <ul>
+        <li>Tenant site on shared CMS (Silverstripe / Drupal / headless)</li>
+        <li>NZ Govt design system components</li>
+        <li>WCAG 2.2 AA, bilingual (Te Reo)</li>
+        <li>Pacific language content packs (Samoan, Tongan, Cook Islands Māori, Niuean, Tokelauan, Fijian)</li>
+        <li>Service catalogue entries feed AI Broker / semantic search</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Single Digital Presence</div>
+      <div class="role">Shared · Headless CMS + design system</div>
+      <ul>
+        <li>Tenant site on shared CMS</li>
+        <li>NZ Govt design system components</li>
+        <li>WCAG 2.2 AA, bilingual (Te Reo)</li>
+        <li>Discussion papers &amp; submissions campaign templates</li>
+        <li>Nominations Service public landing</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Single Digital Presence</div>
+      <div class="role">Shared · Headless CMS + design system</div>
+      <ul>
+        <li>Tenant site on shared CMS</li>
+        <li>NZ Govt design system components</li>
+        <li class="overlay">Accessibility-first UX overlay (screen-reader-native, Easy Read, NZSL video)</li>
+        <li>Provider directory (read-only view of authenticated register)</li>
+      </ul>
+      <div class="footer-note">Whaikaha drives the accessibility standard for the whole SDP.</div>
+    </div>
+  </div>
+
+  <!-- Row: Identity Gateway -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 2</div>
+      <div class="name">Identity &amp; Assurance</div>
+      <div class="desc">Central digital ID + credential wallet</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Digital Identity (RealMe / next-gen)</div>
+      <div class="role">Shared · Partner-led (DIA / MATTR)</div>
+      <ul>
+        <li>OIDC federation into Salesforce</li>
+        <li>Assurance level passed as claim</li>
+        <li>Verifiable credentials from wallet</li>
+        <li>Business / organisation identity for community orgs</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Digital Identity (RealMe / next-gen)</div>
+      <div class="role">Shared · Partner-led (DIA / MATTR)</div>
+      <ul>
+        <li>OIDC federation into Salesforce</li>
+        <li>Assurance level passed as claim</li>
+        <li>Verifiable credentials from wallet</li>
+        <li>Delegated authority for board nominators</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">NZ Digital Identity (RealMe / next-gen)</div>
+      <div class="role">Shared · Partner-led (DIA / MATTR)</div>
+      <ul>
+        <li>OIDC federation into Salesforce</li>
+        <li>Assurance level passed as claim</li>
+        <li>Verifiable credentials from wallet</li>
+        <li class="overlay">Assisted-identity flow for supported decision-making</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Citizen Service Anchor -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 3</div>
+      <div class="name">Citizen Service Delivery</div>
+      <div class="desc">One platform, end-to-end business process</div>
+    </div>
+
+    <div class="cell">
+      <div class="platform">Salesforce (Public Sector Solutions)</div>
+      <div class="role">Agency instance · single anchor for the process</div>
+      <ul>
+        <li><strong>Blueprint: Grants &amp; Funding</strong> — Toloa Fund + community grants configuration</li>
+        <li><strong>Blueprint: Person + Business Hub</strong> — with whakapapa / aiga relationship model overlay</li>
+        <li><strong>Blueprint: Case Management</strong> — light stakeholder case</li>
+        <li>Experience Cloud agency portal (authenticated)</li>
+        <li>Digital Engagement (in-app messaging)</li>
+        <li class="overlay">Pacific relationship model: aiga, kāinga, families as first-class</li>
+      </ul>
+    </div>
+
+    <div class="cell">
+      <div class="platform">Salesforce (Public Sector Solutions)</div>
+      <div class="role">Agency instance · single anchor for the process</div>
+      <ul>
+        <li><strong>Blueprint: Grants &amp; Funding</strong> — prevention grants configuration</li>
+        <li><strong>Blueprint: Nominations &amp; Matching</strong> — board appointments</li>
+        <li><strong>Blueprint: Consultation &amp; Submissions</strong> — discussion paper responses</li>
+        <li>Experience Cloud agency portal (authenticated)</li>
+        <li>Digital Engagement (in-app messaging)</li>
+        <li class="overlay">Nominations matching engine on OmniStudio / Rules</li>
+      </ul>
+    </div>
+
+    <div class="cell">
+      <div class="platform">Salesforce (Public Sector Solutions)</div>
+      <div class="role">Agency instance · single anchor for the process</div>
+      <ul>
+        <li><strong>Blueprint: Case Management</strong> — oversight + complaints</li>
+        <li><strong>Blueprint: Person + Business Hub</strong> — providers, advocacy orgs, iwi Māori disability networks</li>
+        <li><strong>Blueprint: Contract Oversight</strong> — provider monitoring</li>
+        <li>Experience Cloud agency portal (authenticated)</li>
+        <li>Digital Engagement (accessibility-optimised)</li>
+        <li class="overlay">Enabling Good Lives principles configured into case model</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Rules Library -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 4</div>
+      <div class="name">Rules Library</div>
+      <div class="desc">Machine-readable eligibility &amp; policy</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Shared Rules Library</div>
+      <div class="role">Shared · Executed via OmniStudio / BRE</div>
+      <ul>
+        <li>Grant eligibility rules (MPP-authored)</li>
+        <li>Community org verification rules</li>
+        <li>Rules published to DPI for eligibility discovery</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Shared Rules Library</div>
+      <div class="role">Shared · Executed via OmniStudio / BRE</div>
+      <ul>
+        <li>Board eligibility &amp; scoring criteria</li>
+        <li>Grant eligibility rules (prevention variant)</li>
+        <li>Consultation submission validity rules</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Shared Rules Library</div>
+      <div class="role">Shared · Executed via OmniStudio / BRE</div>
+      <ul>
+        <li>Provider compliance thresholds</li>
+        <li>Complaint routing &amp; escalation rules</li>
+        <li>Accessibility conformance rules</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Notifications -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 5</div>
+      <div class="name">Notifications &amp; Payments</div>
+      <div class="desc">Central messaging + payment orchestration</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">DPI Notifications + Payments</div>
+      <div class="role">Shared · Central all-of-Govt services</div>
+      <ul>
+        <li>Outbound SMS / email / push via central</li>
+        <li>Central inbox (&ldquo;my messages&rdquo;)</li>
+        <li>Grant disbursement via central payments</li>
+        <li>User-managed preferences respected</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">DPI Notifications + Payments</div>
+      <div class="role">Shared · Central all-of-Govt services</div>
+      <ul>
+        <li>Outbound SMS / email / push via central</li>
+        <li>Central inbox (&ldquo;my messages&rdquo;)</li>
+        <li>Grant disbursement via central payments</li>
+        <li>Board nomination status notifications</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">DPI Notifications + Payments</div>
+      <div class="role">Shared · Central all-of-Govt services</div>
+      <ul>
+        <li>Outbound SMS / email / push via central</li>
+        <li>Central inbox (&ldquo;my messages&rdquo;)</li>
+        <li>NZSL video notification option</li>
+        <li>Provider contract payment orchestration</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SECTION: INTEGRATION FABRIC ===== -->
+  <div class="stack-row">
+    <div class="section-header">Integration &amp; data fabric — the connective tissue</div>
+  </div>
+
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 6</div>
+      <div class="name">Integration Fabric</div>
+      <div class="desc">API + event orchestration</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">MuleSoft (DPI Services Exchange)</div>
+      <div class="role">Shared · Canonical schema + event bus</div>
+      <ul>
+        <li>Canonical Person / Business schema</li>
+        <li>Grants domain events published to bus</li>
+        <li>Integrations to central payments, records, finance</li>
+        <li>Cross-agency service exchange (e.g. MSD, MBIE)</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">MuleSoft (DPI Services Exchange)</div>
+      <div class="role">Shared · Canonical schema + event bus</div>
+      <ul>
+        <li>Canonical Person / Business schema</li>
+        <li>Nominations domain events published to bus</li>
+        <li>Integrations to central payments, records, finance</li>
+        <li>Public Service Commission board data exchange</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">MuleSoft (DPI Services Exchange)</div>
+      <div class="role">Shared · Canonical schema + event bus</div>
+      <ul>
+        <li>Canonical Person / Business schema</li>
+        <li>Case &amp; complaint events published to bus</li>
+        <li>Integrations to MSD DSS, central payments, records</li>
+        <li>Health, ACC, and education data exchange</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SECTION: BACK OFFICE ===== -->
+  <div class="stack-row">
+    <div class="section-header">Back office — shared enterprise services (agencies consume, don't operate)</div>
+  </div>
+
+  <!-- Row: HR -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 7a</div>
+      <div class="name">Human Resources</div>
+      <div class="desc">Workforce, payroll, learning</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Workday (shared tenant)</div>
+      <div class="role">Shared · NZ Govt HR baseline</div>
+      <ul>
+        <li>~100 FTE agency instance on shared tenant</li>
+        <li>NZ Govt reference HR configuration</li>
+        <li>Learning &amp; capability shared</li>
+        <li>Payroll integration to central</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Workday (shared tenant)</div>
+      <div class="role">Shared · NZ Govt HR baseline</div>
+      <ul>
+        <li>Small agency instance on shared tenant</li>
+        <li>NZ Govt reference HR configuration</li>
+        <li>Learning &amp; capability shared</li>
+        <li>Payroll integration to central</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Workday (shared tenant)</div>
+      <div class="role">Shared · NZ Govt HR baseline</div>
+      <ul>
+        <li>Small agency instance on shared tenant</li>
+        <li>NZ Govt reference HR configuration</li>
+        <li class="overlay">Accessible / assistive workforce provisions overlay</li>
+        <li>Payroll integration to central</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Finance -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 7b</div>
+      <div class="name">Finance / ERP</div>
+      <div class="desc">GL, procurement, contracts, assets</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">TechOne / Oracle (shared cluster)</div>
+      <div class="role">Shared · NZ Govt Finance baseline</div>
+      <ul>
+        <li>Common chart of accounts, cluster instance</li>
+        <li>Grant disbursement posts from Salesforce</li>
+        <li>Contract &amp; procurement register</li>
+        <li>Consolidated whole-of-Govt spend reporting</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">TechOne / Oracle (shared cluster)</div>
+      <div class="role">Shared · NZ Govt Finance baseline</div>
+      <ul>
+        <li>Common chart of accounts, cluster instance</li>
+        <li>Grant disbursement posts from Salesforce</li>
+        <li>Contract &amp; procurement register</li>
+        <li>Consolidated whole-of-Govt spend reporting</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">TechOne / Oracle (shared cluster)</div>
+      <div class="role">Shared · NZ Govt Finance baseline</div>
+      <ul>
+        <li>Common chart of accounts, cluster instance</li>
+        <li>Provider contract payments posted from Salesforce</li>
+        <li>Contract lifecycle register</li>
+        <li>Cost-of-oversight reporting</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Staff ITSM -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 7c</div>
+      <div class="name">Staff Service Management</div>
+      <div class="desc">Internal ITSM · <em>not</em> citizen service</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">ServiceNow (shared cluster)</div>
+      <div class="role">Shared · Staff-only ITSM</div>
+      <ul>
+        <li>My IT, my HR queries, access requests</li>
+        <li>Incident / problem / change for staff</li>
+        <li>Asset &amp; CMDB for shared devices</li>
+        <li>Explicitly not used for citizen-facing service</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">ServiceNow (shared cluster)</div>
+      <div class="role">Shared · Staff-only ITSM</div>
+      <ul>
+        <li>My IT, my HR queries, access requests</li>
+        <li>Incident / problem / change for staff</li>
+        <li>Asset &amp; CMDB for shared devices</li>
+        <li>Explicitly not used for citizen-facing service</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">ServiceNow (shared cluster)</div>
+      <div class="role">Shared · Staff-only ITSM</div>
+      <ul>
+        <li>My IT, my HR queries, access requests</li>
+        <li>Incident / problem / change for staff</li>
+        <li>Asset &amp; CMDB for shared devices</li>
+        <li>Explicitly not used for citizen-facing service</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Row: Productivity -->
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 7d</div>
+      <div class="name">Productivity &amp; Records</div>
+      <div class="desc">Docs, collaboration, records retention</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Microsoft 365 (One Desktop for Govt)</div>
+      <div class="role">Shared · Tenant + records</div>
+      <ul>
+        <li>Standard workspace baseline</li>
+        <li>Purview records &amp; retention</li>
+        <li>Copilot with governance guardrails</li>
+        <li>Cross-agency comms via central</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Microsoft 365 (One Desktop for Govt)</div>
+      <div class="role">Shared · Tenant + records</div>
+      <ul>
+        <li>Standard workspace baseline</li>
+        <li>Purview records &amp; retention</li>
+        <li>Copilot with governance guardrails</li>
+        <li>Cross-agency comms via central</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Microsoft 365 (One Desktop for Govt)</div>
+      <div class="role">Shared · Tenant + records</div>
+      <ul>
+        <li>Standard workspace baseline</li>
+        <li>Purview records &amp; retention</li>
+        <li>Copilot with governance guardrails</li>
+        <li class="overlay">Accessibility &amp; assistive tooling baseline elevated</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== SECTION: DATA & AI ===== -->
+  <div class="stack-row">
+    <div class="section-header">Data, analytics &amp; AI — cross-cutting intelligence layer</div>
+  </div>
+
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 8</div>
+      <div class="name">Data &amp; Analytics</div>
+      <div class="desc">Whole-of-Govt intelligence</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Data Cloud + Tableau (whole-of-Govt)</div>
+      <div class="role">Shared · Harmonised across agencies</div>
+      <ul>
+        <li>Cross-agency Person &amp; Business view</li>
+        <li>Grant outcome measurement</li>
+        <li>Community engagement analytics</li>
+        <li>Central financial reporting</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Data Cloud + Tableau (whole-of-Govt)</div>
+      <div class="role">Shared · Harmonised across agencies</div>
+      <ul>
+        <li>Cross-agency Person &amp; Business view</li>
+        <li>Board diversity &amp; nomination outcomes</li>
+        <li>Prevention grant impact tracking</li>
+        <li>Central financial reporting</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Data Cloud + Tableau (whole-of-Govt)</div>
+      <div class="role">Shared · Harmonised across agencies</div>
+      <ul>
+        <li>Cross-agency Person &amp; Business view</li>
+        <li>Provider performance &amp; outcomes</li>
+        <li>Complaints &amp; accessibility signal analysis</li>
+        <li>Enabling Good Lives outcome dashboards</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="stack-row">
+    <div class="row-label-inner">
+      <div class="tag">Layer 9</div>
+      <div class="name">AI &amp; Agents</div>
+      <div class="desc">Agentforce + shared AI patterns</div>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Agentforce + DPI AI Broker</div>
+      <div class="role">Shared · MCP + Trust Layer</div>
+      <ul>
+        <li>Staff copilot for grant assessment</li>
+        <li>Semantic search across service catalogue</li>
+        <li>Pacific language translation agent</li>
+        <li>Fraud &amp; anomaly detection on grants</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Agentforce + DPI AI Broker</div>
+      <div class="role">Shared · MCP + Trust Layer</div>
+      <ul>
+        <li>Nominations matching assist agent</li>
+        <li>Board data enrichment agent</li>
+        <li>Consultation submissions synthesis</li>
+        <li>Semantic search across service catalogue</li>
+      </ul>
+    </div>
+
+    <div class="cell shared">
+      <div class="platform">Agentforce + DPI AI Broker</div>
+      <div class="role">Shared · MCP + Trust Layer</div>
+      <ul>
+        <li>Complaints triage &amp; classification agent</li>
+        <li>Accessibility-first conversational UI</li>
+        <li>Provider risk-flag agent</li>
+        <li>Semantic search across service catalogue</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER NOTE ===== -->
+  <div class="footer-note-block">
+    <strong>Reading the stack.</strong>
+    Cells outlined with dashed borders on light-blue are <span class="accent">shared services</span> — consumed identically by all three agencies. Solid white cells are <span class="accent">agency instances</span> on Reference-certified platforms, with agency-specific configuration. Pink items inside cells are <span class="accent">agency-specific overlays</span> that extend a shared blueprint (e.g. Whakapapa relationships, accessibility-first UX, Enabling Good Lives principles).
+    <br><br>
+    <strong>The pattern that matters for GDA.</strong> Every citizen-facing service — grants, nominations, complaints, oversight — is delivered end-to-end on Salesforce (Reference-certified for Citizen Service Delivery). Salesforce owns intake, assessment, decision, notification, and closure. It <em>integrates out</em> for payments, records, finance postings, HR data, and cross-agency data exchange — but it does not <em>hand the process off</em> mid-flight to another platform. This is the difference between Service Victoria (works) and MPI's two-platform split (doesn't).
+    <br><br>
+    <strong>Staff service management is deliberately separate.</strong> ServiceNow (Reference-certified for Staff Service Management) handles staff IT, HR queries, and access requests — an internal-only capability. It is not on the citizen-service critical path. Executives who conflate ESM with citizen service delivery will read the stack and understand the distinction.
+    <br><br>
+    <strong>Choosing a certified alternate.</strong> An agency electing MS Dynamics 365 Customer Service instead of Salesforce, or SAP SuccessFactors instead of Workday, would produce a stack of the same shape at the same layers — but the blueprint library, shared talent, and integration acceleration would be thinner. The shared services (SDP, Identity, Notifications, Payments, MuleSoft, Data Cloud, M365) are unchanged. The cost of divergence sits inside the citizen-service layer, not the shared-service layer.
+  </div>
+
+</div>
+</body>
+</html>

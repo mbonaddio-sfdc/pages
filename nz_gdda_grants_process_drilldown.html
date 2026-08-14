@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grants Lifecycle — L4 Process Drill-Down (Toloa Fund)</title>
+<style>
+  :root { color-scheme: light; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #EAF5FE;
+    font-family: "Salesforce Sans", "Calibri", "Helvetica Neue", Arial, sans-serif;
+    color: #001E5B;
+  }
+  .page { max-width: 1700px; margin: 0 auto; padding: 40px 44px 60px; }
+
+  header.title {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,30,91,0.15);
+    margin-bottom: 20px;
+  }
+  header.title .kicker {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #066AFE;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  header.title h1 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 32px;
+    line-height: 1.15;
+    color: #001E5B;
+    margin: 0 0 6px 0;
+    max-width: 1100px;
+  }
+  header.title h1 .accent { color: #066AFE; }
+  header.title .subtitle {
+    font-size: 14px;
+    color: #022AC0;
+    line-height: 1.55;
+    margin-top: 8px;
+    max-width: 1150px;
+  }
+  header.title .meta {
+    font-size: 11px;
+    color: rgba(0,30,91,0.55);
+    margin-top: 10px;
+  }
+
+  /* ---------- Argument box ---------- */
+  .argument {
+    background: linear-gradient(90deg, #066AFE 0%, #0250D9 100%);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 18px;
+  }
+  .argument h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #90D0FE;
+    margin: 0 0 6px 0;
+  }
+  .argument p {
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #FFFFFF;
+    margin: 0;
+    max-width: 1200px;
+  }
+  .argument p em { color: #90D0FE; font-style: italic; }
+
+  /* ---------- Summary counts ---------- */
+  .counts {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .count {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 6px rgba(6,106,254,0.08);
+    text-align: center;
+  }
+  .count .num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 32px;
+    color: #066AFE;
+    font-weight: 700;
+    line-height: 1;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .count .label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0,30,91,0.65);
+    font-weight: 700;
+  }
+
+  /* ---------- Phase overview strip ---------- */
+  .phase-strip {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    margin-bottom: 20px;
+  }
+  .phase-tile {
+    background: #FFFFFF;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #001E5B;
+    box-shadow: 0 2px 5px rgba(6,106,254,0.06);
+    border-top: 3px solid #066AFE;
+  }
+  .phase-tile .num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14px;
+    color: #066AFE;
+    font-weight: 700;
+    display: block;
+  }
+  .phase-tile .name {
+    color: #001E5B;
+    font-weight: 700;
+    display: block;
+    margin-top: 3px;
+  }
+  .phase-tile .count-inline {
+    color: rgba(0,30,91,0.6);
+    font-size: 10px;
+    margin-top: 2px;
+    display: block;
+  }
+
+  /* ---------- Phase blocks (main content) ---------- */
+  .phase {
+    margin-bottom: 18px;
+  }
+  .phase-header {
+    background: linear-gradient(90deg, #001E5B 0%, #002775 100%);
+    color: #FFFFFF;
+    border-radius: 10px 10px 0 0;
+    padding: 12px 18px;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .phase-header .num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 22px;
+    color: #90D0FE;
+    font-weight: 700;
+  }
+  .phase-header .name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 16px;
+    color: #FFFFFF;
+    font-weight: 700;
+  }
+  .phase-header .desc {
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    margin-left: auto;
+    max-width: 700px;
+    text-align: right;
+    line-height: 1.4;
+  }
+
+  /* ---------- Process table ---------- */
+  table.processes {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #FFFFFF;
+    border-radius: 0 0 10px 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(6,106,254,0.06);
+    font-size: 11.5px;
+  }
+  table.processes thead th {
+    background: #002775;
+    color: #FFFFFF;
+    text-align: left;
+    padding: 8px 10px;
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+  table.processes tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(0,30,91,0.06);
+    vertical-align: top;
+    line-height: 1.4;
+    color: #001E5B;
+  }
+  table.processes tbody tr:last-child td { border-bottom: none; }
+  table.processes tbody tr:nth-child(even) td { background: #F5FAFE; }
+
+  .l3-label {
+    background: #001E5B;
+    color: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  .l4-name {
+    font-weight: 600;
+    color: #001E5B;
+    line-height: 1.35;
+  }
+  .persona {
+    color: #04544D;
+    font-size: 11px;
+  }
+  .platform-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.3;
+    margin-right: 3px;
+    margin-bottom: 2px;
+  }
+  .platform-tag.sf { background: rgba(6, 106, 254, 0.18); color: #002775; }
+  .platform-tag.sdp { background: rgba(6, 165, 154, 0.2); color: #04544D; }
+  .platform-tag.id { background: rgba(0, 179, 255, 0.2); color: #002775; }
+  .platform-tag.mule { background: rgba(2, 80, 217, 0.2); color: #0250D9; }
+  .platform-tag.techone { background: rgba(228, 162, 1, 0.2); color: #8B5F00; }
+  .platform-tag.m365 { background: rgba(0, 30, 91, 0.15); color: #001E5B; }
+  .platform-tag.data { background: rgba(6, 106, 254, 0.25); color: #002775; }
+  .platform-tag.notif { background: rgba(115, 3, 148, 0.15); color: #730394; }
+  .platform-tag.pay { background: rgba(228, 162, 1, 0.25); color: #8B5F00; }
+  .platform-tag.rules { background: rgba(2, 42, 192, 0.2); color: #002775; }
+  .platform-tag.agent { background: rgba(6, 106, 254, 0.3); color: #001E5B; }
+
+  .data-entity {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 10.5px;
+    background: #EAF5FE;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #002775;
+    display: inline-block;
+    margin-right: 3px;
+    margin-bottom: 2px;
+  }
+  .rule {
+    font-size: 10.5px;
+    color: #002775;
+    line-height: 1.35;
+  }
+  .event {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 10px;
+    color: #0250D9;
+    background: rgba(2, 80, 217, 0.08);
+    padding: 1px 5px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-right: 3px;
+    margin-bottom: 2px;
+  }
+
+  /* ---------- Closing argument ---------- */
+  .closing {
+    background: #001E5B;
+    color: #FFFFFF;
+    border-radius: 14px;
+    padding: 22px 26px;
+    margin-top: 22px;
+  }
+  .closing h2 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 18px;
+    margin: 0 0 8px 0;
+    color: #FFFFFF;
+  }
+  .closing h2 .accent { color: #90D0FE; }
+  .closing p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: #FFFFFF;
+    margin: 0 0 12px 0;
+    max-width: 1200px;
+  }
+  .closing p:last-child { margin-bottom: 0; }
+  .closing p strong { color: #90D0FE; }
+  .closing p em { color: rgba(255,255,255,0.85); font-style: italic; }
+
+  footer.doc-footer {
+    margin-top: 30px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,30,91,0.15);
+    font-size: 11px;
+    color: rgba(0,30,91,0.55);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <div class="kicker">Working reference · L4 process specification</div>
+    <h1>Grants lifecycle — <span class="accent">Level 4 drill-down</span></h1>
+    <p class="subtitle">
+      The full end-to-end grants process — Toloa Fund as the concrete instantiation — specified at Level 4. Every sub-process, every persona, every data entity, every rule, every integration event. This is what the "common process" for grants looks like when it's codified as configuration on the certified reference blueprint, not documented as policy.
+    </p>
+    <div class="meta">Version 0.1 · working reference · Salesforce Public Sector Solutions Grants blueprint · Toloa Fund overlay</div>
+  </header>
+
+  <div class="argument">
+    <h3>The argument this artefact makes</h3>
+    <p>
+      GDA's current common-process work is oriented toward documenting each process to 8 levels of policy detail. That work is important — but it doesn't produce a running system. The alternative below is <strong>the same process, but specified as configuration on a certified reference blueprint</strong>: 58 Level-4 sub-processes, each with an owner, a persona, a platform component, a data entity, a rule, and an event. Every element of this specification is <em>executable</em>. Deploy it once, agencies adopt it with their own eligibility criteria, scoring rubrics, and program metadata layered on top. The common process <em>is</em> the reference blueprint.
+    </p>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- Summary counts                                        -->
+  <!-- ===================================================== -->
+  <div class="counts">
+    <div class="count"><span class="num">58</span><span class="label">L4 sub-processes</span></div>
+    <div class="count"><span class="num">8</span><span class="label">Phases end-to-end</span></div>
+    <div class="count"><span class="num">15</span><span class="label">Data entities</span></div>
+    <div class="count"><span class="num">24</span><span class="label">Rules invoked</span></div>
+    <div class="count"><span class="num">17</span><span class="label">DPI events published</span></div>
+    <div class="count"><span class="num">9</span><span class="label">Personas involved</span></div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- Phase overview                                        -->
+  <!-- ===================================================== -->
+  <div class="phase-strip">
+    <div class="phase-tile"><span class="num">01</span><span class="name">Discover</span><span class="count-inline">5 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">02</span><span class="name">Apply</span><span class="count-inline">10 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">03</span><span class="name">Validate &amp; Route</span><span class="count-inline">6 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">04</span><span class="name">Assess</span><span class="count-inline">8 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">05</span><span class="name">Decide</span><span class="count-inline">7 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">06</span><span class="name">Disburse &amp; Communicate</span><span class="count-inline">7 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">07</span><span class="name">Monitor</span><span class="count-inline">9 sub-processes</span></div>
+    <div class="phase-tile"><span class="num">08</span><span class="name">Close &amp; Learn</span><span class="count-inline">6 sub-processes</span></div>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 1 — DISCOVER                                                 -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">01</span>
+      <span class="name">Discover</span>
+      <span class="desc">Prospective applicant learns about the fund on the public site, checks eligibility, and moves to authenticated intake.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">1.1 Discover</span></td>
+          <td><span class="l4-name">Applicant reads fund overview &amp; eligibility</span></td>
+          <td><span class="persona">Prospective applicant</span></td>
+          <td><span class="platform-tag sdp">SDP</span></td>
+          <td><span class="data-entity">ServiceCatalogueEntry</span></td>
+          <td><span class="rule">Content-freshness rule (v ≤30d)</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">1.1 Discover</span></td>
+          <td><span class="l4-name">Applicant views prior award outcomes (anonymised)</span></td>
+          <td><span class="persona">Prospective applicant</span></td>
+          <td><span class="platform-tag sdp">SDP</span> <span class="platform-tag data">Data</span></td>
+          <td><span class="data-entity">OutcomeSummary</span></td>
+          <td><span class="rule">Anonymisation rule (k ≥ 5)</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">1.2 Eligibility check</span></td>
+          <td><span class="l4-name">Applicant runs public eligibility calculator</span></td>
+          <td><span class="persona">Prospective applicant</span></td>
+          <td><span class="platform-tag sdp">SDP</span> <span class="platform-tag rules">Rules</span></td>
+          <td><span class="data-entity">EligibilityCheck</span></td>
+          <td><span class="rule">Toloa eligibility rule set v1.0 (published to DPI)</span></td>
+          <td><span class="event">eligibility.checked</span></td>
+        </tr>
+        <tr><td><span class="l3-label">1.3 Sign in</span></td>
+          <td><span class="l4-name">Applicant clicks Apply → identity gateway redirect</span></td>
+          <td><span class="persona">Prospective applicant</span></td>
+          <td><span class="platform-tag sdp">SDP</span> → <span class="platform-tag id">Identity</span></td>
+          <td>—</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">1.3 Sign in</span></td>
+          <td><span class="l4-name">RealMe authentication + OIDC token issued to Salesforce with assurance claim</span></td>
+          <td><span class="persona">Applicant + system</span></td>
+          <td><span class="platform-tag id">Identity</span> → <span class="platform-tag sf">Salesforce</span></td>
+          <td><span class="data-entity">IdentityToken</span> <span class="data-entity">AssuranceClaim</span></td>
+          <td><span class="rule">Assurance-level policy (≥ moderate for grants)</span></td>
+          <td><span class="event">identity.session.opened</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 2 — APPLY                                                   -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">02</span>
+      <span class="name">Apply</span>
+      <span class="desc">Authenticated applicant completes profile, project detail, budget, and evidence sections; obtains a matai/community endorsement; submits.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">2.1 Profile</span></td>
+          <td><span class="l4-name">Person record created or matched via identity claim</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce (Person + Business Hub)</span></td>
+          <td><span class="data-entity">Person</span></td>
+          <td><span class="rule">Deduplication rule</span></td>
+          <td><span class="event">person.matched</span></td>
+        </tr>
+        <tr><td><span class="l3-label">2.1 Profile</span></td>
+          <td><span class="l4-name">Applicant completes profile (name, aiga/family, contact, community)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">PersonProfile</span> <span class="data-entity">Aiga</span></td>
+          <td><span class="rule">Mandatory field rules (Toloa variant)</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">2.2 Application</span></td>
+          <td><span class="l4-name">GrantApplication record created (round open check)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">GrantApplication</span></td>
+          <td><span class="rule">Funding round window rule</span></td>
+          <td><span class="event">grant.application.created</span></td>
+        </tr>
+        <tr><td><span class="l3-label">2.2 Application</span></td>
+          <td><span class="l4-name">Applicant completes project detail (STEAM domain, activity, participants)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">ProjectDetail</span></td>
+          <td><span class="rule">Toloa STEAM category taxonomy</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">2.2 Application</span></td>
+          <td><span class="l4-name">Applicant completes budget section (line items, requested amount)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">BudgetLineItem</span></td>
+          <td><span class="rule">Budget ceiling rule (Toloa variant)</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">2.3 Evidence</span></td>
+          <td><span class="l4-name">Applicant uploads supporting evidence (letters, quotes, CV)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Files</span> <span class="platform-tag m365">M365 Purview</span></td>
+          <td><span class="data-entity">EvidenceDocument</span></td>
+          <td><span class="rule">File type/size + malware scan + retention classification</span></td>
+          <td><span class="event">evidence.uploaded</span></td>
+        </tr>
+        <tr><td><span class="l3-label">2.4 Endorsement</span></td>
+          <td><span class="l4-name">Applicant requests community/matai endorsement (nominee flow)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Person Hub</span></td>
+          <td><span class="data-entity">EndorsementRequest</span></td>
+          <td><span class="rule">Endorser authority via relationship graph</span></td>
+          <td><span class="event">endorsement.requested</span></td>
+        </tr>
+        <tr><td><span class="l3-label">2.4 Endorsement</span></td>
+          <td><span class="l4-name">Endorser receives notification and completes endorsement</span></td>
+          <td><span class="persona">Community leader / matai</span></td>
+          <td><span class="platform-tag sf">Salesforce (endorser portal)</span> <span class="platform-tag notif">Notif</span></td>
+          <td><span class="data-entity">Endorsement</span></td>
+          <td><span class="rule">Endorser eligibility check</span></td>
+          <td><span class="event">endorsement.completed</span></td>
+        </tr>
+        <tr><td><span class="l3-label">2.5 Submit</span></td>
+          <td><span class="l4-name">Applicant reviews complete application, corrects errors</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">GrantApplication</span></td>
+          <td><span class="rule">Completeness validation ruleset</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">2.5 Submit</span></td>
+          <td><span class="l4-name">Application submitted (state transition to SUBMITTED)</span></td>
+          <td><span class="persona">Applicant</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">GrantApplication</span></td>
+          <td><span class="rule">State-machine transition rule</span></td>
+          <td><span class="event">grant.application.submitted</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 3 — VALIDATE & ROUTE                                        -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">03</span>
+      <span class="name">Validate &amp; Route</span>
+      <span class="desc">Automated checks against eligibility, duplication, and fraud signals; application routed to the appropriate assessor pool.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">3.1 Auto-validate</span></td>
+          <td><span class="l4-name">Full eligibility rules re-run (server-side authoritative check)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce</span> <span class="platform-tag rules">Rules</span></td>
+          <td><span class="data-entity">EligibilityResult</span></td>
+          <td><span class="rule">Toloa eligibility rule set v1.0</span></td>
+          <td><span class="event">eligibility.verified</span></td>
+        </tr>
+        <tr><td><span class="l3-label">3.1 Auto-validate</span></td>
+          <td><span class="l4-name">Duplicate application check (per person, per round)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce</span></td>
+          <td><span class="data-entity">GrantApplication</span></td>
+          <td><span class="rule">One-application-per-round rule</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">3.2 Cross-agency check</span></td>
+          <td><span class="l4-name">Cross-agency prior-award check (concurrent funding avoidance)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag mule">MuleSoft</span> <span class="platform-tag data">Data</span></td>
+          <td><span class="data-entity">CrossAgencyAwards</span></td>
+          <td><span class="rule">Concurrent-funding rule</span></td>
+          <td><span class="event">cross-agency.checked</span></td>
+        </tr>
+        <tr><td><span class="l3-label">3.3 Fraud signals</span></td>
+          <td><span class="l4-name">Agentforce anomaly detection on application signals</span></td>
+          <td><span class="persona">System (AI agent)</span></td>
+          <td><span class="platform-tag agent">Agentforce</span></td>
+          <td><span class="data-entity">FraudSignal</span></td>
+          <td><span class="rule">Anomaly threshold rules</span></td>
+          <td><span class="event">fraud.signal.raised</span> (if applicable)</td>
+        </tr>
+        <tr><td><span class="l3-label">3.4 Route</span></td>
+          <td><span class="l4-name">Application routed to assessor pool by category &amp; workload</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce (case routing)</span></td>
+          <td><span class="data-entity">CaseAssignment</span></td>
+          <td><span class="rule">Assessor-pool routing rule</span></td>
+          <td><span class="event">assessment.assigned</span></td>
+        </tr>
+        <tr><td><span class="l3-label">3.5 Confirm</span></td>
+          <td><span class="l4-name">Confirmation notification to applicant (application received)</span></td>
+          <td><span class="persona">System → applicant</span></td>
+          <td><span class="platform-tag notif">Notifications</span></td>
+          <td><span class="data-entity">NotificationEvent</span></td>
+          <td><span class="rule">Notification-preference rule</span></td>
+          <td><span class="event">notification.sent</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 4 — ASSESS                                                  -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">04</span>
+      <span class="name">Assess</span>
+      <span class="desc">Assessor works the case, reviews evidence, applies the merit rubric, and produces a scored assessment with peer review where required.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">4.1 Open case</span></td>
+          <td><span class="l4-name">Assessor opens case in Salesforce Assessment console</span></td>
+          <td><span class="persona">Assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">AssessmentCase</span></td>
+          <td>—</td>
+          <td><span class="event">assessment.started</span></td>
+        </tr>
+        <tr><td><span class="l3-label">4.2 Copilot brief</span></td>
+          <td><span class="l4-name">Agentforce provides applicant summary, prior applications, red flags</span></td>
+          <td><span class="persona">AI agent</span></td>
+          <td><span class="platform-tag agent">Agentforce</span></td>
+          <td><span class="data-entity">AssessmentBriefing</span></td>
+          <td><span class="rule">Prompt template + Trust Layer redaction rules</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">4.3 Review evidence</span></td>
+          <td><span class="l4-name">Assessor reviews evidence documents (with translation if needed)</span></td>
+          <td><span class="persona">Assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce Files</span> <span class="platform-tag agent">Agentforce (translate)</span></td>
+          <td><span class="data-entity">EvidenceReview</span></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">4.4 Score</span></td>
+          <td><span class="l4-name">Assessor scores against Toloa merit rubric (multiple criteria)</span></td>
+          <td><span class="persona">Assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span> <span class="platform-tag rules">Rules</span></td>
+          <td><span class="data-entity">AssessmentScore</span></td>
+          <td><span class="rule">Toloa merit rubric v1.0</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">4.4 Score</span></td>
+          <td><span class="l4-name">Composite score calculated with weighted criteria</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce</span> <span class="platform-tag rules">Rules</span></td>
+          <td><span class="data-entity">CompositeScore</span></td>
+          <td><span class="rule">Weighting rules per program variant</span></td>
+          <td><span class="event">assessment.scored</span></td>
+        </tr>
+        <tr><td><span class="l3-label">4.5 Peer review</span></td>
+          <td><span class="l4-name">Peer review triggered if score in ambiguous band (0.4–0.6)</span></td>
+          <td><span class="persona">Second assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce (workflow)</span></td>
+          <td><span class="data-entity">PeerReview</span></td>
+          <td><span class="rule">Ambiguous-score peer-review rule</span></td>
+          <td><span class="event">peer-review.assigned</span></td>
+        </tr>
+        <tr><td><span class="l3-label">4.5 Peer review</span></td>
+          <td><span class="l4-name">Peer reviewer completes independent assessment</span></td>
+          <td><span class="persona">Second assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">PeerAssessment</span></td>
+          <td><span class="rule">Reconciliation rule (if delta &gt; threshold)</span></td>
+          <td><span class="event">peer-review.completed</span></td>
+        </tr>
+        <tr><td><span class="l3-label">4.6 Assessment complete</span></td>
+          <td><span class="l4-name">Assessment sign-off recorded, case moved to DECISION queue</span></td>
+          <td><span class="persona">Assessor</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">AssessmentCase</span></td>
+          <td><span class="rule">Assessment-completeness rule</span></td>
+          <td><span class="event">assessment.completed</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 5 — DECIDE                                                  -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">05</span>
+      <span class="name">Decide</span>
+      <span class="desc">Delegated authority reviews the assessment, tests against the funding envelope, and records a decision. Records are retained; decision is published to DPI.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">5.1 Portfolio view</span></td>
+          <td><span class="l4-name">Delegated authority reviews ranked list of assessed applications</span></td>
+          <td><span class="persona">Delegated authority</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants (portfolio view)</span></td>
+          <td><span class="data-entity">DecisionPortfolio</span></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">5.2 Envelope check</span></td>
+          <td><span class="l4-name">Automated check against funding envelope (remaining budget)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce</span> <span class="platform-tag techone">TechOne</span></td>
+          <td><span class="data-entity">FundingEnvelope</span></td>
+          <td><span class="rule">Budget-envelope rule</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">5.3 Decide</span></td>
+          <td><span class="l4-name">Decision recorded (APPROVED / DECLINED / CONDITIONAL) per application</span></td>
+          <td><span class="persona">Delegated authority</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">GrantDecision</span></td>
+          <td><span class="rule">Delegation authority rule</span></td>
+          <td><span class="event">grant.decision.recorded</span></td>
+        </tr>
+        <tr><td><span class="l3-label">5.4 Sign-off</span></td>
+          <td><span class="l4-name">CEO / minister sign-off if above delegation threshold</span></td>
+          <td><span class="persona">CEO / minister</span></td>
+          <td><span class="platform-tag sf">Salesforce</span> <span class="platform-tag m365">M365</span></td>
+          <td><span class="data-entity">SignOffRecord</span></td>
+          <td><span class="rule">Delegation-threshold rule</span></td>
+          <td><span class="event">grant.decision.signed-off</span></td>
+        </tr>
+        <tr><td><span class="l3-label">5.5 Award letter</span></td>
+          <td><span class="l4-name">Award letter generated from template (or decline notice)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce (document generation)</span></td>
+          <td><span class="data-entity">AwardLetter</span></td>
+          <td><span class="rule">Award letter template rules</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">5.6 Records</span></td>
+          <td><span class="l4-name">Decision record retained with retention policy applied</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag m365">M365 Purview</span></td>
+          <td><span class="data-entity">DecisionRecord</span></td>
+          <td><span class="rule">Public Records Act retention rules</span></td>
+          <td><span class="event">record.retained</span></td>
+        </tr>
+        <tr><td><span class="l3-label">5.7 Publish</span></td>
+          <td><span class="l4-name">Anonymised outcome published to DPI outcome feed</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag mule">MuleSoft</span> <span class="platform-tag data">Data Cloud</span></td>
+          <td><span class="data-entity">OutcomePublication</span></td>
+          <td><span class="rule">Anonymisation + publication rules</span></td>
+          <td><span class="event">grant.outcome.published</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 6 — DISBURSE & COMMUNICATE                                  -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">06</span>
+      <span class="name">Disburse &amp; Communicate</span>
+      <span class="desc">Applicant is notified, bank details confirmed, funding encumbered and disbursed via central payments, financial posting recorded, milestone schedule created.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">6.1 Notify</span></td>
+          <td><span class="l4-name">Applicant notified of decision via central notification service</span></td>
+          <td><span class="persona">System → applicant</span></td>
+          <td><span class="platform-tag notif">Notifications</span></td>
+          <td><span class="data-entity">NotificationEvent</span></td>
+          <td><span class="rule">Notification-preference rule</span></td>
+          <td><span class="event">notification.sent</span></td>
+        </tr>
+        <tr><td><span class="l3-label">6.2 Bank confirm</span></td>
+          <td><span class="l4-name">Recipient confirms bank details in Experience Cloud portal</span></td>
+          <td><span class="persona">Recipient</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">BankAccount</span></td>
+          <td><span class="rule">Bank-account validation rule</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">6.3 Encumber</span></td>
+          <td><span class="l4-name">Funding encumbered in TechOne (commit against budget)</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag techone">TechOne</span></td>
+          <td><span class="data-entity">Encumbrance</span></td>
+          <td><span class="rule">Encumbrance rules</span></td>
+          <td><span class="event">encumbrance.posted</span></td>
+        </tr>
+        <tr><td><span class="l3-label">6.4 Pay</span></td>
+          <td><span class="l4-name">Payment request lodged with central payments</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag pay">Central Payments</span></td>
+          <td><span class="data-entity">PaymentRequest</span></td>
+          <td><span class="rule">Payment-authorisation rule</span></td>
+          <td><span class="event">payment.requested</span></td>
+        </tr>
+        <tr><td><span class="l3-label">6.4 Pay</span></td>
+          <td><span class="l4-name">Payment executed; confirmation returned</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag pay">Central Payments</span></td>
+          <td><span class="data-entity">PaymentConfirmation</span></td>
+          <td>—</td>
+          <td><span class="event">payment.confirmed</span></td>
+        </tr>
+        <tr><td><span class="l3-label">6.5 GL post</span></td>
+          <td><span class="l4-name">Grant disbursement posted to TechOne GL</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag techone">TechOne</span></td>
+          <td><span class="data-entity">GLPosting</span></td>
+          <td><span class="rule">Chart of accounts rules</span></td>
+          <td><span class="event">gl.posted</span></td>
+        </tr>
+        <tr><td><span class="l3-label">6.6 Milestones</span></td>
+          <td><span class="l4-name">Milestone schedule created for recipient</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">MilestoneSchedule</span></td>
+          <td><span class="rule">Milestone-template rule (Toloa variant)</span></td>
+          <td><span class="event">milestones.created</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 7 — MONITOR                                                 -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">07</span>
+      <span class="name">Monitor</span>
+      <span class="desc">Milestone reminders, recipient reporting, compliance checks, variation requests, site visits (if applicable), outcome capture.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">7.1 Reminder</span></td>
+          <td><span class="l4-name">Automated milestone reminder to recipient</span></td>
+          <td><span class="persona">System → recipient</span></td>
+          <td><span class="platform-tag notif">Notifications</span></td>
+          <td><span class="data-entity">MilestoneReminder</span></td>
+          <td><span class="rule">Reminder cadence rule (30/14/7 days)</span></td>
+          <td><span class="event">reminder.sent</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.2 Report intake</span></td>
+          <td><span class="l4-name">Recipient submits milestone report + evidence via portal</span></td>
+          <td><span class="persona">Recipient</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">MilestoneReport</span></td>
+          <td><span class="rule">Milestone report validation rules</span></td>
+          <td><span class="event">milestone.reported</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.3 Review</span></td>
+          <td><span class="l4-name">Grant officer reviews milestone report against expected outcomes</span></td>
+          <td><span class="persona">Grant officer</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">MilestoneReview</span></td>
+          <td><span class="rule">Milestone acceptance rule</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">7.4 Compliance</span></td>
+          <td><span class="l4-name">Compliance check against grant terms + Toloa program rules</span></td>
+          <td><span class="persona">Grant officer</span></td>
+          <td><span class="platform-tag sf">Salesforce</span> <span class="platform-tag rules">Rules</span></td>
+          <td><span class="data-entity">ComplianceCheck</span></td>
+          <td><span class="rule">Toloa compliance ruleset</span></td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">7.5 Variation</span></td>
+          <td><span class="l4-name">Recipient requests variation (scope, timing, budget)</span></td>
+          <td><span class="persona">Recipient</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">VariationRequest</span></td>
+          <td><span class="rule">Variation authority rules</span></td>
+          <td><span class="event">variation.requested</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.5 Variation</span></td>
+          <td><span class="l4-name">Variation reviewed and decided</span></td>
+          <td><span class="persona">Grant officer / delegated authority</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">VariationDecision</span></td>
+          <td><span class="rule">Variation acceptance rules</span></td>
+          <td><span class="event">variation.decided</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.6 Site visit</span></td>
+          <td><span class="l4-name">Site visit case created (if compliance risk flagged)</span></td>
+          <td><span class="persona">Grant officer</span></td>
+          <td><span class="platform-tag sf">Salesforce (mobile field service)</span></td>
+          <td><span class="data-entity">SiteVisit</span></td>
+          <td><span class="rule">Site-visit trigger rule</span></td>
+          <td><span class="event">site-visit.scheduled</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.7 Outcome capture</span></td>
+          <td><span class="l4-name">Recipient submits outcome data (STEAM participation, learner numbers)</span></td>
+          <td><span class="persona">Recipient</span></td>
+          <td><span class="platform-tag sf">Salesforce Experience Cloud</span></td>
+          <td><span class="data-entity">OutcomeReport</span></td>
+          <td><span class="rule">Outcome-schema validation rules</span></td>
+          <td><span class="event">outcome.captured</span></td>
+        </tr>
+        <tr><td><span class="l3-label">7.7 Outcome capture</span></td>
+          <td><span class="l4-name">Outcome data harmonised into whole-of-Govt outcomes register</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag data">Data Cloud</span> <span class="platform-tag mule">MuleSoft</span></td>
+          <td><span class="data-entity">OutcomeRegister</span></td>
+          <td><span class="rule">Canonical schema mapping rules</span></td>
+          <td><span class="event">outcome.registered</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- PHASE 8 — CLOSE & LEARN                                           -->
+  <!-- ================================================================== -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="num">08</span>
+      <span class="name">Close &amp; Learn</span>
+      <span class="desc">Final closure, satisfaction survey, records retention, feedback into program design and cross-agency outcome analytics.</span>
+    </div>
+    <table class="processes">
+      <thead>
+        <tr>
+          <th style="width: 11%;">L3 process</th>
+          <th style="width: 21%;">L4 sub-process</th>
+          <th style="width: 12%;">Persona</th>
+          <th style="width: 12%;">Platform</th>
+          <th style="width: 15%;">Data entity</th>
+          <th style="width: 15%;">Rule invoked</th>
+          <th style="width: 14%;">Event published</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="l3-label">8.1 Close case</span></td>
+          <td><span class="l4-name">Case closure workflow (final compliance + finance sign-off)</span></td>
+          <td><span class="persona">Grant officer</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">GrantApplication</span></td>
+          <td><span class="rule">Closure checklist rule</span></td>
+          <td><span class="event">grant.closed</span></td>
+        </tr>
+        <tr><td><span class="l3-label">8.2 Survey</span></td>
+          <td><span class="l4-name">Satisfaction survey sent to recipient</span></td>
+          <td><span class="persona">System → recipient</span></td>
+          <td><span class="platform-tag notif">Notifications</span> <span class="platform-tag sf">Salesforce</span></td>
+          <td><span class="data-entity">SurveyResponse</span></td>
+          <td>—</td>
+          <td><span class="event">survey.sent</span></td>
+        </tr>
+        <tr><td><span class="l3-label">8.3 Retention</span></td>
+          <td><span class="l4-name">Final case records archived under Public Records Act</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag m365">M365 Purview</span></td>
+          <td><span class="data-entity">ArchivedRecord</span></td>
+          <td><span class="rule">Public Records Act retention rules</span></td>
+          <td><span class="event">record.archived</span></td>
+        </tr>
+        <tr><td><span class="l3-label">8.4 Analytics</span></td>
+          <td><span class="l4-name">Outcome data aggregated into Toloa program dashboard</span></td>
+          <td><span class="persona">Program manager</span></td>
+          <td><span class="platform-tag data">Data Cloud + Tableau</span></td>
+          <td><span class="data-entity">ProgramDashboard</span></td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+        <tr><td><span class="l3-label">8.4 Analytics</span></td>
+          <td><span class="l4-name">Cross-agency Pacific outcomes updated with grant impact data</span></td>
+          <td><span class="persona">System</span></td>
+          <td><span class="platform-tag data">Data Cloud</span> <span class="platform-tag mule">MuleSoft</span></td>
+          <td><span class="data-entity">PacificOutcomesRegister</span></td>
+          <td><span class="rule">Canonical outcome mapping rules</span></td>
+          <td><span class="event">pacific-outcome.updated</span></td>
+        </tr>
+        <tr><td><span class="l3-label">8.5 Feedback loop</span></td>
+          <td><span class="l4-name">Program design feedback captured for next-round refresh</span></td>
+          <td><span class="persona">Program manager</span></td>
+          <td><span class="platform-tag sf">Salesforce Grants</span></td>
+          <td><span class="data-entity">ProgramFeedback</span></td>
+          <td><span class="rule">Feedback taxonomy rules</span></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ================================================================== -->
+  <!-- Closing argument                                                  -->
+  <!-- ================================================================== -->
+  <div class="closing">
+    <h2>What this shows — <span class="accent">common process, codified as configuration</span></h2>
+    <p>
+      Everything above is one grants process, specified at Level 4, with every sub-process assigned to a persona, a certified platform component, a data entity, a rule, and a published event. <strong>Fifty-eight sub-processes.</strong> Eight phases. Fifteen data entities. Twenty-four rules. Seventeen DPI events. Nine personas. All of it configured on the Salesforce Public Sector Solutions Grants blueprint — the certified Reference platform for Citizen Service Delivery — with the Toloa Fund overlay providing MPP's program-specific eligibility, merit rubric, and milestone template.
+    </p>
+    <p>
+      <strong>This is what the "common process for grants" actually is when it's built rather than documented.</strong> Not eight levels of nested policy — one Level 4 specification, expressed as configuration, running on a shared platform with events published to DPI. Ministry for Women reuses 90% of this same specification, changing the eligibility rules, the merit rubric, and the milestone template. Whaikaha reuses ~70%, replacing the merit-scoring lane with an oversight-monitoring lane. That's what reuse actually looks like.
+    </p>
+    <p>
+      <strong>The cost story.</strong> Building this once at the certification body level and letting agencies overlay their program-specific rules replaces an 18–24 month per-agency build. For three small ministries, that's three fewer separate grants system builds and one shared upgrade path. Multiply that across the ten agencies Mel identified and the arithmetic against <em>Driving Down the Cost of Digital</em> starts to look real.
+    </p>
+    <p>
+      <strong>What we would take to Andy.</strong> This artefact is the answer to the question <em>&ldquo;what does common process actually mean and how deep does it need to go?&rdquo;</em> The answer is: as deep as this — no deeper. Any further depth is deployment configuration, not common process definition. The common process is the blueprint. The blueprint is the specification. Adopt it, layer your program-specific rules on top, and deliver in months instead of years.
+    </p>
+  </div>
+
+  <footer class="doc-footer">
+    Working reference — L4 process drill-down for Toloa Fund grant lifecycle on the Salesforce PSS Grants blueprint. Version 0.1 · 2026-07 · companion to the certification framework, CoE architecture, and process architecture artefacts.
+  </footer>
+
+</div>
+</body>
+</html>

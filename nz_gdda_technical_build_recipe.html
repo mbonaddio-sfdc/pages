@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Technical Build Recipe — Toloa Fund on Salesforce Public Sector Solutions</title>
+<style>
+  :root { color-scheme: light; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #EAF5FE;
+    font-family: "Salesforce Sans", "Calibri", "Helvetica Neue", Arial, sans-serif;
+    color: #001E5B;
+  }
+  .page { max-width: 1600px; margin: 0 auto; padding: 40px 44px 60px; }
+
+  header.title {
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0,30,91,0.15);
+    margin-bottom: 20px;
+  }
+  header.title .kicker {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #066AFE;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  header.title h1 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 32px;
+    line-height: 1.15;
+    color: #001E5B;
+    margin: 0 0 6px 0;
+    max-width: 1100px;
+  }
+  header.title h1 .accent { color: #066AFE; }
+  header.title .subtitle {
+    font-size: 14px;
+    color: #022AC0;
+    line-height: 1.55;
+    margin-top: 8px;
+    max-width: 1150px;
+  }
+  header.title .meta {
+    font-size: 11px;
+    color: rgba(0,30,91,0.55);
+    margin-top: 10px;
+  }
+
+  .section {
+    margin-bottom: 28px;
+  }
+  .section-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 20px;
+    color: #001E5B;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .section-title .number {
+    color: #066AFE;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .section-lede {
+    font-size: 13.5px;
+    color: #022AC0;
+    line-height: 1.55;
+    margin: 0 0 14px 0;
+    max-width: 1100px;
+  }
+
+  /* ---------- Panel cards ---------- */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .panel {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(6,106,254,0.08);
+  }
+  .panel h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14px;
+    color: #001E5B;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.01em;
+  }
+  .panel h4 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    color: #066AFE;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 12px 0 6px;
+  }
+  .panel h4:first-child { margin-top: 0; }
+  .panel p {
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: #001E5B;
+    margin: 0 0 8px 0;
+  }
+  .panel ul {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .panel li {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #001E5B;
+    padding-left: 12px;
+    position: relative;
+  }
+  .panel li::before {
+    content: "";
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #066AFE;
+    position: absolute; left: 0; top: 8px;
+  }
+  .panel li strong { color: #066AFE; }
+  .panel li code, .panel p code {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 11.5px;
+    background: #EAF5FE;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #002775;
+  }
+
+  /* ---------- Data model panels ---------- */
+  .data-model {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .dm-layer {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 2px 6px rgba(6,106,254,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 4px solid #066AFE;
+  }
+  .dm-layer.foundation { border-top-color: #001E5B; }
+  .dm-layer.grants { border-top-color: #066AFE; }
+  .dm-layer.overlay { border-top-color: #B60554; }
+  .dm-layer h4 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #066AFE;
+    margin: 0;
+    font-weight: 700;
+  }
+  .dm-layer.foundation h4 { color: #001E5B; }
+  .dm-layer.overlay h4 { color: #B60554; }
+  .dm-layer h3 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 14px;
+    color: #001E5B;
+    margin: 0;
+  }
+  .dm-layer .source {
+    font-size: 10.5px;
+    color: rgba(0,30,91,0.6);
+    font-style: italic;
+    margin: -4px 0 4px;
+  }
+  .obj {
+    background: #EAF5FE;
+    border-radius: 6px;
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11.5px;
+    color: #001E5B;
+  }
+  .obj code {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 11px;
+    color: #066AFE;
+    font-weight: 700;
+  }
+  .obj .desc {
+    color: #002775;
+    font-size: 10.5px;
+    text-align: right;
+    max-width: 60%;
+  }
+  .dm-layer.overlay .obj code { color: #B60554; }
+
+  /* ---------- Layered package diagram ---------- */
+  .packages {
+    background: linear-gradient(180deg, #EAF5FE 0%, #DCEBFD 100%);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .package-layer {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 5px rgba(6,106,254,0.08);
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    align-items: center;
+  }
+  .package-layer .layer-label {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .package-layer .layer-num {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #066AFE;
+    font-weight: 700;
+  }
+  .package-layer .layer-name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 15px;
+    color: #001E5B;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .package-layer .layer-scope {
+    font-size: 11px;
+    color: rgba(0,30,91,0.6);
+    line-height: 1.4;
+  }
+  .package-layer .layer-contents {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .package-tag {
+    background: #EAF5FE;
+    color: #001E5B;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    line-height: 1.3;
+    font-family: "SF Mono", "Consolas", monospace;
+  }
+  .package-layer.common { border-left: 4px solid #001E5B; }
+  .package-layer.nz { border-left: 4px solid #066AFE; }
+  .package-layer.agency { border-left: 4px solid #B60554; }
+  .package-layer.agency .package-tag { background: rgba(182, 5, 84, 0.1); color: #B60554; }
+
+  /* ---------- Event contract table ---------- */
+  table.events {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #FFFFFF;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(6,106,254,0.08);
+    font-size: 12px;
+  }
+  table.events thead th {
+    background: #001E5B;
+    color: #FFFFFF;
+    text-align: left;
+    padding: 9px 12px;
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  table.events tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(0,30,91,0.06);
+    line-height: 1.4;
+    color: #001E5B;
+    vertical-align: top;
+  }
+  table.events tbody tr:last-child td { border-bottom: none; }
+  table.events tbody tr:nth-child(even) td { background: #F5FAFE; }
+  table.events code {
+    font-family: "SF Mono", "Consolas", monospace;
+    font-size: 11px;
+    background: #EAF5FE;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: #002775;
+  }
+  table.events .platform-event { color: #066AFE; font-weight: 700; }
+  table.events .cdc { color: #06A59A; font-weight: 700; }
+  table.events .mule { color: #0250D9; font-weight: 700; }
+
+  /* ---------- Team roles ---------- */
+  .roles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .role {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: 0 2px 5px rgba(6,106,254,0.06);
+  }
+  .role .who {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 13px;
+    color: #001E5B;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  .role .fte {
+    font-size: 10.5px;
+    color: #066AFE;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .role p {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #002775;
+    margin: 0;
+  }
+
+  /* ---------- Environment flow ---------- */
+  .env-flow {
+    background: linear-gradient(90deg, #002775 0%, #0250D9 100%);
+    color: #FFFFFF;
+    border-radius: 12px;
+    padding: 16px 20px;
+  }
+  .env-flow-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #90D0FE;
+    margin-bottom: 10px;
+  }
+  .env-steps {
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr 32px 1fr 32px 1fr 32px 1fr;
+    gap: 4px;
+    align-items: stretch;
+  }
+  .env-step {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #FFFFFF;
+  }
+  .env-step strong { display: block; color: #90D0FE; font-size: 12px; margin-bottom: 3px; }
+  .env-arrow {
+    color: #90D0FE;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Sprint zero panel ---------- */
+  .sprint-zero {
+    background: linear-gradient(90deg, #066AFE 0%, #0250D9 100%);
+    color: #FFFFFF;
+    border-radius: 14px;
+    padding: 22px 26px;
+  }
+  .sprint-zero h2 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 18px;
+    color: #FFFFFF;
+    margin: 0 0 8px 0;
+  }
+  .sprint-zero p.lede {
+    font-size: 13.5px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.55;
+    margin: 0 0 14px 0;
+    max-width: 1100px;
+  }
+  .sprint-items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .sprint-item {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #FFFFFF;
+  }
+  .sprint-item strong { color: #90D0FE; display: block; margin-bottom: 3px; }
+
+  /* ---------- Closing note ---------- */
+  .closing {
+    background: #001E5B;
+    color: #FFFFFF;
+    border-radius: 14px;
+    padding: 20px 26px;
+    margin-top: 22px;
+  }
+  .closing h2 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 16px;
+    color: #FFFFFF;
+    margin: 0 0 8px 0;
+  }
+  .closing p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #FFFFFF;
+    margin: 0 0 10px 0;
+    max-width: 1200px;
+  }
+  .closing p:last-child { margin-bottom: 0; }
+  .closing p strong { color: #90D0FE; }
+
+  footer.doc-footer {
+    margin-top: 30px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,30,91,0.15);
+    font-size: 11px;
+    color: rgba(0,30,91,0.55);
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <div class="kicker">Working reference · technical build recipe</div>
+    <h1>How to build it — <span class="accent">Toloa Fund on Salesforce PSS</span></h1>
+    <p class="subtitle">
+      Concrete Salesforce architecture and delivery approach for the grants lifecycle specified at Level 4. Foundation stack, data model, applicant experience, business logic, integration and events, AI, packaging, security, team, and first sprint. The technical companion to the L4 process drill-down.
+    </p>
+    <div class="meta">Version 0.1 · Salesforce Public Sector Solutions · working reference for a technical audience</div>
+  </header>
+
+  <!-- ===================================================== -->
+  <!-- 1. Foundation stack                                    -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">01</span>Foundation — the Salesforce Public Sector Solutions stack</h2>
+    <p class="section-lede">
+      Salesforce PSS is a bundle, not a single product. The grants lifecycle uses the core CRM plus a specific set of add-on capabilities. All of the following are pre-integrated in a PSS org and provisioned at licensing time.
+    </p>
+
+    <div class="grid-3">
+      <div class="panel">
+        <h4>Core platform</h4>
+        <ul>
+          <li><strong>Sales &amp; Service Cloud</strong> — base CRM: Account, Contact, Case, Task, Queue, Approval</li>
+          <li><strong>Public Sector Solutions data model</strong> — Individual, Party Relationship Group, License, Benefit</li>
+          <li><strong>Salesforce Grants Management</strong> — FundingProgram, FundingOpportunity, FundingRequest, FundingAward, Disbursement, Requirement</li>
+          <li><strong>Experience Cloud</strong> — applicant portal (LWR-based)</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>Low-code &amp; logic</h4>
+        <ul>
+          <li><strong>OmniStudio</strong> — OmniScript, FlexCard, DataRaptor, Integration Procedure</li>
+          <li><strong>Business Rules Engine (BRE)</strong> — eligibility, decisioning, scoring</li>
+          <li><strong>Flow &amp; Flow Orchestration</strong> — screen flows, record-triggered flows, multi-user orchestrations</li>
+          <li><strong>Approval Processes</strong> — delegation authority, sign-off workflow</li>
+          <li><strong>Lightning Web Components (LWC)</strong> — custom UI where needed</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>Integration, data &amp; AI</h4>
+        <ul>
+          <li><strong>Platform Events</strong> — outbound DPI event publishing</li>
+          <li><strong>Change Data Capture</strong> — entity-level sync</li>
+          <li><strong>MuleSoft</strong> — integration fabric to DPI Services Exchange</li>
+          <li><strong>Data Cloud</strong> — cross-agency harmonised person + outcome view</li>
+          <li><strong>Agentforce</strong> — AI agents, Prompt Builder, Einstein Trust Layer</li>
+          <li><strong>Salesforce Shield</strong> — encryption, event monitoring, field audit trail</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 2. Data model                                          -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">02</span>Data model — three layers</h2>
+    <p class="section-lede">
+      Every object below already exists in a licensed PSS org except the Agency Overlay layer, which is custom per-program. Roughly 85% of the model is out-of-the-box; the custom overlay is where Toloa program specifics live.
+    </p>
+
+    <div class="data-model">
+      <div class="dm-layer foundation">
+        <h4>Layer 1 — Foundation</h4>
+        <h3>Person &amp; Relationship</h3>
+        <div class="source">Salesforce PSS + Financial Services Cloud data model</div>
+        <div class="obj"><code>Individual</code><span class="desc">Constituent record</span></div>
+        <div class="obj"><code>Party Relationship Group</code><span class="desc">Aiga / whakapapa</span></div>
+        <div class="obj"><code>Party Relationship</code><span class="desc">Individual-to-individual link</span></div>
+        <div class="obj"><code>Account</code><span class="desc">Community organisation</span></div>
+        <div class="obj"><code>Contact Point</code><span class="desc">Email, phone, address</span></div>
+        <div class="obj"><code>Identity Verification</code><span class="desc">RealMe claim record</span></div>
+      </div>
+
+      <div class="dm-layer grants">
+        <h4>Layer 2 — Grants Management</h4>
+        <h3>Program &amp; Application</h3>
+        <div class="source">Salesforce Grants Management (out-of-the-box)</div>
+        <div class="obj"><code>FundingProgram</code><span class="desc">Toloa Fund</span></div>
+        <div class="obj"><code>FundingOpportunity</code><span class="desc">Each round</span></div>
+        <div class="obj"><code>FundingRequest</code><span class="desc">Application</span></div>
+        <div class="obj"><code>FundingAward</code><span class="desc">Post-decision</span></div>
+        <div class="obj"><code>Budget / BudgetCategory</code><span class="desc">Requested line items</span></div>
+        <div class="obj"><code>IndividualApplicationReviewer</code><span class="desc">Assessor assignment</span></div>
+        <div class="obj"><code>Disbursement</code><span class="desc">Payment tracking</span></div>
+        <div class="obj"><code>FundingAwardRequirement</code><span class="desc">Milestones &amp; reports</span></div>
+      </div>
+
+      <div class="dm-layer overlay">
+        <h4>Layer 3 — Agency Overlay</h4>
+        <h3>Toloa-specific extensions</h3>
+        <div class="source">Custom, deployed per agency via unlocked package</div>
+        <div class="obj"><code>Toloa_Program_Variant__c</code><span class="desc">Category (STEAM / Community / Business)</span></div>
+        <div class="obj"><code>Endorsement__c</code><span class="desc">Matai / community endorsement</span></div>
+        <div class="obj"><code>Cultural_Affiliation__c</code><span class="desc">Aiga, iwi Māori / Pacific</span></div>
+        <div class="obj"><code>Outcome_Report__c</code><span class="desc">STEAM participation data</span></div>
+        <div class="obj"><code>Program_Feedback__c</code><span class="desc">Program design learnings</span></div>
+        <div class="obj"><code>Site_Visit__c</code><span class="desc">Compliance field visits</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 3. Applicant experience                                -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">03</span>Applicant experience — Experience Cloud + OmniStudio</h2>
+    <p class="section-lede">
+      The applicant journey — discover, sign in, apply, monitor, close — runs entirely inside an Experience Cloud site. The multi-step application form is an OmniScript. No custom SPA needed.
+    </p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Portal foundation</h3>
+        <h4>Experience Cloud site (LWR)</h4>
+        <ul>
+          <li>Template: <code>Build Your Own (LWR)</code> — modern, accessible, SPA-fast</li>
+          <li>NZ Government design system as an LWR theme layer (custom LWCs matching design tokens)</li>
+          <li>WCAG 2.2 AA baseline; Salesforce Accessibility Studio validation</li>
+          <li>Multilingual via Translation Workbench + custom translation tables for Pacific languages</li>
+          <li>Login: RealMe federation via OpenID Connect (Auth Provider + Registration Handler apex class)</li>
+          <li>Guest access for public discovery pages (eligibility, program info)</li>
+        </ul>
+        <h4>Applicant record type</h4>
+        <ul>
+          <li>Person Account or Individual (depending on tenant model — Individual preferred for full PSS)</li>
+          <li>Sharing rule: applicant sees own applications only</li>
+          <li>Permission set: <code>Toloa_Applicant</code> — read/write own <code>FundingRequest</code>, upload evidence</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Application intake — OmniScript</h3>
+        <h4>OmniScript: <code>Toloa_Application_Intake</code></h4>
+        <ul>
+          <li>Multi-step: Profile → Family/Aiga → Project → Budget → Evidence → Endorsement → Review → Submit</li>
+          <li>Save-and-resume: DataRaptor Save + Extract per step, backed by <code>FundingRequest</code> record</li>
+          <li>Client-side eligibility rules via BRE Public API (called from OmniScript)</li>
+          <li>Evidence upload: OmniStudio File Upload element → Salesforce Files → virus scan integration → Purview classification via CDC</li>
+          <li>Endorsement: OmniScript branch triggers <code>Endorsement__c</code> creation + email/SMS to matai via Digital Engagement</li>
+          <li>Submission triggers <code>FundingRequest.Status</code> = <code>SUBMITTED</code> and publishes Platform Event</li>
+        </ul>
+        <h4>Key LWCs</h4>
+        <ul>
+          <li><code>toloaEligibilityCalculator</code> — public-facing pre-check, calls Rules Library via Named Credential</li>
+          <li><code>toloaAigaRelationshipPicker</code> — custom relationship graph UI for whakapapa/aiga</li>
+          <li><code>toloaEvidenceUploader</code> — accessible file upload with progress + classification hints</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 4. Assessor experience                                 -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">04</span>Assessor &amp; officer experience — Lightning App + Agentforce panel</h2>
+    <p class="section-lede">
+      Staff work in a dedicated Lightning App with an assessment console, workload queue, and embedded Agentforce copilot. Standard Salesforce UI plus a small number of purpose-built LWCs.
+    </p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Assessor console</h3>
+        <h4>Lightning App: <code>Toloa Grants Assessment</code></h4>
+        <ul>
+          <li>Home tab: My assigned assessments (Salesforce List View with saved filter)</li>
+          <li>Assessment tab: <code>FundingRequest</code> record page with Assessor layout</li>
+          <li>Related lists: Evidence, Endorsements, Prior Applications, Cross-Agency Awards</li>
+          <li>Utility bar: Agentforce Assist panel (persistent)</li>
+        </ul>
+        <h4>Scoring UI</h4>
+        <ul>
+          <li>Screen Flow: <code>Toloa_Merit_Assessment</code> — one screen per rubric criterion</li>
+          <li>Each criterion score writes to <code>AssessmentScore__c</code> via record-triggered flow</li>
+          <li>Composite score calculated by BRE ruleset <code>Toloa_Merit_Rubric_v1_0</code></li>
+          <li>Peer-review trigger: record-triggered flow evaluates ambiguity band → assigns second reviewer via Omni-Channel</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Workload &amp; routing</h3>
+        <h4>Case-style routing via Omni-Channel</h4>
+        <ul>
+          <li><code>FundingRequest</code> enabled for Omni-Channel with a service channel</li>
+          <li>Routing configuration: skills-based (STEAM category, Pacific language capability)</li>
+          <li>Queues per assessor pool; presence config controls workload cap</li>
+          <li>Auto-reassignment on assessor absence via scheduled flow</li>
+        </ul>
+        <h4>Decision workflow</h4>
+        <ul>
+          <li>Approval Process: <code>Toloa_Decision_Approval</code></li>
+          <li>Steps: Assessor recommendation → Program manager review → Delegated authority (if under threshold) → CEO sign-off (if over threshold)</li>
+          <li>Delegation-threshold rule: BRE ruleset <code>Toloa_Delegation_Rules</code></li>
+          <li>Award letter generation: Docusign or Salesforce Doc Gen from template</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 5. Business logic — BRE + Flow                         -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">05</span>Business logic — Business Rules Engine + Flow Orchestration</h2>
+    <p class="section-lede">
+      Rules are declarative and version-controlled via BRE — not scattered through Apex triggers. End-to-end multi-user process orchestration is Flow Orchestration. This split lets non-developers change rules without releasing code.
+    </p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Business Rules Engine (BRE)</h3>
+        <h4>Rule sets (versioned, published to Rules Library)</h4>
+        <ul>
+          <li><code>Toloa_Eligibility_v1_0</code> — applicant eligibility (age, residency, Pacific descent, prior award history)</li>
+          <li><code>Toloa_Merit_Rubric_v1_0</code> — scoring rubric across 5–7 criteria with weights</li>
+          <li><code>Toloa_Delegation_Rules</code> — decision authority by grant amount</li>
+          <li><code>Toloa_Compliance_Rules</code> — post-award compliance thresholds</li>
+          <li><code>Toloa_Milestone_Templates</code> — default milestone schedule</li>
+        </ul>
+        <h4>Rule invocation patterns</h4>
+        <ul>
+          <li>Client-side: OmniScript calls BRE via Integration Procedure (fast, cached)</li>
+          <li>Server-side authoritative: Record-triggered Flow calls BRE on state transition</li>
+          <li>Public DPI: Rules exposed via Named Credential to external DPI Rules Library — same version, single source of truth</li>
+          <li>Rule authoring: Business analyst / program manager in BRE Designer; no code deploy needed to change rule values</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Flow Orchestration</h3>
+        <h4>Orchestration: <code>Grant_Lifecycle_Toloa</code></h4>
+        <ul>
+          <li>Stage 1: Submission → auto-validate (Autolaunched Flow, ~5 sec)</li>
+          <li>Stage 2: Assessor assignment (Omni-Channel routing, human step)</li>
+          <li>Stage 3: Assessment (Screen Flow assigned to assessor, blocking)</li>
+          <li>Stage 4: Peer review (conditional stage, triggered by ambiguity)</li>
+          <li>Stage 5: Decision approval (Approval Process, delegated authority)</li>
+          <li>Stage 6: Disbursement (Autolaunched Flow calling MuleSoft)</li>
+          <li>Stage 7: Milestone monitoring (long-running, scheduled reminders + intake)</li>
+          <li>Stage 8: Closure (Autolaunched Flow, records retention trigger)</li>
+        </ul>
+        <h4>Automation surface</h4>
+        <ul>
+          <li>Record-triggered Flows on <code>FundingRequest</code> state transitions publish Platform Events</li>
+          <li>Scheduled Flows for milestone reminders (30/14/7 day cadence)</li>
+          <li>Event-triggered Flows subscribing to <code>Payment_Confirmed__e</code> etc.</li>
+          <li>All flows source-controlled; deployed via unlocked package</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 6. Integration & DPI events                           -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">06</span>Integration &amp; DPI events</h2>
+    <p class="section-lede">
+      Salesforce publishes Platform Events on state transitions; MuleSoft subscribes, translates to canonical schema, and forwards to the DPI Services Exchange. Inbound integrations follow the reverse pattern. Every event named below is a real Platform Event or CDC channel.
+    </p>
+
+    <table class="events">
+      <thead>
+        <tr>
+          <th style="width: 15%;">Salesforce event</th>
+          <th style="width: 12%;">Type</th>
+          <th style="width: 20%;">Trigger</th>
+          <th style="width: 15%;">Payload</th>
+          <th style="width: 38%;">MuleSoft → DPI transformation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>Grant_Application_Submitted__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td><code>FundingRequest.Status → SUBMITTED</code></td>
+          <td>Application ID, applicant ID, program, amount</td>
+          <td>Published to <code>grants.application.submitted</code> topic on DPI Services Exchange (Kafka / AsyncAPI)</td>
+        </tr>
+        <tr>
+          <td><code>Grant_Decision_Recorded__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td><code>FundingAward</code> creation</td>
+          <td>Award ID, decision, amount, recipient</td>
+          <td>Anonymised → <code>grants.outcome.published</code> topic; feeds Data Cloud + Cabinet reporting</td>
+        </tr>
+        <tr>
+          <td><code>Payment_Requested__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td>Disbursement record created</td>
+          <td>Payment request ID, amount, recipient bank</td>
+          <td>Consumed by MuleSoft Central Payments connector → GDA payments service</td>
+        </tr>
+        <tr>
+          <td><code>Payment_Confirmed__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td>Callback from MuleSoft (from Central Payments)</td>
+          <td>Payment ID, confirmation, timestamp</td>
+          <td>Consumed by Flow Orchestration → advances to milestone stage; posts to TechOne GL</td>
+        </tr>
+        <tr>
+          <td><code>Outcome_Registered__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td><code>Outcome_Report__c</code> submitted &amp; validated</td>
+          <td>Outcome metrics, participant counts</td>
+          <td>Harmonised → Data Cloud Pacific Outcomes register; feeds whole-of-Govt dashboard</td>
+        </tr>
+        <tr>
+          <td><code>FundingRequestChangeEvent</code></td>
+          <td><span class="cdc">CDC</span></td>
+          <td>Any change to <code>FundingRequest</code></td>
+          <td>Full record delta</td>
+          <td>Consumed by M365 Purview for records retention classification &amp; audit</td>
+        </tr>
+        <tr>
+          <td><code>Identity_Session_Opened</code></td>
+          <td><span class="mule">Inbound</span></td>
+          <td>RealMe → OIDC handshake via Auth Provider</td>
+          <td>Identity token, assurance claim</td>
+          <td>MuleSoft receives from DPI Identity, transforms to Salesforce Auth Provider format</td>
+        </tr>
+        <tr>
+          <td><code>Cross_Agency_Prior_Awards</code></td>
+          <td><span class="mule">Outbound query</span></td>
+          <td>Auto-validate stage (Phase 3)</td>
+          <td>Applicant NHI / IRD number (masked)</td>
+          <td>MuleSoft queries DPI Services Exchange → returns concurrent-funding list; Salesforce applies concurrent-funding rule</td>
+        </tr>
+        <tr>
+          <td><code>Fraud_Signal_Raised__e</code></td>
+          <td><span class="platform-event">Platform Event</span></td>
+          <td>Agentforce anomaly detection agent</td>
+          <td>Signal type, score, evidence</td>
+          <td>Consumed by Salesforce case for investigation + published anonymised to DPI fraud signal aggregation</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 7. AI / Agentforce                                     -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">07</span>AI — Agentforce agents, prompts, and Trust Layer</h2>
+    <p class="section-lede">
+      Four Agentforce agents operate across the lifecycle. Each is defined declaratively in Agent Builder with tightly-scoped topics, tool access, and Einstein Trust Layer guardrails. Prompt templates are version-controlled alongside metadata.
+    </p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Applicant Assist Agent</h3>
+        <h4>Scope</h4>
+        <ul>
+          <li>Guides applicant through form fields</li>
+          <li>Translates fields on demand between English and Pacific languages</li>
+          <li>Explains eligibility rules in plain language (calls BRE)</li>
+          <li>Does <em>not</em> pre-fill fields; does <em>not</em> assess merit</li>
+        </ul>
+        <h4>Configuration</h4>
+        <ul>
+          <li>Topics: <code>ApplicationHelp</code>, <code>LanguageTranslation</code>, <code>EligibilityExplanation</code></li>
+          <li>Actions: <code>ExplainEligibilityRule</code>, <code>TranslateField</code>, <code>ExplainProgram</code></li>
+          <li>Trust Layer: PII masking on prompts, retention off, output moderation on</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Assessor Copilot Agent</h3>
+        <h4>Scope</h4>
+        <ul>
+          <li>Summarises applicant history + prior applications</li>
+          <li>Cross-references evidence against project narrative</li>
+          <li>Surfaces flagged inconsistencies</li>
+          <li>Does <em>not</em> score; does <em>not</em> decide</li>
+        </ul>
+        <h4>Configuration</h4>
+        <ul>
+          <li>Topics: <code>ApplicantHistorySummary</code>, <code>EvidenceReview</code>, <code>PriorApplicationLookup</code></li>
+          <li>Actions: <code>QueryPriorApplications</code>, <code>SummariseEvidence</code>, <code>DetectInconsistencies</code></li>
+          <li>Trust Layer: full PII masking, prompt injection defence, output audit logged</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Fraud Signal Agent</h3>
+        <h4>Scope</h4>
+        <ul>
+          <li>Anomaly detection on submitted applications</li>
+          <li>Cross-check against known fraud patterns</li>
+          <li>Publishes signals; never blocks applications autonomously</li>
+        </ul>
+        <h4>Configuration</h4>
+        <ul>
+          <li>Runs on Platform Event <code>Grant_Application_Submitted__e</code></li>
+          <li>Actions: <code>DetectAnomalyPattern</code>, <code>ScoreFraudRisk</code>, <code>PublishFraudSignal</code></li>
+          <li>Trust Layer: audit trail full, model provider portability enabled</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Compliance Agent</h3>
+        <h4>Scope</h4>
+        <ul>
+          <li>Interprets milestone reports against contract terms</li>
+          <li>Highlights compliance concerns to grant officer</li>
+          <li>Recommends site-visit trigger when thresholds crossed</li>
+        </ul>
+        <h4>Configuration</h4>
+        <ul>
+          <li>Runs on <code>Outcome_Report__c</code> submission</li>
+          <li>Actions: <code>InterpretMilestone</code>, <code>CheckCompliance</code>, <code>RecommendSiteVisit</code></li>
+          <li>Trust Layer: retention 90 days for audit, feedback loop enabled</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 8. Packaging strategy                                  -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">08</span>Packaging — the three-layer reference blueprint pattern</h2>
+    <p class="section-lede">
+      Everything above is packaged as three stacked Salesforce Unlocked Packages. The Common Foundation is versioned centrally and pushed to every agency. The NZ Government Overlay adds the shared services connections. The Agency Overlay is where agency-specific configuration lives. Upgrades to the shared layers do not break agency overlays if package boundaries are respected.
+    </p>
+
+    <div class="packages">
+      <div class="package-layer common">
+        <div class="layer-label">
+          <div class="layer-num">Layer 1 — Common</div>
+          <div class="layer-name">Common Foundation</div>
+          <div class="layer-scope">Maintained by the certification body EDA. Versioned quarterly. Deployed identically to every certified agency.</div>
+        </div>
+        <div class="layer-contents">
+          <span class="package-tag">Individual + Party Relationship model</span>
+          <span class="package-tag">Common FundingProgram metadata</span>
+          <span class="package-tag">Base BRE rule scaffolding</span>
+          <span class="package-tag">Base Flow Orchestration template</span>
+          <span class="package-tag">Common Platform Event definitions</span>
+          <span class="package-tag">Base permission sets</span>
+          <span class="package-tag">Base sharing rule templates</span>
+          <span class="package-tag">Trust Layer configuration</span>
+        </div>
+      </div>
+
+      <div class="package-layer nz">
+        <div class="layer-label">
+          <div class="layer-num">Layer 2 — NZ Government</div>
+          <div class="layer-name">NZ Government Overlay</div>
+          <div class="layer-scope">Maintained by GDA. Versioned semi-annually. Deployed to every NZ agency choosing the certified reference stack.</div>
+        </div>
+        <div class="layer-contents">
+          <span class="package-tag">RealMe Auth Provider config</span>
+          <span class="package-tag">NZ Government design system LWCs</span>
+          <span class="package-tag">MuleSoft connector Named Credentials</span>
+          <span class="package-tag">DPI Services Exchange event mapping</span>
+          <span class="package-tag">M365 Purview retention integration</span>
+          <span class="package-tag">TechOne GL posting connector</span>
+          <span class="package-tag">Te Reo &amp; Pacific language packs</span>
+          <span class="package-tag">Accessibility LWC overrides</span>
+        </div>
+      </div>
+
+      <div class="package-layer agency">
+        <div class="layer-label">
+          <div class="layer-num">Layer 3 — Agency</div>
+          <div class="layer-name">MPP Toloa Overlay</div>
+          <div class="layer-scope">Maintained by MPP (or delegated implementation partner). Agency owns cadence. Only agency-specific config lives here.</div>
+        </div>
+        <div class="layer-contents">
+          <span class="package-tag">Toloa_Program_Variant__c</span>
+          <span class="package-tag">Toloa_Eligibility_v1_0</span>
+          <span class="package-tag">Toloa_Merit_Rubric_v1_0</span>
+          <span class="package-tag">Endorsement__c + workflow</span>
+          <span class="package-tag">Cultural_Affiliation__c</span>
+          <span class="package-tag">Toloa portal branding</span>
+          <span class="package-tag">MPP-specific report templates</span>
+          <span class="package-tag">Pacific relationship-graph LWC overlays</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="section-lede" style="margin-top:14px;">
+      Package boundaries are enforced by naming convention (namespace prefix per layer), by permission sets that scope access to metadata layers, and by DevOps Center scratch org validation on every merge. Upgrading Layer 1 or Layer 2 is a one-line command per agency; Layer 3 is deployed via each agency's own pipeline.
+    </p>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 9. Security, compliance, records                       -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">09</span>Security, compliance &amp; records</h2>
+    <p class="section-lede">
+      Salesforce Shield + Hyperforce residency + a small set of specific configurations cover the NZ Government controls. Records retention is handed off to M365 Purview via CDC.
+    </p>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Platform security</h3>
+        <ul>
+          <li><strong>Salesforce Shield Platform Encryption</strong> on all PII fields (<code>Individual</code>, <code>Contact Point</code>, evidence documents)</li>
+          <li><strong>Event Monitoring</strong> — every login, report export, API call captured; forwarded to security operations via streaming</li>
+          <li><strong>Field Audit Trail</strong> — 10-year history on all <code>FundingRequest</code>, <code>FundingAward</code>, decision records</li>
+          <li><strong>Hyperforce residency</strong> — AU Sydney region baseline; NZ residency option where available</li>
+          <li><strong>Sovereignty:</strong> data at rest in-region; sub-processor list published; foreign-access request policy documented</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Access control</h3>
+        <ul>
+          <li><strong>Permission set groups per persona:</strong> <code>Toloa_Applicant</code>, <code>Toloa_Assessor</code>, <code>Toloa_Program_Manager</code>, <code>Toloa_Delegated_Authority</code></li>
+          <li><strong>Sharing rules:</strong> criteria-based sharing so assessors see only their assigned cases</li>
+          <li><strong>Record types:</strong> per Toloa program variant (STEAM / Community / Business)</li>
+          <li><strong>Session policies:</strong> IP-restricted for staff; standard for applicants</li>
+          <li><strong>MFA:</strong> mandatory for all internal users</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Records &amp; retention</h3>
+        <ul>
+          <li>Every <code>FundingRequest</code> CDC event forwarded to M365 Purview via MuleSoft</li>
+          <li>Purview classifies records according to Public Records Act retention schedules</li>
+          <li>Retention actions (destroy / transfer to Archives NZ) triggered by Purview policies</li>
+          <li>Salesforce retains "record of record" pointer to Purview record ID</li>
+          <li>OIA response workflow: Salesforce case with Purview-sourced document links</li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <h3>Privacy &amp; assurance</h3>
+        <ul>
+          <li><strong>Privacy Act compliance:</strong> Data subject request → Salesforce case → Flow orchestrates export, correction, or deletion across systems</li>
+          <li><strong>Data minimisation:</strong> only fields tagged in the canonical schema are collected; extensions require justification</li>
+          <li><strong>Consent management:</strong> <code>Individual.ConsentEvent</code> records track what an applicant has agreed to share</li>
+          <li><strong>Audit &amp; assurance:</strong> annual conformance re-check against EDA patterns (part of certification recertification)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 10. Team & environments                                -->
+  <!-- ===================================================== -->
+  <div class="section">
+    <h2 class="section-title"><span class="number">10</span>Team, environments &amp; delivery</h2>
+    <p class="section-lede">
+      A ~10-person delivery team for a first-cohort agency build. Environments follow a five-tier flow. Delivery cadence is two-week sprints with quarterly reference blueprint refresh cycles.
+    </p>
+
+    <div class="roles">
+      <div class="role"><div class="who">Solution architect / tech lead</div><div class="fte">1 FTE</div><p>Owns end-to-end design, package boundaries, integration patterns, technical decisions.</p></div>
+      <div class="role"><div class="who">Salesforce PSS SME</div><div class="fte">1 FTE</div><p>Data model, security, permission architecture, records integration. Grants Management specialist.</p></div>
+      <div class="role"><div class="who">OmniStudio developer</div><div class="fte">1–2 FTE</div><p>OmniScripts, FlexCards, DataRaptors, Integration Procedures, LWC where needed.</p></div>
+      <div class="role"><div class="who">BRE / Flow developer</div><div class="fte">1 FTE</div><p>Business Rules Engine rule sets, Flow Orchestration, approval processes, automation.</p></div>
+      <div class="role"><div class="who">Integration developer (MuleSoft)</div><div class="fte">1 FTE</div><p>DPI Services Exchange connectors, Platform Event bridges, RealMe federation, central payments.</p></div>
+      <div class="role"><div class="who">UX / accessibility specialist</div><div class="fte">0.5 FTE</div><p>NZ design system implementation, WCAG 2.2 AA validation, Pacific language content.</p></div>
+      <div class="role"><div class="who">Data / Agentforce engineer</div><div class="fte">1 FTE</div><p>Data Cloud harmonisation, Agentforce agents, Prompt Builder, Trust Layer config.</p></div>
+      <div class="role"><div class="who">QA / test engineer</div><div class="fte">1 FTE</div><p>Automated regression suite, accessibility testing, performance testing, security testing.</p></div>
+      <div class="role"><div class="who">Product owner / BA</div><div class="fte">1 FTE</div><p>Requirements from MPP, rule definition, milestone template design, acceptance criteria.</p></div>
+      <div class="role"><div class="who">DevOps / release engineer</div><div class="fte">0.5 FTE</div><p>Salesforce DX pipeline, unlocked package management, environment provisioning.</p></div>
+    </div>
+
+    <div class="env-flow" style="margin-top:16px;">
+      <div class="env-flow-title">Environment flow — five-tier</div>
+      <div class="env-steps">
+        <div class="env-step"><strong>Reference Blueprint Org</strong>Central. Held by EDA. Layer 1 &amp; 2 packages authored here.</div>
+        <div class="env-arrow">→</div>
+        <div class="env-step"><strong>Agency Dev Sandbox</strong>MPP-owned. Layer 3 authored here. Pulls Layers 1 &amp; 2 automatically.</div>
+        <div class="env-arrow">→</div>
+        <div class="env-step"><strong>Integration Sandbox</strong>MuleSoft wired in. Full DPI service stubs available.</div>
+        <div class="env-arrow">→</div>
+        <div class="env-step"><strong>UAT / Pre-Prod</strong>Full stack with production-like data. End-user validation.</div>
+        <div class="env-arrow">→</div>
+        <div class="env-step"><strong>Production</strong>Live agency org. Layer 1 &amp; 2 upgrades applied on release cadence.</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px;">
+      <div class="panel">
+        <h4>Delivery cadence</h4>
+        <ul>
+          <li>Two-week sprints, standard agile ceremonies</li>
+          <li>Reference blueprint versioned quarterly by EDA</li>
+          <li>Agency releases fortnightly, gated on reference blueprint version</li>
+          <li>Feature flags via <code>Custom Metadata</code> for progressive rollout</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h4>DevOps &amp; source control</h4>
+        <ul>
+          <li>Salesforce DX + <code>sfdx-project.json</code> multi-package config</li>
+          <li>Source of truth: Git (GitHub or Azure DevOps)</li>
+          <li>CI: automated scratch-org validation on PR</li>
+          <li>CD: DevOps Center or GitHub Actions to promote through envs</li>
+          <li>Metadata separation strictly enforced by package boundary</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- 11. Sprint zero                                        -->
+  <!-- ===================================================== -->
+  <div class="sprint-zero">
+    <h2>Sprint zero — what actually gets built in the first two weeks</h2>
+    <p class="lede">
+      The smallest end-to-end vertical slice that proves the pattern: an applicant can authenticate with RealMe, complete a partial application, and have it appear in Salesforce with the right data model, publishing a Platform Event to a MuleSoft stub. Nothing else. Everything else follows.
+    </p>
+
+    <div class="sprint-items">
+      <div class="sprint-item"><strong>Environment provisioning</strong>PSS org provisioned. Sandboxes cloned. Salesforce DX repo initialised. Multi-package structure in place.</div>
+      <div class="sprint-item"><strong>Layer 1 skeleton</strong>Common Foundation unlocked package v0.1 — Individual + Party Relationship + one FundingProgram record.</div>
+      <div class="sprint-item"><strong>Layer 2 skeleton</strong>NZ Government Overlay unlocked package v0.1 — RealMe Auth Provider config, one MuleSoft Named Credential.</div>
+      <div class="sprint-item"><strong>Layer 3 skeleton</strong>MPP Toloa Overlay unlocked package v0.1 — <code>Toloa_Program_Variant__c</code>, one custom permission set.</div>
+      <div class="sprint-item"><strong>Experience Cloud site</strong>Bare LWR site, RealMe login working, one guest page with fund overview.</div>
+      <div class="sprint-item"><strong>Application intake OmniScript</strong>Two screens: Profile + Submit. No BRE yet. Data lands in <code>FundingRequest</code>.</div>
+      <div class="sprint-item"><strong>Platform Event definition</strong><code>Grant_Application_Submitted__e</code> defined. Fires on submit. Consumed by MuleSoft stub that logs receipt.</div>
+      <div class="sprint-item"><strong>Assessor Lightning App</strong>Standard List View + record page for <code>FundingRequest</code>. No scoring yet. Assessors can see submissions.</div>
+      <div class="sprint-item"><strong>CI/CD baseline</strong>Every push runs scratch-org validation. First automated deploy to Agency Dev Sandbox working.</div>
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- Closing note                                           -->
+  <!-- ===================================================== -->
+  <div class="closing">
+    <h2>What this shows</h2>
+    <p>
+      Every capability described above is either a native PSS product (Grants Management, OmniStudio, Business Rules Engine, Flow Orchestration, Experience Cloud, Agentforce) or a standard Salesforce mechanism (Platform Events, CDC, Unlocked Packages, Shield). Roughly <strong>85% of the build is configuration</strong>; the remainder is custom LWCs, MuleSoft flows, and agency-specific overlays. The technical risk lives in the integrations, not the platform.
+    </p>
+    <p>
+      The three-layer package structure is what makes the certification framework technically real. <strong>Layer 1 is versioned centrally; Layer 3 is owned by the agency;</strong> upgrades to shared layers do not break agency configuration provided the boundaries are respected. This is the same pattern Service Victoria explored with its base package concept, applied at NZ Government scale.
+    </p>
+    <p>
+      For a first-cohort agency of ~100 FTE with a defined program like Toloa, a full end-to-end greenfield build on this stack is a <strong>~6-month delivery</strong> with the team above. Ministry for Women following on with Nominations Service (reusing Layers 1 &amp; 2, replacing Layer 3) is <strong>~2 months</strong>. Whaikaha with provider oversight is <strong>~3 months</strong>. That reuse arithmetic is what turns the Cabinet cost story into something measurable.
+    </p>
+  </div>
+
+  <footer class="doc-footer">
+    Working technical reference — Toloa Fund on Salesforce Public Sector Solutions. Version 0.1 · 2026-07 · companion to the L4 process drill-down, CoE architecture, and certification framework artefacts.
+  </footer>
+
+</div>
+</body>
+</html>
