@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NZ Government Digital Services CoE — Certified Reference Architecture (v0.2)</title>
+<style>
+  :root { color-scheme: light; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #EAF5FE;
+    font-family: "Salesforce Sans", "Calibri", "Helvetica Neue", Arial, sans-serif;
+    color: #001E5B;
+  }
+  .page { max-width: 1820px; margin: 0 auto; padding: 36px 40px 60px; }
+
+  header.title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0, 30, 91, 0.15);
+  }
+  header.title h1 {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 36px;
+    line-height: 1.1;
+    color: #001E5B;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.title h1 .accent { color: #066AFE; }
+  header.title .caption {
+    font-size: 12px;
+    color: rgba(0, 30, 91, 0.6);
+    text-align: right;
+    line-height: 1.4;
+  }
+  header.title .caption strong { color: #001E5B; }
+
+  .lede {
+    font-size: 14px;
+    color: #022AC0;
+    margin: 10px 0 8px;
+    max-width: 1200px;
+    line-height: 1.5;
+  }
+  .principle {
+    background: #FFFFFF;
+    border-left: 4px solid #066AFE;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 10px 0 18px;
+    font-size: 13px;
+    color: #001E5B;
+    line-height: 1.55;
+    max-width: 1200px;
+  }
+  .principle strong { color: #066AFE; }
+
+  /* ---------- Certification legend ---------- */
+  .cert-legend {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .cert-tier {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+  }
+  .cert-tier .badge {
+    flex-shrink: 0;
+    min-width: 50px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    line-height: 1.3;
+  }
+  .badge.ref { background: #066AFE; }
+  .badge.alt { background: #06A59A; }
+  .badge.assessing { background: #E4A201; color: #FFFFFF; }
+  .badge.divergent { background: #B60554; }
+  .cert-tier .desc {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: #001E5B;
+  }
+  .cert-tier .desc strong { color: #001E5B; }
+
+  /* ---------- Horizontal governance bands ---------- */
+  .band {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 12px 20px;
+    margin-bottom: 8px;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 20px;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+  }
+  .band.exec { background: #001E5B; color: #FFFFFF; }
+  .band.exec .band-title { color: #FFFFFF; }
+  .band.exec .chip { background: rgba(255,255,255,0.14); color: #FFFFFF; }
+
+  .band.eda {
+    background: linear-gradient(90deg, #002775 0%, #0250D9 100%);
+    color: #FFFFFF;
+    padding: 16px 20px;
+  }
+  .band.eda .band-title { color: #FFFFFF; }
+  .band.eda .chip {
+    background: rgba(255,255,255,0.15);
+    color: #FFFFFF;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  .band-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #001E5B;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .band-title .sub {
+    display: block;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(0,30,91,0.6);
+    margin-top: 3px;
+  }
+  .band.exec .band-title .sub,
+  .band.eda .band-title .sub { color: rgba(255,255,255,0.7); }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    background: #CFE9FE;
+    color: #001E5B;
+    border-radius: 999px;
+    padding: 4px 11px;
+    font-size: 11.5px;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  /* ---------- Certification lifecycle band ---------- */
+  .lifecycle {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin: 8px 0 12px;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+  }
+  .lifecycle-title {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #066AFE;
+    margin-bottom: 10px;
+  }
+  .lifecycle-flow {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr) 40px;
+    gap: 4px;
+    align-items: center;
+  }
+  .lifecycle-flow > .step {
+    background: #EAF5FE;
+    border-radius: 10px;
+    padding: 8px 10px;
+    text-align: center;
+    font-size: 11px;
+    color: #001E5B;
+    line-height: 1.35;
+    position: relative;
+  }
+  .lifecycle-flow > .step strong { display: block; color: #066AFE; font-size: 11.5px; margin-bottom: 2px; }
+  .lifecycle-flow > .arrow {
+    color: #066AFE;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .lifecycle-flow > .loop {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(0,30,91,0.6);
+    font-style: italic;
+    line-height: 1.35;
+  }
+
+  .glue-label {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(0, 30, 91, 0.55);
+    margin: 10px 0 6px;
+  }
+
+  /* ---------- Domain columns ---------- */
+  .cols {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    margin: 4px 0 10px;
+  }
+  .col {
+    background: #FFFFFF;
+    border-radius: 12px;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+    overflow: hidden;
+  }
+
+  /* Split header: capability at top, certified list below */
+  .col-domain {
+    background: linear-gradient(180deg, #001E5B 0%, #002775 100%);
+    color: #FFFFFF;
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .col-domain .name {
+    font-family: "Avant Garde Demi SFDC", "Bookman Old Style", "Cambria", serif;
+    font-size: 13px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+  .col-domain .sub {
+    display: block;
+    font-size: 10px;
+    color: rgba(255,255,255,0.75);
+    margin-top: 3px;
+    line-height: 1.3;
+  }
+
+  .col-cert {
+    background: #DCEBFD;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(2, 42, 192, 0.15);
+  }
+  .cert-entry {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: #001E5B;
+    line-height: 1.3;
+  }
+  .cert-entry:last-child { margin-bottom: 0; }
+  .cert-entry .platform { font-weight: 600; }
+  .cert-entry .mini-badge {
+    flex-shrink: 0;
+    padding: 2px 6px;
+    border-radius: 999px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #FFFFFF;
+    line-height: 1.2;
+  }
+  .mini-badge.ref { background: #066AFE; }
+  .mini-badge.alt { background: #06A59A; }
+  .mini-badge.assessing { background: #E4A201; }
+  .mini-badge.national { background: #001E5B; }
+
+  .col-body {
+    padding: 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .col-section h4 {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(0, 30, 91, 0.65);
+    margin: 0 0 5px;
+    font-weight: 700;
+  }
+  .col-section ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .col-section li {
+    font-size: 11px;
+    color: #001E5B;
+    line-height: 1.35;
+    padding-left: 9px;
+    position: relative;
+  }
+  .col-section li::before {
+    content: "";
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: #066AFE;
+    position: absolute; left: 0; top: 6px;
+  }
+
+  .col-alt {
+    background: rgba(6, 165, 154, 0.08);
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .col-alt h4 { color: #04544D; }
+  .col-alt li::before { background: #06A59A; }
+  .col-alt li { color: #04544D; font-size: 10.5px; }
+
+  .col-divergent {
+    background: rgba(182, 5, 84, 0.06);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-top: auto;
+  }
+  .col-divergent h4 {
+    color: #B60554;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .col-divergent p {
+    font-size: 10.5px;
+    color: #B60554;
+    margin: 0;
+    line-height: 1.4;
+  }
+  .col-divergent p strong { color: #B60554; }
+
+  /* ---------- Foot band ---------- */
+  .foot-band {
+    background: #FFFFFF;
+    border-radius: 14px;
+    padding: 12px 20px;
+    margin-top: 8px;
+    display: grid;
+    grid-template-columns: 210px 1fr;
+    gap: 20px;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(6, 106, 254, 0.06);
+  }
+
+  /* ---------- Footer note ---------- */
+  .footer-note-block {
+    margin-top: 18px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 12px;
+    font-size: 12px;
+    color: #001E5B;
+    line-height: 1.5;
+    max-width: 1300px;
+  }
+  .footer-note-block strong { color: #001E5B; font-weight: 700; }
+  .footer-note-block .accent { color: #066AFE; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="title">
+    <h1>NZ Government Digital Services <span class="accent">Centre of Excellence</span></h1>
+    <div class="caption">
+      <strong>Certified reference architecture</strong><br>
+      Working sketch · v0.2 · for dialogue
+    </div>
+  </header>
+
+  <p class="lede">
+    Standards first, vendors second. The Enterprise Design Authority publishes technology-agnostic interop patterns and <strong>certifies</strong> platforms against them. Certified platforms receive centralised investment in shared blueprints, talent, and release capability — lowering onboarding cost for any agency choosing certified.
+  </p>
+
+  <div class="principle">
+    <strong>What certification buys an agency.</strong> Faster onboarding (blueprint library exists), shared talent pool, shared release pipeline, and pre-integrated conformance to identity, data, event, and security patterns. Divergent choices are supported for interop — the agency just pays the full lifecycle cost of what centralisation would have provided.
+  </div>
+
+  <!-- ===== CERTIFICATION LEGEND ===== -->
+  <div class="cert-legend">
+    <div class="cert-tier">
+      <div class="badge ref">Reference</div>
+      <div class="desc"><strong>Certified — Reference.</strong> Deepest centralised investment. Full blueprint library. Shared CoE, shared talent, shared release. Fastest onboarding, lowest TCO.</div>
+    </div>
+    <div class="cert-tier">
+      <div class="badge alt">Approved</div>
+      <div class="desc"><strong>Certified — Approved.</strong> Conformant to EDA patterns. Blueprint coverage partial and growing. Onboarding real but slower than reference. Investment scales with adoption.</div>
+    </div>
+    <div class="cert-tier">
+      <div class="badge assessing">Assessing</div>
+      <div class="desc"><strong>Under assessment.</strong> Vendor in conformance testing. Not yet certified. Agencies may pilot but should expect the divergent-cost profile until certification is granted.</div>
+    </div>
+    <div class="cert-tier">
+      <div class="badge divergent">Divergent</div>
+      <div class="desc"><strong>Divergent.</strong> Not certified. Permitted if it conforms to EDA interop patterns. Agency owns full lifecycle cost. No shared blueprints, talent, or release capability.</div>
+    </div>
+  </div>
+
+  <!-- ===== TOP HORIZONTAL BANDS ===== -->
+  <div class="band exec">
+    <div class="band-title">Executive Sponsorship <span class="sub">Single instance</span></div>
+    <div class="chips">
+      <span class="chip">Cabinet oversight</span>
+      <span class="chip">Ministerial governance</span>
+      <span class="chip">Chief Executives forum</span>
+      <span class="chip">GDA leadership</span>
+      <span class="chip">Portfolio investment committee</span>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-title">Strategy Office <span class="sub">Certification portfolio · Cabinet-paper aligned</span></div>
+    <div class="chips">
+      <span class="chip">Vision &amp; strategy</span>
+      <span class="chip">Certification portfolio management</span>
+      <span class="chip">Portfolio &amp; roadmap</span>
+      <span class="chip">Budget &amp; investment allocation per certified platform</span>
+      <span class="chip">Cost-of-divergence tracking</span>
+      <span class="chip">Savings measurement</span>
+      <span class="chip">Stakeholder &amp; comms</span>
+    </div>
+  </div>
+
+  <div class="band eda">
+    <div class="band-title">Enterprise Design Authority <span class="sub">The certification body — publishes patterns, assesses vendors, grants certification</span></div>
+    <div class="chips">
+      <span class="chip">Interop pattern library</span>
+      <span class="chip">Identity &amp; assurance model</span>
+      <span class="chip">Canonical data schema</span>
+      <span class="chip">Event contracts</span>
+      <span class="chip">API standards</span>
+      <span class="chip">Security posture</span>
+      <span class="chip">Sovereignty &amp; residency</span>
+      <span class="chip">Consent &amp; entitlement</span>
+      <span class="chip">Conformance assessment</span>
+      <span class="chip">Certification maintenance &amp; recert</span>
+    </div>
+  </div>
+
+  <!-- ===== CERTIFICATION LIFECYCLE ===== -->
+  <div class="lifecycle">
+    <div class="lifecycle-title">Certification lifecycle — how a platform becomes certified</div>
+    <div class="lifecycle-flow">
+      <div class="step"><strong>1. Submit</strong>Vendor lodges intent + conformance evidence</div>
+      <div class="arrow">→</div>
+      <div class="step"><strong>2. Assess</strong>EDA conformance testing against interop patterns</div>
+      <div class="arrow">→</div>
+      <div class="step"><strong>3. Invest</strong>Centralised blueprint library &amp; shared capability stood up</div>
+      <div class="loop">Recertification annually · Investment scales with adoption</div>
+    </div>
+    <div class="lifecycle-flow" style="margin-top:6px;">
+      <div class="step"><strong>4. Certify</strong>Reference or Approved status granted per domain</div>
+      <div class="arrow">→</div>
+      <div class="step"><strong>5. Onboard</strong>Agencies adopt via shared CoE, blueprints, talent pool</div>
+      <div class="arrow">→</div>
+      <div class="step"><strong>6. Operate</strong>Shared release cadence, patched centrally, upgrades planned</div>
+      <div class="loop"></div>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-title">AI Enablement <span class="sub">Cross-technology · one instance</span></div>
+    <div class="chips">
+      <span class="chip">AI strategy &amp; governance</span>
+      <span class="chip">MCP / open agent standards</span>
+      <span class="chip">Trust &amp; red-team patterns</span>
+      <span class="chip">Reusable agent libraries</span>
+      <span class="chip">Model &amp; provider portability</span>
+      <span class="chip">Certified AI tooling per domain</span>
+      <span class="chip">Innovation lab</span>
+    </div>
+  </div>
+
+  <div class="glue-label">↓ Enterprise Design Authority certifies platforms in every domain below ↓</div>
+
+  <!-- ===== DOMAIN COLUMNS ===== -->
+  <div class="cols">
+
+    <!-- 1. Digital Identity -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Digital Identity</div>
+        <span class="sub">Identity, assurance, credentials, wallet</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge national">National</span>
+          <span class="platform">NZ Digital Identity / MATTR</span>
+        </div>
+        <div class="cert-entry" style="opacity:0.75; font-size:10px;">
+          National sovereign capability. No alternates.
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Certified reference blueprints</h4>
+          <ul>
+            <li>Digital identity + assurance levels</li>
+            <li>Verifiable credential issuance</li>
+            <li>Consent &amp; entitlement register</li>
+            <li>Business authority &amp; delegation</li>
+            <li>Agency federation (OIDC / SAML)</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Not permitted. Sovereignty-critical.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Content & Digital Presence -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Content &amp; Digital Presence</div>
+        <span class="sub">Unauthenticated web + design system</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">NZ Single Digital Presence</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Contentful / Adobe AEM</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Shared headless CMS + design system</li>
+            <li>Agency tenant onboarding</li>
+            <li>WCAG 2.2 AA + Te Reo</li>
+            <li>Service catalogue publication (feeds AI Broker)</li>
+            <li>Search &amp; taxonomy</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>Component library thinner</li>
+            <li>Design system integration required</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Agency-run web platform: full DevOps + accessibility programme + design system reimplementation.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Citizen Service Delivery -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Citizen Service Delivery</div>
+        <span class="sub">Case, service catalogue, intake, decision</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">Salesforce (PSS)</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Microsoft Dynamics 365 Customer Service</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge assessing">Assess</span>
+          <span class="platform">ServiceNow CSM</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Person + Business Hub (with Whakapapa relationship model)</li>
+            <li>Grants &amp; funding</li>
+            <li>Regulation &amp; enforcement</li>
+            <li>Registry / lodgement</li>
+            <li>Case &amp; service management</li>
+            <li>Contact centre &amp; digital engagement</li>
+            <li>Notifications &amp; messaging</li>
+            <li>Rules Library (OmniStudio / BRE)</li>
+            <li>Experience Cloud agency portal</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>Case + service catalogue conformant</li>
+            <li>Blueprint library partial and growing</li>
+            <li>Rules Library integration bespoke</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p><strong>Alternate:</strong> agency-maintained blueprints, materially longer onboarding, higher lifecycle cost. <strong>Divergent:</strong> full stack rebuild, agency-owned end to end.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Integration Fabric -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Integration Fabric</div>
+        <span class="sub">API + event + services exchange</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">MuleSoft</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Azure APIM + Logic Apps</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge assessing">Assess</span>
+          <span class="platform">Boomi</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Canonical Person / Business schema</li>
+            <li>DPI Services Exchange patterns</li>
+            <li>AsyncAPI event contracts</li>
+            <li>Agency onboarding integration pack</li>
+            <li>Rules-as-code publication pattern</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>API management conformant</li>
+            <li>Event bus patterns bespoke</li>
+            <li>Canonical schema requires custom mapping</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Point-to-point integration + custom schema translation + no shared event fabric.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Staff Service Management -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Staff Service Management</div>
+        <span class="sub">Internal ITSM &middot; not citizen service</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">ServiceNow</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">MS Dynamics 365 ITSM</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Jira Service Management</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Agency service desk baseline</li>
+            <li>Incident / problem / change</li>
+            <li>Asset &amp; CMDB</li>
+            <li>ITOM / observability integration</li>
+            <li>Cross-agency knowledge base</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>ITIL-conformant service desk</li>
+            <li>Shared knowledge base integration bespoke</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Agency-run ITSM: no shared talent, no shared knowledge base, higher operating cost.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. HR & Workforce -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">HR &amp; Workforce</div>
+        <span class="sub">HR, workforce, learning, payroll</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">Workday</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">SAP SuccessFactors</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Oracle HCM</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>NZ Govt HR baseline configuration</li>
+            <li>Workforce planning &amp; org design</li>
+            <li>Learning &amp; capability</li>
+            <li>Time / absence / payroll integration</li>
+            <li>NZ Govt workforce reporting</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>Core HRIS conformant</li>
+            <li>Reporting integration bespoke</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Legacy HRIS: full lifecycle cost, no shared analytics feed.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Finance & ERP -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Finance &amp; ERP</div>
+        <span class="sub">GL, procurement, contracts, assets</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">TechOne (small/mid) &middot; Oracle Cloud (large)</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">SAP S/4HANA</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">MS Dynamics 365 Finance</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Common chart of accounts</li>
+            <li>Procurement &amp; contracts</li>
+            <li>Grants disbursement integration</li>
+            <li>Asset &amp; project accounting</li>
+            <li>Whole-of-Govt spend analytics</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>Core financials conformant</li>
+            <li>Consolidated reporting integration bespoke</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Legacy ERP: no consolidated spend reporting, higher audit cost.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. Productivity & Records -->
+    <div class="col">
+      <div class="col-domain">
+        <div class="name">Productivity &amp; Records</div>
+        <span class="sub">Docs, collaboration, records retention</span>
+      </div>
+      <div class="col-cert">
+        <div class="cert-entry">
+          <span class="mini-badge ref">Ref</span>
+          <span class="platform">Microsoft 365 (One Desktop for Govt)</span>
+        </div>
+        <div class="cert-entry">
+          <span class="mini-badge alt">Alt</span>
+          <span class="platform">Google Workspace</span>
+        </div>
+      </div>
+      <div class="col-body">
+        <div class="col-section">
+          <h4>Reference blueprints</h4>
+          <ul>
+            <li>Agency workspace baseline</li>
+            <li>Purview records &amp; retention</li>
+            <li>Secure collaboration standards</li>
+            <li>Copilot governance</li>
+            <li>Cross-agency comms baseline</li>
+          </ul>
+        </div>
+        <div class="col-alt">
+          <h4>Approved alternate coverage</h4>
+          <ul>
+            <li>Productivity suite conformant</li>
+            <li>Records retention pattern bespoke</li>
+          </ul>
+        </div>
+        <div class="col-divergent">
+          <h4>Cost of divergence</h4>
+          <p>Full desktop lifecycle cost, records &amp; retention programme owned.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== BOTTOM BAND ===== -->
+  <div class="foot-band">
+    <div class="band-title">Support &amp; Enablement <span class="sub">Cross-cutting practice · single instance</span></div>
+    <div class="chips">
+      <span class="chip">Enterprise architecture practice</span>
+      <span class="chip">Security &amp; assurance practice</span>
+      <span class="chip">Data practice</span>
+      <span class="chip">Cross-technology communities of practice</span>
+      <span class="chip">Talent acquisition &amp; workforce planning</span>
+      <span class="chip">Cross-agency learning &amp; capability</span>
+      <span class="chip">Certified vendor liaison</span>
+      <span class="chip">Knowledge sharing &amp; artefact library</span>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER NOTE ===== -->
+  <div class="footer-note-block">
+    <strong>Reading the sketch.</strong>
+    Every column is a capability domain, not a vendor. Under each domain header the <span class="accent">certified platforms</span> are listed with their status: <span class="accent">Reference</span> is the platform with the deepest centralised investment, <span class="accent">Approved</span> is a certified alternate with a real (but thinner) blueprint library, <span class="accent">Assessing</span> is in-flight, and <span class="accent">Divergent</span> is anything else.
+    <br><br>
+    <strong>What this signals to GDA.</strong> The framework is technology-agnostic at the top: standards live in the Enterprise Design Authority and are the same regardless of which certified platform an agency picks. Certification is transparent — it names the platforms, publishes the cost-of-divergence, and lets agencies choose with eyes open. The Salesforce advantage is <em>earned through the depth of the reference blueprint library</em>, not asserted through positional exclusion.
+    <br><br>
+    <strong>How the model incentivises the right behaviour.</strong> The certification lifecycle rewards vendors who invest in conformance — patterns published centrally, adoption measured, investment scaled to adoption. Agencies who go divergent still get to plug into DPI (as long as they conform to interop patterns), but they carry the full lifecycle cost. That's the &ldquo;lower cost through certification&rdquo; story that connects directly to <em>Driving Down the Cost of Digital</em>.
+    <br><br>
+    <strong>The Salesforce play in this framing.</strong> Reference status in Citizen Service Delivery (with the deepest blueprint library any vendor currently offers), plus Reference in Integration Fabric via MuleSoft. Salesforce doesn't need to be everywhere; it needs to be the platform whose reference implementation is deepest, most reusable, and most upgradeable in its two domains. That's a defensible position that survives multi-vendor scrutiny.
+  </div>
+
+</div>
+</body>
+</html>
