@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NZ Government Digital Services — Centre of Excellence · Certified Reference Architecture</title>
+<title>NZ Government Digital Services — CoE · Certified Reference Architecture</title>
 <style>
 @font-face {
     font-family: 'AvantGardeSF';
@@ -41,172 +41,57 @@
     font-display: swap;
   }
 
-  /* ============================================================
-     DESIGN TOKENS
-     ============================================================ */
   :root {
     color-scheme: light;
-    /* colours */
-    --navy: #001E5B;
-    --navy-2: #002775;
-    --blue-primary: #066AFE;
-    --blue-secondary: #0250D9;
-    --cloud-blue: #00B3FF;
-    --cloud-blue-light: #90D0FE;
-    --bg-page: #EAF5FE;
-    --bg-tile: #FFFFFF;
-    --bg-tile-alt: #F5FAFE;
-    --bg-cert: #DCEBFD;
-    --bg-cert-strong: #CFE9FE;
-    --teal: #06A59A;
-    --teal-tint: rgba(6, 165, 154, 0.10);
-    --teal-text: #04544D;
-    --pink: #B60554;
-    --pink-tint: rgba(182, 5, 84, 0.08);
-    --yellow: #E4A201;
-    --violet: #730394;
-    --white: #FFFFFF;
-
-    /* text */
-    --text: #001E5B;
-    --text-2: #002775;
-    --text-muted: rgba(0, 30, 91, 0.7);
+    --navy: #001E5B; --navy-2: #002775;
+    --blue-primary: #066AFE; --blue-secondary: #0250D9;
+    --cloud-blue: #00B3FF; --cloud-blue-light: #90D0FE;
+    --bg-page: #EAF5FE; --bg-tile: #FFFFFF; --bg-tile-alt: #F5FAFE;
+    --bg-cert: #DCEBFD; --bg-cert-strong: #CFE9FE;
+    --teal: #06A59A; --teal-tint: rgba(6,165,154,0.10); --teal-text: #04544D;
+    --pink: #B60554; --pink-tint: rgba(182,5,84,0.08);
+    --yellow: #E4A201; --violet: #730394; --white: #FFFFFF;
+    --text: #001E5B; --text-2: #002775; --text-muted: rgba(0,30,91,0.7);
     --text-strong: #001E5B;
-
-    /* spacing (8-based scale) */
-    --s-1: 4px;
-    --s-2: 8px;
-    --s-3: 12px;
-    --s-4: 16px;
-    --s-5: 24px;
-    --s-6: 32px;
-    --s-7: 40px;
-    --s-8: 56px;
-
-    /* radius */
-    --r-sm: 6px;
-    --r-md: 8px;
-    --r-lg: 12px;
-    --r-xl: 14px;
-    --r-pill: 999px;
-
-    /* font sizes */
-    --fs-h1: 34px;
-    --fs-h2: 22px;
-    --fs-h3: 17px;
-    --fs-lg: 15px;
-    --fs-md: 14px;
-    --fs-sm: 13px;
-    --fs-xs: 12px;
-    --fs-2xs: 11px;
-
-    /* shadow */
-    --shadow-sm: 0 2px 6px rgba(6, 106, 254, 0.08);
-    --shadow-md: 0 3px 12px rgba(6, 106, 254, 0.10);
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+    --s-5: 24px; --s-6: 32px; --s-7: 40px; --s-8: 56px;
+    --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 14px; --r-pill: 999px;
+    --fs-h1: 34px; --fs-h2: 22px; --fs-h3: 17px;
+    --fs-lg: 15px; --fs-md: 14px; --fs-sm: 13px;
+    --fs-xs: 12px; --fs-2xs: 11px;
+    --shadow-sm: 0 2px 6px rgba(6,106,254,0.08);
+    --shadow-md: 0 3px 12px rgba(6,106,254,0.10);
   }
-
   * { box-sizing: border-box; }
   html, body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     background: var(--bg-page);
     font-family: 'SalesforceSans', 'Salesforce Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: var(--text);
-    line-height: 1.6;
+    color: var(--text); line-height: 1.6;
   }
-
   h1, h2, h3, h4 {
     font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    color: var(--text-strong);
-    margin: 0;
-    letter-spacing: -0.01em;
-    font-weight: 700;
+    color: var(--text-strong); margin: 0; letter-spacing: -0.01em; font-weight: 700;
   }
+  .page { max-width: 1780px; margin: 0 auto; padding: var(--s-6) var(--s-7) var(--s-8); }
 
-  .page {
-    max-width: 1720px;
-    margin: 0 auto;
-    padding: var(--s-6) var(--s-7) var(--s-8);
-  }
-
-  /* ============================================================
-     TITLE
-     ============================================================ */
-  header.title {
-    padding-bottom: var(--s-4);
-    border-bottom: 1px solid rgba(0, 30, 91, 0.12);
-    margin-bottom: var(--s-6);
-  }
-  .title-kicker {
-    font-size: var(--fs-xs);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--blue-primary);
-    font-weight: 700;
-    margin-bottom: var(--s-2);
-  }
-  .title-h1 {
-    font-size: var(--fs-h1);
-    line-height: 1.15;
-    color: var(--text-strong);
-    margin: 0 0 var(--s-2);
-  }
+  header.title { padding-bottom: var(--s-4); border-bottom: 1px solid rgba(0,30,91,0.12); margin-bottom: var(--s-6); }
+  .title-kicker { font-size: var(--fs-xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-primary); font-weight: 700; margin-bottom: var(--s-2); }
+  .title-h1 { font-size: var(--fs-h1); line-height: 1.15; margin: 0 0 var(--s-2); }
   .title-h1 .accent { color: var(--blue-primary); }
-  .title-subtitle {
-    font-size: var(--fs-lg);
-    color: var(--text-2);
-    line-height: 1.6;
-    margin: 0 0 var(--s-3);
-    max-width: 1100px;
-  }
-  .title-subtitle em { color: var(--text-2); font-style: italic; }
-  .title-meta {
-    font-size: var(--fs-xs);
-    color: var(--text-muted);
-  }
+  .title-subtitle { font-size: var(--fs-lg); color: var(--text-2); line-height: 1.6; margin: 0 0 var(--s-3); max-width: 1200px; }
+  .title-subtitle strong { color: var(--text-strong); }
+  .title-meta { font-size: var(--fs-xs); color: var(--text-muted); }
 
-  /* ============================================================
-     SECTION HEADINGS
-     ============================================================ */
-  .section-heading-block {
-    margin: var(--s-7) 0 var(--s-4);
-  }
-  .section-heading-kicker {
-    font-size: var(--fs-2xs);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--blue-primary);
-    font-weight: 700;
-    margin-bottom: var(--s-2);
-  }
-  .section-heading {
-    font-size: var(--fs-h2);
-    line-height: 1.2;
-    color: var(--text-strong);
-    margin: 0;
-  }
-  .section-lede {
-    font-size: var(--fs-md);
-    color: var(--text-2);
-    line-height: 1.6;
-    margin: var(--s-2) 0 0;
-    max-width: 1050px;
-  }
+  .section-heading-block { margin: var(--s-7) 0 var(--s-4); }
+  .section-heading-kicker { font-size: var(--fs-2xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--blue-primary); font-weight: 700; margin-bottom: var(--s-2); }
+  .section-heading { font-size: var(--fs-h2); line-height: 1.2; margin: 0; }
+  .section-lede { font-size: var(--fs-md); color: var(--text-2); line-height: 1.6; margin: var(--s-2) 0 0; max-width: 1200px; }
 
-  /* ============================================================
-     TIER BADGES & CHIPS
-     ============================================================ */
   .tier-badge, .mini-badge {
-    display: inline-block;
-    padding: 3px 9px;
-    border-radius: var(--r-pill);
-    font-size: var(--fs-2xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--white);
-    line-height: 1.3;
-    white-space: nowrap;
+    display: inline-block; padding: 3px 9px; border-radius: var(--r-pill);
+    font-size: var(--fs-2xs); font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--white); line-height: 1.3; white-space: nowrap;
   }
   .mini-badge { font-size: 10px; padding: 2px 6px; }
   .tier-badge.ref, .mini-badge.ref { background: var(--blue-primary); }
@@ -215,408 +100,82 @@
   .tier-badge.national, .mini-badge.national { background: var(--navy); }
   .tier-badge.divergent { background: var(--pink); }
 
-  .chip {
-    background: var(--bg-cert);
-    color: var(--text);
-    padding: 4px 12px;
-    border-radius: var(--r-pill);
-    font-size: var(--fs-xs);
-    line-height: 1.3;
-    white-space: nowrap;
-  }
+  .chip { background: var(--bg-cert); color: var(--text); padding: 4px 12px; border-radius: var(--r-pill); font-size: var(--fs-xs); line-height: 1.3; white-space: nowrap; }
 
-  /* ============================================================
-     CERTIFICATION LEGEND
-     ============================================================ */
-  .legend-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--s-2);
-    margin-bottom: var(--s-6);
-  }
-  .legend-item {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-3) var(--s-4);
-    display: flex;
-    gap: var(--s-3);
-    align-items: flex-start;
-    box-shadow: var(--shadow-sm);
-  }
-  .legend-item .badge-slot {
-    flex-shrink: 0;
-    padding-top: 2px;
-  }
-  .legend-item .desc {
-    font-size: var(--fs-sm);
-    line-height: 1.5;
-    color: var(--text);
-  }
+  .legend-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-2); margin-bottom: var(--s-6); }
+  .legend-item { background: var(--bg-tile); border-radius: var(--r-lg); padding: var(--s-3) var(--s-4); display: flex; gap: var(--s-3); align-items: flex-start; box-shadow: var(--shadow-sm); }
+  .legend-item .badge-slot { flex-shrink: 0; padding-top: 2px; }
+  .legend-item .desc { font-size: var(--fs-sm); line-height: 1.5; color: var(--text); }
   .legend-item .desc strong { color: var(--text-strong); font-weight: 700; }
 
-  /* ============================================================
-     HORIZONTAL BANDS (Executive, Strategy, EDA, AI Enablement)
-     ============================================================ */
-  .band {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-3) var(--s-4);
-    margin-bottom: var(--s-2);
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: var(--s-4);
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-  }
-  .band-exec {
-    background: var(--navy);
-    color: var(--white);
-  }
-  .band-eda {
-    background: linear-gradient(90deg, var(--navy-2) 0%, var(--blue-secondary) 100%);
-    color: var(--white);
-  }
-  .band-label {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    color: var(--text-strong);
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    line-height: 1.3;
-  }
+  .band { background: var(--bg-tile); border-radius: var(--r-lg); padding: var(--s-3) var(--s-4); margin-bottom: var(--s-2); display: grid; grid-template-columns: 220px 1fr; gap: var(--s-4); align-items: center; box-shadow: var(--shadow-sm); }
+  .band-exec { background: var(--navy); color: var(--white); }
+  .band-eda { background: linear-gradient(90deg, var(--navy-2) 0%, var(--blue-secondary) 100%); color: var(--white); }
+  .band-label { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: var(--fs-sm); font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.3; }
   .band-exec .band-label, .band-eda .band-label { color: var(--white); }
-  .band-label .sub {
-    display: block;
-    text-transform: none;
-    letter-spacing: 0;
-    font-size: var(--fs-xs);
-    font-weight: 400;
-    color: var(--text-muted);
-    margin-top: var(--s-1);
-  }
-  .band-exec .band-label .sub, .band-eda .band-label .sub {
-    color: rgba(255, 255, 255, 0.8);
-  }
-  .band-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-1);
-  }
-  .band-exec .chip, .band-eda .chip {
-    background: rgba(255, 255, 255, 0.16);
-    color: var(--white);
-    border: 1px solid rgba(255, 255, 255, 0.22);
-  }
+  .band-label .sub { display: block; text-transform: none; letter-spacing: 0; font-size: var(--fs-xs); font-weight: 400; color: var(--text-muted); margin-top: var(--s-1); }
+  .band-exec .band-label .sub, .band-eda .band-label .sub { color: rgba(255,255,255,0.8); }
+  .band-chips { display: flex; flex-wrap: wrap; gap: var(--s-1); }
+  .band-exec .chip, .band-eda .chip { background: rgba(255,255,255,0.16); color: var(--white); border: 1px solid rgba(255,255,255,0.22); }
 
-  /* ============================================================
-     LIFECYCLE STRIP
-     ============================================================ */
-  .lifecycle {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-4) var(--s-4);
-    margin: var(--s-4) 0 var(--s-2);
-    box-shadow: var(--shadow-sm);
-  }
-  .lifecycle-title {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-xs);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: var(--blue-primary);
-    font-weight: 700;
-    margin-bottom: var(--s-3);
-  }
-  .lifecycle-flow {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--s-1);
-  }
-  .lifecycle-step {
-    background: var(--bg-page);
-    border-radius: var(--r-md);
-    padding: var(--s-2) var(--s-3);
-    text-align: left;
-    font-size: var(--fs-xs);
-    color: var(--text);
-    line-height: 1.5;
-  }
-  .lifecycle-step strong {
-    display: block;
-    color: var(--blue-primary);
-    font-size: var(--fs-sm);
-    margin-bottom: 2px;
-    font-weight: 700;
-  }
-  .lifecycle-note {
-    text-align: center;
-    font-size: var(--fs-xs);
-    color: var(--text-muted);
-    font-style: italic;
-    margin-top: var(--s-3);
-  }
+  .lifecycle { background: var(--bg-tile); border-radius: var(--r-lg); padding: var(--s-4); margin: var(--s-4) 0 var(--s-2); box-shadow: var(--shadow-sm); }
+  .lifecycle-title { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: var(--fs-xs); letter-spacing: 0.10em; text-transform: uppercase; color: var(--blue-primary); font-weight: 700; margin-bottom: var(--s-3); }
+  .lifecycle-flow { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--s-1); }
+  .lifecycle-step { background: var(--bg-page); border-radius: var(--r-md); padding: var(--s-2) var(--s-3); font-size: var(--fs-xs); color: var(--text); line-height: 1.5; }
+  .lifecycle-step strong { display: block; color: var(--blue-primary); font-size: var(--fs-sm); margin-bottom: 2px; font-weight: 700; }
+  .lifecycle-note { text-align: center; font-size: var(--fs-xs); color: var(--text-muted); font-style: italic; margin-top: var(--s-3); }
 
-  /* ============================================================
-     GLUE LABEL
-     ============================================================ */
-  .glue-label {
-    text-align: center;
-    font-size: var(--fs-2xs);
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin: var(--s-6) 0 var(--s-3);
-  }
+  .glue-label { text-align: center; font-size: var(--fs-2xs); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted); margin: var(--s-6) 0 var(--s-3); }
 
-  /* ============================================================
-     SECTION A — ARCHITECTURE AT A GLANCE (compact 10-col strip)
-     ============================================================ */
-  .summary-grid {
-    display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    gap: var(--s-2);
-  }
-  .summary-col {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-3);
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-2);
-    box-shadow: var(--shadow-sm);
-    border-top: 4px solid var(--blue-primary);
-  }
-  .summary-num {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-md);
-    color: var(--blue-primary);
-    font-weight: 700;
-    line-height: 1;
-  }
-  .summary-name {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-md);
-    line-height: 1.25;
-    color: var(--text-strong);
-    font-weight: 700;
-  }
-  .summary-platforms {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-  }
-  .summary-platforms li {
-    font-size: var(--fs-xs);
-    color: var(--text);
-    line-height: 1.4;
-    display: flex;
-    align-items: baseline;
-    gap: 4px;
-    flex-wrap: wrap;
-  }
-  .summary-platforms .platform-name {
-    display: inline;
-  }
-  .summary-note {
-    font-size: var(--fs-2xs);
-    color: var(--text-muted);
-    font-style: italic;
-    line-height: 1.4;
-  }
+  .summary-grid { display: grid; grid-template-columns: repeat(11, 1fr); gap: var(--s-2); }
+  .summary-col { background: var(--bg-tile); border-radius: var(--r-lg); padding: var(--s-3); display: flex; flex-direction: column; gap: var(--s-2); box-shadow: var(--shadow-sm); border-top: 4px solid var(--blue-primary); }
+  .summary-num { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: var(--fs-md); color: var(--blue-primary); font-weight: 700; line-height: 1; }
+  .summary-name { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: var(--fs-md); line-height: 1.25; color: var(--text-strong); font-weight: 700; }
+  .summary-platforms { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+  .summary-platforms li { font-size: var(--fs-xs); color: var(--text); line-height: 1.4; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+  .summary-platforms .platform-name { display: inline; }
+  .summary-note { font-size: var(--fs-2xs); color: var(--text-muted); font-style: italic; line-height: 1.4; }
 
-  /* ============================================================
-     SECTION B — DETAIL ROWS
-     ============================================================ */
-  .detail-rows {
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-3);
-  }
-  .detail-row {
-    background: var(--bg-tile);
-    border-radius: var(--r-xl);
-    box-shadow: var(--shadow-md);
-    border-left: 5px solid var(--blue-primary);
-    overflow: hidden;
-  }
-  .detail-header {
-    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-2) 100%);
-    color: var(--white);
-    padding: var(--s-3) var(--s-5);
-    display: grid;
-    grid-template-columns: 60px 1fr auto;
-    align-items: center;
-    gap: var(--s-4);
-  }
-  .detail-num {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 26px;
-    color: var(--cloud-blue-light);
-    font-weight: 700;
-    line-height: 1;
-  }
-  .detail-title h3 {
-    font-size: var(--fs-h3);
-    color: var(--white);
-    margin: 0;
-    line-height: 1.2;
-  }
-  .detail-title p {
-    font-size: var(--fs-sm);
-    color: rgba(255, 255, 255, 0.85);
-    margin: 3px 0 0;
-    line-height: 1.4;
-  }
-  .detail-certified {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s-2);
-    justify-content: flex-end;
-    max-width: 620px;
-  }
-  .detail-cert-entry {
-    font-size: var(--fs-xs);
-    color: rgba(255, 255, 255, 0.95);
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    line-height: 1.4;
-    white-space: nowrap;
-  }
+  .detail-rows { display: flex; flex-direction: column; gap: var(--s-3); }
+  .detail-row { background: var(--bg-tile); border-radius: var(--r-xl); box-shadow: var(--shadow-md); border-left: 5px solid var(--blue-primary); overflow: hidden; }
+  .detail-header { background: linear-gradient(90deg, var(--navy) 0%, var(--navy-2) 100%); color: var(--white); padding: var(--s-3) var(--s-5); display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: var(--s-4); }
+  .detail-num { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 26px; color: var(--cloud-blue-light); font-weight: 700; line-height: 1; }
+  .detail-title h3 { font-size: var(--fs-h3); color: var(--white); margin: 0; line-height: 1.2; }
+  .detail-title p { font-size: var(--fs-sm); color: rgba(255,255,255,0.85); margin: 3px 0 0; line-height: 1.4; }
+  .detail-certified { display: flex; flex-wrap: wrap; gap: var(--s-2); justify-content: flex-end; max-width: 650px; }
+  .detail-cert-entry { font-size: var(--fs-xs); color: rgba(255,255,255,0.95); display: inline-flex; align-items: center; gap: 4px; line-height: 1.4; white-space: nowrap; }
   .detail-cert-entry .platform-name { color: var(--white); }
-
-  .detail-body {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr;
-    gap: var(--s-3);
-    padding: var(--s-4);
-  }
-  .detail-block {
-    padding: var(--s-3) var(--s-4);
-    border-radius: var(--r-md);
-  }
-  .detail-block h4 {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-2xs);
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin: 0 0 var(--s-2);
-    font-weight: 700;
-  }
-  .detail-block ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--s-1);
-  }
-  .detail-block li {
-    font-size: var(--fs-sm);
-    line-height: 1.5;
-    color: var(--text);
-    padding-left: var(--s-3);
-    position: relative;
-  }
-  .detail-block li::before {
-    content: '';
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--blue-primary);
-    position: absolute;
-    left: 0;
-    top: 8px;
-  }
+  .detail-body { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: var(--s-3); padding: var(--s-4); }
+  .detail-block { padding: var(--s-3) var(--s-4); border-radius: var(--r-md); }
+  .detail-block h4 { font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: var(--fs-2xs); letter-spacing: 0.10em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 var(--s-2); font-weight: 700; }
+  .detail-block ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+  .detail-block li { font-size: var(--fs-sm); line-height: 1.5; color: var(--text); padding-left: var(--s-3); position: relative; }
+  .detail-block li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--blue-primary); position: absolute; left: 0; top: 8px; }
   .detail-block li em { font-style: italic; color: var(--text-2); }
-
-  .detail-blueprints {
-    background: var(--bg-tile-alt);
-  }
-  .detail-alt {
-    background: var(--teal-tint);
-  }
+  .detail-blueprints { background: var(--bg-tile-alt); }
+  .detail-alt { background: var(--teal-tint); }
   .detail-alt h4 { color: var(--teal-text); }
   .detail-alt li { color: var(--teal-text); }
   .detail-alt li::before { background: var(--teal); }
-  .detail-empty .empty-note {
-    font-size: var(--fs-sm);
-    color: var(--text-muted);
-    font-style: italic;
-    margin: 0;
-  }
-  .detail-divergent {
-    background: var(--pink-tint);
-  }
+  .detail-empty .empty-note { font-size: var(--fs-sm); color: var(--text-muted); font-style: italic; margin: 0; }
+  .detail-divergent { background: var(--pink-tint); }
   .detail-divergent h4 { color: var(--pink); }
-  .detail-divergent p {
-    font-size: var(--fs-sm);
-    color: var(--pink);
-    margin: 0;
-    line-height: 1.55;
-  }
+  .detail-divergent p { font-size: var(--fs-sm); color: var(--pink); margin: 0; line-height: 1.55; }
   .detail-divergent p strong { color: var(--pink); font-weight: 700; }
 
-  .section-note {
-    background: rgba(6, 106, 254, 0.06);
-    border-left: 3px solid var(--blue-primary);
-    border-radius: var(--r-sm);
-    padding: var(--s-2) var(--s-3);
-    font-size: var(--fs-xs);
-    color: var(--text-2);
-    line-height: 1.5;
-    margin: 0 0 var(--s-3);
-  }
+  .section-note { background: rgba(6, 106, 254, 0.06); border-left: 3px solid var(--blue-primary); border-radius: var(--r-sm); padding: var(--s-2) var(--s-3); font-size: var(--fs-xs); color: var(--text-2); line-height: 1.5; margin: 0 0 var(--s-3); }
   .section-note em { font-style: italic; }
 
-  /* ============================================================
-     FOOT BAND (Support & Enablement)
-     ============================================================ */
-  .foot-band {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-3) var(--s-4);
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: var(--s-4);
-    align-items: center;
-    box-shadow: var(--shadow-sm);
-    margin-top: var(--s-4);
-  }
+  .foot-band { background: var(--bg-tile); border-radius: var(--r-lg); padding: var(--s-3) var(--s-4); display: grid; grid-template-columns: 220px 1fr; gap: var(--s-4); align-items: center; box-shadow: var(--shadow-sm); margin-top: var(--s-4); }
 
-  /* ============================================================
-     FOOTER NOTE
-     ============================================================ */
-  .footer-note {
-    margin-top: var(--s-6);
-    padding: var(--s-4) var(--s-5);
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    font-size: var(--fs-md);
-    line-height: 1.65;
-    color: var(--text);
-    max-width: 1300px;
-    box-shadow: var(--shadow-sm);
-  }
+  .footer-note { margin-top: var(--s-6); padding: var(--s-4) var(--s-5); background: var(--bg-tile); border-radius: var(--r-lg); font-size: var(--fs-md); line-height: 1.65; color: var(--text); max-width: 1300px; box-shadow: var(--shadow-sm); }
   .footer-note p { margin: 0 0 var(--s-3); }
   .footer-note p:last-child { margin-bottom: 0; }
   .footer-note strong { color: var(--text-strong); font-weight: 700; }
   .footer-note .accent { color: var(--blue-primary); font-weight: 600; }
   .footer-note em { color: var(--text-2); font-style: italic; }
 
-  footer.doc-footer {
-    margin-top: var(--s-5);
-    padding-top: var(--s-3);
-    border-top: 1px solid rgba(0, 30, 91, 0.12);
-    font-size: var(--fs-xs);
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
+  footer.doc-footer { margin-top: var(--s-5); padding-top: var(--s-3); border-top: 1px solid rgba(0,30,91,0.12); font-size: var(--fs-xs); color: var(--text-muted); line-height: 1.5; }
 
 </style>
 </head>
@@ -627,7 +186,7 @@
     <div class="title-kicker">Working proposal · Certified reference architecture</div>
     <h1 class="title-h1">NZ Government Digital Services <span class="accent">Centre of Excellence</span></h1>
     <p class="title-subtitle">Standards first, vendors second. The Enterprise Design Authority publishes technology-agnostic interop patterns and <strong>certifies</strong> platforms against them. Certified platforms receive centralised investment in shared blueprints, talent, and release capability — lowering onboarding cost for any agency choosing certified.</p>
-    <p class="title-meta">Version 0.3 · working document · companion to the microsite</p>
+    <p class="title-meta">Version 0.4 · working document · companion to the microsite · 11 capability domains</p>
   </header>
 
   <div class="section-heading-block">
@@ -636,22 +195,10 @@
   </div>
 
   <div class="legend-grid">
-    <div class="legend-item">
-      <div class="badge-slot"><span class="tier-badge ref">Reference</span></div>
-      <div class="desc"><strong>Deepest centralised investment.</strong> Full blueprint library. Shared CoE, talent, release. Fastest onboarding, lowest TCO.</div>
-    </div>
-    <div class="legend-item">
-      <div class="badge-slot"><span class="tier-badge alt">Approved</span></div>
-      <div class="desc"><strong>Certified alternate.</strong> Conformant to EDA patterns. Blueprint coverage partial and growing. Investment scales with adoption.</div>
-    </div>
-    <div class="legend-item">
-      <div class="badge-slot"><span class="tier-badge assessing">Assessing</span></div>
-      <div class="desc"><strong>Under assessment.</strong> Vendor in conformance testing. Agencies may pilot but should expect the divergent-cost profile until certification is granted.</div>
-    </div>
-    <div class="legend-item">
-      <div class="badge-slot"><span class="tier-badge divergent">Divergent</span></div>
-      <div class="desc"><strong>Not certified.</strong> Permitted if it conforms to EDA interop patterns. Agency owns full lifecycle cost. No shared blueprints, talent, or release.</div>
-    </div>
+    <div class="legend-item"><div class="badge-slot"><span class="tier-badge ref">Reference</span></div><div class="desc"><strong>Deepest centralised investment.</strong> Full blueprint library. Shared CoE, talent, release. Fastest onboarding, lowest TCO.</div></div>
+    <div class="legend-item"><div class="badge-slot"><span class="tier-badge alt">Approved</span></div><div class="desc"><strong>Certified alternate.</strong> Conformant to EDA patterns. Blueprint coverage partial and growing. Investment scales with adoption.</div></div>
+    <div class="legend-item"><div class="badge-slot"><span class="tier-badge assessing">Assessing</span></div><div class="desc"><strong>Under assessment.</strong> Vendor in conformance testing. Agencies may pilot but should expect the divergent-cost profile until certification is granted.</div></div>
+    <div class="legend-item"><div class="badge-slot"><span class="tier-badge divergent">Divergent</span></div><div class="desc"><strong>Not certified.</strong> Permitted if it conforms to EDA interop patterns. Agency owns full lifecycle cost. No shared blueprints, talent, or release.</div></div>
   </div>
 
   <div class="section-heading-block">
@@ -662,40 +209,19 @@
   <div class="band band-exec">
     <div class="band-label">Executive Sponsorship <span class="sub">Single instance across all technologies</span></div>
     <div class="band-chips">
-      <span class="chip">Cabinet oversight</span>
-      <span class="chip">Ministerial governance</span>
-      <span class="chip">Chief Executives forum</span>
-      <span class="chip">GDDA leadership</span>
-      <span class="chip">Portfolio investment committee</span>
+      <span class="chip">Cabinet oversight</span><span class="chip">Ministerial governance</span><span class="chip">Chief Executives forum</span><span class="chip">GDDA leadership</span><span class="chip">Portfolio investment committee</span>
     </div>
   </div>
-
   <div class="band">
     <div class="band-label">Strategy Office <span class="sub">Certification portfolio · Cabinet-paper aligned</span></div>
     <div class="band-chips">
-      <span class="chip">Vision &amp; strategy</span>
-      <span class="chip">Certification portfolio management</span>
-      <span class="chip">Portfolio &amp; roadmap</span>
-      <span class="chip">Budget &amp; investment allocation</span>
-      <span class="chip">Cost-of-divergence tracking</span>
-      <span class="chip">Savings measurement</span>
-      <span class="chip">Stakeholder &amp; comms</span>
+      <span class="chip">Vision &amp; strategy</span><span class="chip">Certification portfolio management</span><span class="chip">Portfolio &amp; roadmap</span><span class="chip">Budget &amp; investment allocation</span><span class="chip">Cost-of-divergence tracking</span><span class="chip">Savings measurement</span><span class="chip">Stakeholder &amp; comms</span>
     </div>
   </div>
-
   <div class="band band-eda">
     <div class="band-label">Enterprise Design Authority <span class="sub">The certification body — publishes patterns, assesses vendors, grants certification</span></div>
     <div class="band-chips">
-      <span class="chip">Interop pattern library</span>
-      <span class="chip">Identity &amp; assurance model</span>
-      <span class="chip">Canonical data schema</span>
-      <span class="chip">Event contracts</span>
-      <span class="chip">API standards</span>
-      <span class="chip">Security posture</span>
-      <span class="chip">Sovereignty &amp; residency</span>
-      <span class="chip">Consent &amp; entitlement</span>
-      <span class="chip">Conformance assessment</span>
-      <span class="chip">Certification maintenance &amp; recert</span>
+      <span class="chip">Interop pattern library</span><span class="chip">Identity &amp; assurance model</span><span class="chip">Canonical data schema</span><span class="chip">Event contracts</span><span class="chip">API standards</span><span class="chip">Security posture</span><span class="chip">Sovereignty &amp; residency</span><span class="chip">Consent &amp; entitlement</span><span class="chip">Conformance assessment</span><span class="chip">Certification maintenance &amp; recert</span>
     </div>
   </div>
 
@@ -715,13 +241,7 @@
   <div class="band">
     <div class="band-label">AI Enablement <span class="sub">Cross-technology · one instance</span></div>
     <div class="band-chips">
-      <span class="chip">AI strategy &amp; governance</span>
-      <span class="chip">MCP / open agent standards</span>
-      <span class="chip">Trust &amp; red-team patterns</span>
-      <span class="chip">Reusable agent libraries</span>
-      <span class="chip">Model &amp; provider portability</span>
-      <span class="chip">Certified AI tooling per domain</span>
-      <span class="chip">Innovation lab</span>
+      <span class="chip">AI strategy &amp; governance</span><span class="chip">MCP / open agent standards</span><span class="chip">Trust &amp; red-team patterns</span><span class="chip">Reusable agent libraries</span><span class="chip">Model &amp; provider portability</span><span class="chip">Certified AI tooling per domain</span><span class="chip">Innovation lab</span>
     </div>
   </div>
 
@@ -729,7 +249,7 @@
 
   <div class="section-heading-block">
     <div class="section-heading-kicker">Section A · Architecture at a glance</div>
-    <h2 class="section-heading">Ten capability domains · certified platforms per domain</h2>
+    <h2 class="section-heading">Eleven capability domains · certified platforms per domain</h2>
     <p class="section-lede">The full architectural picture in a single view. Each domain shows its certified platforms with tier status. Detail — reference blueprints, alternate coverage, cost of divergence — sits in Section B below.</p>
   </div>
 
@@ -746,9 +266,7 @@
         <div class="summary-num">02</div>
         <div class="summary-name">Content &amp; Digital Presence</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">NZ Single Digital Presence</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Contentful · Adobe AEM</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Salesforce Experience Cloud</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">NZ Single Digital Presence</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Contentful · Adobe AEM</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Salesforce Experience Cloud</span></li>
         </ul>
         
       </div>
@@ -756,80 +274,71 @@
         <div class="summary-num">03</div>
         <div class="summary-name">Citizen Service Delivery</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Salesforce (PSS)</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Microsoft Dynamics 365 Customer Service</span></li>
-            <li><span class="mini-badge assessing">Assess</span><span class="platform-name">ServiceNow CSM</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Salesforce (PSS)</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Microsoft Dynamics 365 Customer Service</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">ServiceNow CSM</span></li>
         </ul>
         
+      </div>
+      <div class="summary-col" style="border-top-color: #E4A201;">
+        <div class="summary-num">04</div>
+        <div class="summary-name">Communications &amp; Engagement</div>
+        <ul class="summary-platforms">
+            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Salesforce Marketing Cloud</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Adobe Experience Platform + Marketo</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Microsoft Dynamics 365 Customer Insights – Journeys</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">HubSpot Marketing Hub</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">Braze</span></li>
+        </ul>
+        <div class="summary-note">No Reference — competitive multi-vendor field</div>
       </div>
       <div class="summary-col" style="border-top-color: #0250D9;">
-        <div class="summary-num">04</div>
+        <div class="summary-num">05</div>
         <div class="summary-name">Integration Fabric</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">MuleSoft</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Azure APIM + Logic Apps</span></li>
-            <li><span class="mini-badge assessing">Assess</span><span class="platform-name">Boomi</span></li>
-        </ul>
-        
-      </div>
-      <div class="summary-col" style="border-top-color: #066AFE;">
-        <div class="summary-num">05</div>
-        <div class="summary-name">Data Foundation &amp; Governance</div>
-        <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Snowflake · Databricks</span></li>
-            <li><span class="mini-badge ref">Ref (CDP)</span><span class="platform-name">Salesforce Data Cloud</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Microsoft Fabric</span></li>
-            <li><span class="mini-badge assessing">Assess</span><span class="platform-name">BigQuery · Redshift</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">MuleSoft</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Azure APIM + Logic Apps</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">Boomi</span></li>
         </ul>
         
       </div>
       <div class="summary-col" style="border-top-color: #066AFE;">
         <div class="summary-num">06</div>
+        <div class="summary-name">Data Foundation &amp; Governance</div>
+        <ul class="summary-platforms">
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Snowflake · Databricks</span></li><li><span class="mini-badge ref">Ref (CDP)</span><span class="platform-name">Salesforce Data Cloud</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Microsoft Fabric</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">BigQuery · Redshift</span></li>
+        </ul>
+        
+      </div>
+      <div class="summary-col" style="border-top-color: #066AFE;">
+        <div class="summary-num">07</div>
         <div class="summary-name">Analytics, BI &amp; Insights</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref (BI)</span><span class="platform-name">Tableau · Power BI</span></li>
-            <li><span class="mini-badge ref">Ref (ML)</span><span class="platform-name">Databricks</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Looker · CRM Analytics</span></li>
-            <li><span class="mini-badge assessing">Assess</span><span class="platform-name">MicroStrategy · ThoughtSpot</span></li>
+            <li><span class="mini-badge ref">Ref (BI)</span><span class="platform-name">Tableau · Power BI</span></li><li><span class="mini-badge ref">Ref (ML)</span><span class="platform-name">Databricks</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Looker · CRM Analytics</span></li><li><span class="mini-badge assessing">Assess</span><span class="platform-name">MicroStrategy · ThoughtSpot</span></li>
         </ul>
         
       </div>
       <div class="summary-col" style="border-top-color: #730394;">
-        <div class="summary-num">07</div>
+        <div class="summary-num">08</div>
         <div class="summary-name">Staff Service Management</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">ServiceNow</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">MS Dynamics 365 ITSM</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Jira Service Management</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">ServiceNow</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">MS Dynamics 365 ITSM</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Jira Service Management</span></li>
         </ul>
         
       </div>
       <div class="summary-col" style="border-top-color: #B60554;">
-        <div class="summary-num">08</div>
+        <div class="summary-num">09</div>
         <div class="summary-name">HR &amp; Workforce</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Workday</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">SAP SuccessFactors</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Oracle HCM</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Workday</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">SAP SuccessFactors</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Oracle HCM</span></li>
         </ul>
         
       </div>
       <div class="summary-col" style="border-top-color: #E4A201;">
-        <div class="summary-num">09</div>
+        <div class="summary-num">10</div>
         <div class="summary-name">Finance &amp; ERP</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">TechOne (small/mid) · Oracle Cloud (large)</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">SAP S/4HANA</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">MS Dynamics 365 Finance</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">TechOne (small/mid) · Oracle Cloud (large)</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">SAP S/4HANA</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">MS Dynamics 365 Finance</span></li>
         </ul>
         
       </div>
       <div class="summary-col" style="border-top-color: #001E5B;">
-        <div class="summary-num">10</div>
+        <div class="summary-num">11</div>
         <div class="summary-name">Productivity &amp; Records</div>
         <ul class="summary-platforms">
-            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Microsoft 365 (One Desktop for Govt)</span></li>
-            <li><span class="mini-badge alt">Alt</span><span class="platform-name">Google Workspace</span></li>
+            <li><span class="mini-badge ref">Ref</span><span class="platform-name">Microsoft 365 (One Desktop for Govt)</span></li><li><span class="mini-badge alt">Alt</span><span class="platform-name">Google Workspace</span></li>
         </ul>
         
       </div>
@@ -857,6 +366,7 @@
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
             
+            
             <ul>
               <li>Digital identity + assurance levels</li>
               <li>Verifiable credential issuance</li>
@@ -865,7 +375,7 @@
               <li>Agency federation (OIDC / SAML)</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt detail-empty">
+          <div class="detail-block detail-alt detail-empty">
             <h4>Approved alternate coverage</h4>
             <p class="empty-note">No alternates — national capability</p>
           </div>
@@ -883,15 +393,14 @@
             <p>Unauthenticated web + design system</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">NZ Single Digital Presence</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Contentful · Adobe AEM</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Salesforce Experience Cloud</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">NZ Single Digital Presence</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Contentful · Adobe AEM</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Salesforce Experience Cloud</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
             <p class="section-note"><em>Headless CMS = a content management system that serves content as an API rather than rendering the website itself. Any number of frontends (agency sites, mobile app, government app, chatbot) consume the same content while writers manage one source of truth.</em></p>
+            
             <ul>
               <li>Shared headless CMS + design system (Silverstripe / Drupal likely)</li>
               <li>Agency tenant onboarding</li>
@@ -900,12 +409,12 @@
               <li>Search &amp; taxonomy</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Contentful / AEM: component library thinner, design system integration required</li>
                 <li>Experience Cloud: strong for authenticated-heavy sites; licensing model less optimal for large anonymous content sites</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -921,14 +430,13 @@
             <p>Case, service catalogue, intake, decision</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Salesforce (PSS)</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Microsoft Dynamics 365 Customer Service</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">ServiceNow CSM</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Salesforce (PSS)</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Microsoft Dynamics 365 Customer Service</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">ServiceNow CSM</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Person + Business Hub (with Whakapapa relationship model)</li>
@@ -942,13 +450,13 @@
               <li>Experience Cloud agency portal</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Case + service catalogue conformant</li>
                 <li>Blueprint library partial and growing</li>
                 <li>Rules Library integration bespoke</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -956,22 +464,60 @@
           </div>
         </div>
       </article>
-      <article class="detail-row" style="border-left-color: #0250D9;">
+      <article class="detail-row" style="border-left-color: #E4A201;">
         <header class="detail-header">
           <div class="detail-num">04</div>
           <div class="detail-title">
-            <h3>Integration Fabric</h3>
-            <p>API + event + services exchange</p>
+            <h3>Communications &amp; Engagement</h3>
+            <p>Campaigns, journeys, personalisation, outbound engagement</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">MuleSoft</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Azure APIM + Logic Apps</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">Boomi</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Salesforce Marketing Cloud</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Adobe Experience Platform + Marketo</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Microsoft Dynamics 365 Customer Insights – Journeys</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">HubSpot Marketing Hub</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">Braze</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
+            <p class="section-note" style="background: rgba(228, 162, 1, 0.10); border-left-color: #E4A201;"><em>No Reference designation. Multi-vendor competitive field; no single platform holds sufficient market advantage or NZ Govt adoption to warrant Reference tier at this time. Certification body reviews annually.</em></p>
+            <ul>
+              <li>Campaign &amp; journey builder</li>
+              <li>Segmentation &amp; audience management</li>
+              <li>Multi-channel outbound (email, SMS, push, ads, social)</li>
+              <li>Personalisation &amp; interaction studio</li>
+              <li>Preference &amp; consent management</li>
+              <li>Campaign analytics &amp; A/B testing</li>
+              <li>Engagement journey templates</li>
+            </ul>
+          </div>
+          <div class="detail-block detail-alt">
+            <h4>Approved alternate coverage</h4>
+            <ul>
+                <li>All Approved platforms cover the core capability; differentiation is on depth (Journey Builder maturity, personalisation, ad platform integration)</li>
+                <li>Agency picks based on existing tenant relationships (M365 → Dynamics; SF PSS → Marketing Cloud; Adobe stack → AEP)</li>
+            </ul>
+          </div>
+          <div class="detail-block detail-divergent">
+            <h4>Cost of divergence</h4>
+            <p>Agency-specific point tool: no shared segmentation library, no consolidated engagement analytics, higher lifecycle cost.</p>
+          </div>
+        </div>
+      </article>
+      <article class="detail-row" style="border-left-color: #0250D9;">
+        <header class="detail-header">
+          <div class="detail-num">05</div>
+          <div class="detail-title">
+            <h3>Integration Fabric</h3>
+            <p>API + event + services exchange</p>
+          </div>
+          <div class="detail-certified">
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">MuleSoft</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Azure APIM + Logic Apps</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">Boomi</span></span>
+          </div>
+        </header>
+        <div class="detail-body">
+          <div class="detail-block detail-blueprints">
+            <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Canonical Person / Business schema</li>
@@ -982,13 +528,13 @@
               <li><em>DPI Data Dictionary + Services Catalogue live here</em></li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>API management conformant</li>
                 <li>Event bus patterns bespoke</li>
                 <li>Canonical schema requires custom mapping</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -998,21 +544,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #066AFE;">
         <header class="detail-header">
-          <div class="detail-num">05</div>
+          <div class="detail-num">06</div>
           <div class="detail-title">
             <h3>Data Foundation &amp; Governance</h3>
             <p>Where data lives, is harmonised, and governed</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Snowflake · Databricks</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge ref">Ref (CDP)</span> <span class="platform-name">Salesforce Data Cloud</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Microsoft Fabric</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">BigQuery · Redshift</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Snowflake · Databricks</span></span><span class="detail-cert-entry"><span class="mini-badge ref">Ref (CDP)</span> <span class="platform-name">Salesforce Data Cloud</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Microsoft Fabric</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">BigQuery · Redshift</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Analytical warehouse / lakehouse (Snowflake, Databricks)</li>
@@ -1023,12 +567,12 @@
               <li>Zero-copy federation between analytical and operational layers</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>MS Fabric: unified data + analytics, thinner NZ ecosystem</li>
                 <li>BigQuery / Redshift: capable but limited NZ Govt track record</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1038,21 +582,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #066AFE;">
         <header class="detail-header">
-          <div class="detail-num">06</div>
+          <div class="detail-num">07</div>
           <div class="detail-title">
             <h3>Analytics, BI &amp; Insights</h3>
             <p>How organisations see and act on data</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref (BI)</span> <span class="platform-name">Tableau · Power BI</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge ref">Ref (ML)</span> <span class="platform-name">Databricks</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Looker · CRM Analytics</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">MicroStrategy · ThoughtSpot</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref (BI)</span> <span class="platform-name">Tableau · Power BI</span></span><span class="detail-cert-entry"><span class="mini-badge ref">Ref (ML)</span> <span class="platform-name">Databricks</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Looker · CRM Analytics</span></span><span class="detail-cert-entry"><span class="mini-badge assessing">Assess</span> <span class="platform-name">MicroStrategy · ThoughtSpot</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Self-service BI &amp; dashboards</li>
@@ -1063,12 +605,12 @@
               <li>Cross-agency comparative analytics</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Looker: strong governance, thinner NZ ecosystem</li>
                 <li>CRM Analytics: embedded in Salesforce workflows</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1078,20 +620,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #730394;">
         <header class="detail-header">
-          <div class="detail-num">07</div>
+          <div class="detail-num">08</div>
           <div class="detail-title">
             <h3>Staff Service Management</h3>
             <p>Internal ITSM · not citizen service</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">ServiceNow</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">MS Dynamics 365 ITSM</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Jira Service Management</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">ServiceNow</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">MS Dynamics 365 ITSM</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Jira Service Management</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Agency service desk baseline</li>
@@ -1101,12 +642,12 @@
               <li>Cross-agency knowledge base</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>ITIL-conformant service desk</li>
                 <li>Shared knowledge base integration bespoke</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1116,20 +657,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #B60554;">
         <header class="detail-header">
-          <div class="detail-num">08</div>
+          <div class="detail-num">09</div>
           <div class="detail-title">
             <h3>HR &amp; Workforce</h3>
             <p>HR, workforce, learning, payroll</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Workday</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">SAP SuccessFactors</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Oracle HCM</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Workday</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">SAP SuccessFactors</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Oracle HCM</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>NZ Govt HR baseline configuration</li>
@@ -1139,12 +679,12 @@
               <li>NZ Govt workforce reporting</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Core HRIS conformant</li>
                 <li>Reporting integration bespoke</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1154,20 +694,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #E4A201;">
         <header class="detail-header">
-          <div class="detail-num">09</div>
+          <div class="detail-num">10</div>
           <div class="detail-title">
             <h3>Finance &amp; ERP</h3>
             <p>GL, procurement, contracts, assets</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">TechOne (small/mid) · Oracle Cloud (large)</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">SAP S/4HANA</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">MS Dynamics 365 Finance</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">TechOne (small/mid) · Oracle Cloud (large)</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">SAP S/4HANA</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">MS Dynamics 365 Finance</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Common chart of accounts</li>
@@ -1177,12 +716,12 @@
               <li>Whole-of-Govt spend analytics</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Core financials conformant</li>
                 <li>Consolidated reporting integration bespoke</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1192,19 +731,19 @@
       </article>
       <article class="detail-row" style="border-left-color: #001E5B;">
         <header class="detail-header">
-          <div class="detail-num">10</div>
+          <div class="detail-num">11</div>
           <div class="detail-title">
             <h3>Productivity &amp; Records</h3>
             <p>Docs, collaboration, records retention</p>
           </div>
           <div class="detail-certified">
-            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Microsoft 365 (One Desktop for Govt)</span></span>
-              <span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Google Workspace</span></span>
+            <span class="detail-cert-entry"><span class="mini-badge ref">Ref</span> <span class="platform-name">Microsoft 365 (One Desktop for Govt)</span></span><span class="detail-cert-entry"><span class="mini-badge alt">Alt</span> <span class="platform-name">Google Workspace</span></span>
           </div>
         </header>
         <div class="detail-body">
           <div class="detail-block detail-blueprints">
             <h4>Reference blueprints</h4>
+            
             
             <ul>
               <li>Agency workspace baseline</li>
@@ -1214,12 +753,12 @@
               <li>Cross-agency comms baseline</li>
             </ul>
           </div>
-                    <div class="detail-block detail-alt">
+          <div class="detail-block detail-alt">
             <h4>Approved alternate coverage</h4>
             <ul>
                 <li>Productivity suite conformant</li>
                 <li>Records retention pattern bespoke</li>
-              </ul>
+            </ul>
           </div>
           <div class="detail-block detail-divergent">
             <h4>Cost of divergence</h4>
@@ -1232,26 +771,19 @@
   <div class="foot-band">
     <div class="band-label">Support &amp; Enablement <span class="sub">Cross-cutting practice · single instance</span></div>
     <div class="band-chips">
-      <span class="chip">Enterprise architecture practice</span>
-      <span class="chip">Security &amp; assurance practice</span>
-      <span class="chip">Data practice</span>
-      <span class="chip">Cross-technology communities of practice</span>
-      <span class="chip">Talent acquisition &amp; workforce planning</span>
-      <span class="chip">Cross-agency learning &amp; capability</span>
-      <span class="chip">Certified vendor liaison</span>
-      <span class="chip">Knowledge sharing &amp; artefact library</span>
+      <span class="chip">Enterprise architecture practice</span><span class="chip">Security &amp; assurance practice</span><span class="chip">Data practice</span><span class="chip">Cross-technology communities of practice</span><span class="chip">Talent acquisition &amp; workforce planning</span><span class="chip">Cross-agency learning &amp; capability</span><span class="chip">Certified vendor liaison</span><span class="chip">Knowledge sharing &amp; artefact library</span>
     </div>
   </div>
 
   <div class="footer-note">
-    <p><strong>Reading the sketch.</strong> Section A shows the ten capability domains as columns — the architectural picture. Section B holds the detail per domain in rows below. Every column is a capability, not a vendor. Certified status is transparent, tier-based, and earned against six published criteria.</p>
-    <p><strong>What this signals to GDDA.</strong> The framework is technology-agnostic at the top: standards live in the Enterprise Design Authority and are the same regardless of which certified platform an agency picks. Certification is transparent — it names the platforms, publishes the cost of divergence, and lets agencies choose with eyes open. The Salesforce advantage is <em>earned through the depth of the reference blueprint library</em>, not asserted through positional exclusion.</p>
-    <p><strong>How the model incentivises the right behaviour.</strong> The certification lifecycle rewards vendors who invest in conformance — patterns published centrally, adoption measured, investment scaled to adoption. Agencies who go divergent still get to plug into DPI (as long as they conform to interop patterns), but they carry the full lifecycle cost. That's the &ldquo;lower cost through certification&rdquo; story that connects directly to <em>Driving Down the Cost of Digital</em>.</p>
-    <p><strong>The Salesforce play in this framing.</strong> Reference status in four capability domains: Citizen Service Delivery (with the deepest blueprint library any vendor currently offers), Integration Fabric via MuleSoft, Data Foundation via Salesforce Data Cloud (for the real-time operational CDP workload), and Analytics via Tableau. Salesforce doesn't need to be everywhere; it needs to be the platform whose reference implementation is deepest, most reusable, and most upgradeable where it competes. Snowflake, Databricks, and Microsoft Power BI hold Reference alongside Salesforce in the data domains — the framework rewards depth on merit, not positional exclusion.</p>
+    <p><strong>Reading the sketch.</strong> Section A shows the eleven capability domains as columns — the architectural picture. Section B holds the detail per domain in rows below. Every column is a capability, not a vendor. Certified status is transparent, tier-based, and earned against six published criteria.</p>
+    <p><strong>What this signals to GDDA.</strong> The framework is technology-agnostic at the top: standards live in the Enterprise Design Authority and are the same regardless of which certified platform an agency picks. Certification is transparent — it names the platforms, publishes the cost of divergence, and lets agencies choose with eyes open. Where competition is genuinely multi-vendor (Domain 04 · Communications &amp; Engagement), the framework deliberately leaves the Reference slot vacant rather than pretend one platform dominates.</p>
+    <p><strong>How the model incentivises the right behaviour.</strong> The certification lifecycle rewards vendors who invest in conformance — patterns published centrally, adoption measured, investment scaled to adoption. Agencies who go divergent still get to plug into DPI (as long as they conform to interop patterns), but they carry the full lifecycle cost.</p>
+    <p><strong>The Salesforce position in this framing.</strong> Reference status in four capability domains: Citizen Service Delivery (with the deepest blueprint library any vendor currently offers), Integration Fabric via MuleSoft, Data Foundation via Salesforce Data Cloud (for the real-time operational CDP workload), and Analytics via Tableau (alongside Microsoft Power BI as co-Reference). Approved status in Communications &amp; Engagement via Marketing Cloud — Salesforce competes there against Adobe, Microsoft, HubSpot, Braze and doesn't hold a Reference designation because the multi-vendor field doesn't warrant one. Salesforce doesn't need to be everywhere; it needs to be the platform whose reference implementation is deepest where it competes. Snowflake, Databricks, and Microsoft Power BI hold Reference alongside Salesforce in the data domains — the framework rewards depth on merit, not positional exclusion.</p>
   </div>
 
   <footer class="doc-footer">
-    Working proposal · developed for dialogue with the Government Digital Data Agency. Companion to the microsite. Version 0.3 · 2026-08 · font: Avant Garde for Salesforce (headings) + Salesforce Sans (body), both embedded.
+    Working proposal · developed for dialogue with the Government Digital Data Agency. Companion to the microsite. Version 0.4 · 2026-08 · 11 capability domains · font: Avant Garde for Salesforce (headings) + Salesforce Sans (body), both embedded.
   </footer>
 
 </div>
