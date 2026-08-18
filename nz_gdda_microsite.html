@@ -576,7 +576,7 @@
   }
   .coe-cols-mini {
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(11, 1fr);
     gap: 3px;
     margin-top: 8px;
   }
@@ -861,7 +861,7 @@
       </a>
       <a class="contents-item" href="#reference-architecture">
         <div class="num">04</div>
-        <div class="item-body"><h3>Reference architecture</h3><p>Horizontal governance and ten capability domains. <span class="reading-time">5 min · 20 min full</span></p></div>
+        <div class="item-body"><h3>Reference architecture</h3><p>Horizontal governance and eleven capability domains. <span class="reading-time">5 min · 20 min full</span></p></div>
       </a>
       <a class="contents-item" href="#dpi-mapping">
         <div class="num">05</div>
@@ -935,7 +935,7 @@
     <div class="card">
       <div class="card-tag">Move 02</div>
       <h4>A capability-domain Centre of Excellence</h4>
-      <p>Structure within a structure. Horizontal governance (Exec Sponsorship, Strategy Office, Enterprise Design Authority, AI Enablement, Support &amp; Enablement) applies across every technology. Under it, capability domains — Citizen Service, Content, Integration, Data Platform, Staff Service Management, HR, Finance, Productivity, Identity — each have a certified reference platform and certified alternates.</p>
+      <p>Structure within a structure. Horizontal governance (Exec Sponsorship, Strategy Office, Enterprise Design Authority, AI Enablement, Support &amp; Enablement) applies across every technology. Under it, capability domains — Citizen Service, Content, Communications &amp; Engagement, Integration, Data Foundation, Analytics, Staff Service Management, HR, Finance, Productivity, Identity — each have a certified reference platform and certified alternates (with Communications deliberately left without a Reference — competitive multi-vendor field).</p>
     </div>
     <div class="card">
       <div class="card-tag">Move 03</div>
@@ -1070,7 +1070,7 @@
 <section class="chapter" id="reference-architecture">
   <div class="chap-kicker">Section 04 · Reference Architecture</div>
   <h2 class="chap-title"><span class="num">04</span>The <span class="accent">reference architecture</span></h2>
-  <p class="chap-subtitle">Horizontal governance spans every technology. Under it, ten capability domains — each with a certified reference platform and alternates.</p>
+  <p class="chap-subtitle">Horizontal governance spans every technology. Under it, eleven capability domains — each with a certified reference platform and alternates.</p>
   <div class="reading-time-hero"><strong>Reading time:</strong> Overview 5 min · Full 20 min</div>
 
   <div class="prose">
@@ -1143,6 +1143,15 @@
           <div class="col-ref">Assess: ServiceNow CSM</div>
         </div>
       </div>
+      <div class="coe-col-mini yellow">
+        <div class="col-name">Communications &amp; Engagement</div>
+        <div class="col-refs">
+          <div class="col-ref">Alt: SF Marketing Cloud</div>
+          <div class="col-ref">Alt: Adobe · Marketo</div>
+          <div class="col-ref">Alt: MS Dynamics CI</div>
+          <div class="col-ref" style="font-style:italic;">No Reference — competitive field</div>
+        </div>
+      </div>
       <div class="coe-col-mini">
         <div class="col-name">Integration Fabric</div>
         <div class="col-refs">
@@ -1199,7 +1208,7 @@
   </div>
 
   <div class="callout">
-    <strong>The strategic honesty.</strong> Salesforce holds Reference status in four domains — Citizen Service Delivery, Integration (via MuleSoft), the operational CDP workload within Data Foundation, and Analytics via Tableau — because those are the domains where the criteria naturally favour our depth. We don't hold Reference in HR, Finance, Staff Service Management, Productivity, Identity, or analytical data warehousing. Those go to Workday, Oracle/TechOne, ServiceNow, Microsoft, DIA/MATTR, and Snowflake/Databricks (with Microsoft's Power BI as a co-Reference for Analytics BI) respectively. This is what makes the framework survive procurement scrutiny.
+    <strong>The strategic honesty.</strong> Salesforce holds Reference status in four domains — Citizen Service Delivery, Integration Fabric (via MuleSoft), the operational CDP workload within Data Foundation (via Data Cloud), and Analytics (via Tableau, alongside Microsoft Power BI as co-Reference). Salesforce holds <em>Approved</em> in Communications &amp; Engagement (via Marketing Cloud) — a domain the framework deliberately leaves without a Reference designation because the multi-vendor competitive field (Adobe, Microsoft, Salesforce, HubSpot, Braze) doesn't yet warrant one. Reference in HR, Finance, Staff Service Management, Productivity, Identity, and analytical data warehousing goes to Workday, Oracle/TechOne, ServiceNow, Microsoft, DIA/MATTR, and Snowflake/Databricks respectively. This is what makes the framework survive procurement scrutiny.
   </div>
 
   <details class="deep">
@@ -1226,37 +1235,42 @@
           <p><strong>Reference:</strong> Salesforce PSS. <strong>Alternate:</strong> Microsoft Dynamics 365 Customer Service. <strong>Assessing:</strong> ServiceNow CSM. Blueprints: Person + Business Hub (whakapapa/aiga relationship model), Grants &amp; Funding, Regulation &amp; Enforcement, Case Management, Rules Library.</p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 04 · Integration Fabric</div>
+          <div class="card-tag">Domain 04 · Communications &amp; Engagement</div>
+          <h4>No Reference · Approved multi-vendor field</h4>
+          <p><strong>Approved:</strong> Salesforce Marketing Cloud, Adobe Experience Platform + Marketo, Microsoft Dynamics 365 Customer Insights – Journeys. <strong>Assessing:</strong> HubSpot Marketing Hub, Braze. <em>No Reference designation — multi-vendor competitive field; no single platform holds sufficient market advantage or NZ Govt adoption to warrant Reference tier at this time. Certification body reviews annually.</em> Blueprints: campaign journey builder, segmentation &amp; audience management, multi-channel outbound (email, SMS, push, ads), personalisation, preference &amp; consent management, campaign analytics.</p>
+        </div>
+        <div class="card">
+          <div class="card-tag">Domain 05 · Integration Fabric</div>
           <h4>MuleSoft</h4>
           <p><strong>Reference:</strong> MuleSoft. <strong>Alternate:</strong> Azure APIM + Logic Apps. <strong>Assessing:</strong> Boomi. Blueprints: canonical Person / Business schema, DPI Services Exchange patterns, AsyncAPI event contracts, agency onboarding integration pack. <em>Note: the DPI Data Dictionary and Services Catalogue live here — the semantic layer that defines shared meaning across agencies.</em></p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 05 · Data Foundation &amp; Governance</div>
+          <div class="card-tag">Domain 06 · Data Foundation &amp; Governance</div>
           <h4>Snowflake · Databricks · Salesforce Data Cloud</h4>
           <p><strong>Reference (analytical warehouse / lakehouse):</strong> Snowflake, Databricks. <strong>Reference (operational CDP):</strong> Salesforce Data Cloud (Data 360). <strong>Alternate:</strong> Microsoft Fabric. <strong>Assessing:</strong> BigQuery, Redshift. Where data actually lives, is harmonised, governed, and made available. Zero-copy federation between analytical and operational layers.</p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 06 · Analytics, BI &amp; Insights</div>
+          <div class="card-tag">Domain 07 · Analytics, BI &amp; Insights</div>
           <h4>Tableau · Power BI · Databricks (ML)</h4>
           <p><strong>Reference (BI &amp; self-service):</strong> Tableau (Salesforce), Power BI (Microsoft) — two References acknowledging both leading tools. <strong>Reference (data science / ML):</strong> Databricks. <strong>Approved:</strong> Looker, CRM Analytics (embedded). <strong>Assessing:</strong> MicroStrategy, ThoughtSpot. The consumption layer — how organisations see and act on the data.</p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 07 · Staff Service Management</div>
+          <div class="card-tag">Domain 08 · Staff Service Management</div>
           <h4>ServiceNow</h4>
           <p><strong>Reference:</strong> ServiceNow. <strong>Alternate:</strong> MS Dynamics 365 ITSM, Jira Service Management. Blueprints: agency service desk, incident/problem/change, asset &amp; CMDB, ITOM integration. <em>Explicitly not for citizen service delivery.</em></p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 08 · HR &amp; Workforce</div>
+          <div class="card-tag">Domain 09 · HR &amp; Workforce</div>
           <h4>Workday</h4>
           <p><strong>Reference:</strong> Workday. <strong>Alternate:</strong> SAP SuccessFactors, Oracle HCM. Blueprints: NZ Govt HR baseline, workforce planning, learning &amp; capability, payroll integration to central.</p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 09 · Finance &amp; ERP</div>
+          <div class="card-tag">Domain 10 · Finance &amp; ERP</div>
           <h4>TechOne · Oracle</h4>
           <p><strong>Reference:</strong> TechOne (small/mid), Oracle Cloud (large). <strong>Alternate:</strong> SAP S/4HANA, MS Dynamics 365 Finance. Blueprints: common chart of accounts, procurement, grants disbursement integration, whole-of-Govt spend analytics.</p>
         </div>
         <div class="card">
-          <div class="card-tag">Domain 10 · Productivity &amp; Records</div>
+          <div class="card-tag">Domain 11 · Productivity &amp; Records</div>
           <h4>Microsoft 365</h4>
           <p><strong>Reference:</strong> Microsoft 365 (One Desktop for Govt). <strong>Alternate:</strong> Google Workspace. Blueprints: agency workspace baseline, Purview records &amp; retention, secure collaboration, Copilot governance.</p>
         </div>
