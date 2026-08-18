@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fire Rescue Victoria — Enterprise Capability Map</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Salesforce Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #f3f6fb; color: #16325c; padding: 28px 32px 48px; -webkit-font-smoothing: antialiased;
+}
+header { max-width: 1640px; margin: 0 auto 22px; }
+h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.3px; color: #032d60; }
+.legend { display: flex; flex-wrap: wrap; gap: 18px; margin: 18px 0 4px; align-items: center; font-size: 12.5px; }
+.legend .item { display: flex; align-items: center; gap: 7px; }
+.swatch { width: 15px; height: 15px; border-radius: 3px; display: inline-block; }
+.sw-core { background: #ba0517; }
+.sw-enabling { background: #0176d3; }
+.sw-gov { background: #396547; }
+
+.map { max-width: 1640px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+.band-label {
+  font-size: 12px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+  color: #54698d; margin-bottom: -8px; padding-left: 2px;
+}
+.band { display: grid; gap: 14px; align-items: start; }
+.band-core { grid-template-columns: repeat(3, 1fr); }
+.band-enabling { grid-template-columns: repeat(4, 1fr); }
+.band-gov { grid-template-columns: repeat(3, 1fr); }
+
+.domain {
+  background: #fff; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(3,45,96,0.10), 0 4px 12px rgba(3,45,96,0.05);
+  border: 1px solid #e5ebf4; display: flex; flex-direction: column;
+}
+.domain-head { padding: 12px 14px; color: #fff; font-weight: 700; font-size: 14.5px; line-height: 1.3; }
+.domain-head .code {
+  font-size: 11px; font-weight: 700; opacity: 0.85; background: rgba(255,255,255,0.22);
+  padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px; margin-right: 8px;
+}
+.domain-head .purpose { display: block; font-weight: 400; font-size: 11px; opacity: 0.92; margin-top: 5px; line-height: 1.4; }
+.core .domain-head { background: linear-gradient(135deg,#ba0517,#8e0413); }
+.enabling .domain-head { background: linear-gradient(135deg,#0176d3,#014486); }
+.gov .domain-head { background: linear-gradient(135deg,#396547,#274832); }
+
+.caps { padding: 8px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.cap {
+  background: #f7f9fc; border: 1px solid #e5ebf4; border-radius: 7px; padding: 9px 10px;
+  font-size: 12.8px; font-weight: 600; color: #16325c; position: relative; line-height: 1.35;
+  transition: background .12s, border-color .12s;
+}
+.core .cap { border-left: 3px solid #ba0517; }
+.enabling .cap { border-left: 3px solid #0176d3; }
+.gov .cap { border-left: 3px solid #396547; }
+.cap:hover { background: #eef4fc; border-color: #c9d8ec; }
+.cap .def { font-size: 11.3px; font-weight: 400; color: #54698d; margin-top: 3px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Fire Rescue Victoria — Enterprise Business Capability Map</h1>
+  <div class="legend">
+    <div class="item"><span class="swatch sw-core"></span> Core / Mission</div>
+    <div class="item"><span class="swatch sw-enabling"></span> Enabling / Supporting</div>
+    <div class="item"><span class="swatch sw-gov"></span> Governance / Strategic</div>
+  </div>
+</header>
+
+<div class="map" id="map"></div>
+
+<script>
+const DOMAINS = [
+ {cls:"core",band:"core",code:"1",title:"Community Risk & Resilience",purpose:"Understand community risk and strengthen people's ability to prevent, prepare for and withstand emergencies.",caps:[
+   {t:"Community Risk Intelligence",d:"Combine incident, demographic, place, vulnerability and hazard information into an evidence-based view of community risk and demand."},
+   {t:"Community Fire Safety Education",d:"Design and deliver accessible learning that builds fire-safe knowledge and behaviour across ages and settings."},
+   {t:"Priority Population Risk Reduction",d:"Identify and support people at heightened risk from age, disability, language, health, housing or social factors."},
+   {t:"Community Preparedness & Resilience",d:"Help communities prepare, practise and adapt for emergencies, including household and local preparedness."},
+   {t:"Public Safety Campaigns & Engagement",d:"Communicate prevention advice, run targeted campaigns, engage trusted intermediaries, capture feedback."},
+ ]},
+ {cls:"core",band:"core",code:"2",title:"Built Environment Fire Safety",purpose:"Shape, assess and improve fire safety in buildings, infrastructure and high-risk premises.",caps:[
+   {t:"Land-Use & Development Fire Safety",d:"Fire-service advice on planning, precincts and major infrastructure so access, water, evacuation and operational needs are built in."},
+   {t:"Building Fire Safety Assessment",d:"Assess building-permit, performance-solution and fire-engineering matters; advise on compliant, workable designs."},
+   {t:"Existing-Building Fire Safety & Compliance Support",d:"Inspect or advise on existing premises, essential safety measures and rectification with regulators and councils."},
+   {t:"High-Risk Sites & Dangerous Goods Prevention",d:"Assess and reduce fire and explosion risk at industrial, waste, dangerous-goods and complex sites."},
+   {t:"Fire Safety Standards, Research & Advocacy",d:"Turn operational evidence into standards, regulatory reform, guidance and systemic improvement."},
+ ]},
+ {cls:"core",band:"core",code:"3",title:"Operational Preparedness & Coverage",purpose:"Maintain the doctrine, coverage, readiness and continuity needed to respond safely and effectively.",caps:[
+   {t:"Emergency Demand & Coverage Planning",d:"Forecast risk and demand; determine geographic service coverage and required response capability."},
+   {t:"Resource Deployment & Station Readiness",d:"Maintain deployable crews, appliances, specialist resources and stations at required readiness levels."},
+   {t:"Pre-Incident Planning & Site Intelligence",d:"Maintain actionable plans and information for complex, high-risk or operationally significant sites."},
+   {t:"Operational Doctrine & Procedures",d:"Establish, assure and maintain authoritative operational policies, doctrine, tactics and safe systems of work."},
+   {t:"Surge & Mutual-Aid Readiness",d:"Prepare scalable resources, strike teams and specialists for major, interstate, national or international deployments."},
+   {t:"Emergency Operations Continuity",d:"Sustain emergency delivery through technology outages, facility loss, workforce disruption and concurrent emergencies."},
+ ]},
+ {cls:"core",band:"core",code:"4",title:"Emergency Response & Incident Management",purpose:"Receive incidents, mobilise resources, control operations and protect life, property and the environment.",caps:[
+   {t:"Dispatch Interface & Incident Notification",d:"Receive, validate and act on notifications from Triple Zero Victoria, automatic alarms and partner agencies."},
+   {t:"Mobilisation & Resource Coordination",d:"Select, alert, dispatch, track and reinforce the crews, appliances and specialists needed for an incident."},
+   {t:"Incident Command & Control",d:"Establish command, objectives, control structures, safety and tactical direction through escalation and resolution."},
+   {t:"Fire Suppression",d:"Contain and extinguish structural, non-structural, industrial, bush and grass fires while protecting exposures."},
+   {t:"Life Safety, Search & Evacuation",d:"Locate, protect, rescue and evacuate people and animals and manage immediate life-safety hazards."},
+   {t:"Multi-Agency Incident Coordination",d:"Integrate FRV operations with controllers, coordinators and other response agencies under Victoria's arrangements."},
+   {t:"Incident Communications & Warnings Support",d:"Maintain operational information flows; provide verified intelligence for public warnings and stakeholders."},
+ ]},
+ {cls:"core",band:"core",code:"5",title:"Specialist Emergency Services",purpose:"Deliver specialist medical, rescue, hazardous-material and technical response capabilities.",caps:[
+   {t:"Emergency Medical First Response",d:"Rapid lifesaving intervention for time-critical emergencies alongside — not in place of — Ambulance Victoria."},
+   {t:"Road Crash & General Extrication",d:"Access and release people or property endangered by road crashes, accidents, explosions and entrapment."},
+   {t:"Technical Rescue",d:"Urban search & rescue, structural-collapse, confined-space, trench, tunnel, high/low-angle and comparable rescues."},
+   {t:"Marine, Swift-Water & Flood Rescue",d:"Respond to vessel, port, waterway, swift-water and flood emergencies with suitable marine and rescue resources."},
+   {t:"Hazardous Materials & Dangerous Goods Response",d:"Identify, contain, render safe and support consequence management for chemical and dangerous-goods incidents."},
+   {t:"Specialist Operational Support",d:"Scientific advice, remote-piloted aircraft, breathing apparatus, decontamination, technical imaging and other support."},
+ ]},
+ {cls:"core",band:"core",code:"6",title:"Incident Intelligence, Investigation & Recovery",purpose:"Record, investigate and learn from incidents and support consequence assessment and recovery.",caps:[
+   {t:"Fire Origin & Cause Investigation",d:"Determine fire origin, cause and circumstances using trained investigators and defensible methods."},
+   {t:"Evidence & Expert Liaison",d:"Preserve and analyse evidence; provide expertise to police, coroners, regulators and insurers."},
+   {t:"Incident Reporting & Operational Records",d:"Capture complete, timely, standardised records of incidents, actions, resources, exposures and outcomes."},
+   {t:"Post-Incident Review & Operational Learning",d:"Convert lessons into improved doctrine, training, equipment, prevention and partner arrangements."},
+   {t:"Fire Trend & Emerging Hazard Analysis",d:"Analyse incident patterns, products and technologies (e.g. lithium-ion, PFAS) to identify emerging risk."},
+   {t:"Impact Assessment & Recovery Support",d:"Assess emergency consequences; contribute specialist information and resources to state and local recovery."},
+ ]},
+ {cls:"gov",band:"gov",code:"7",title:"Strategy, Governance & Accountability",purpose:"Set direction, govern the statutory entity and demonstrate outcomes and public value.",caps:[
+   {t:"Enterprise Strategy & Policy",d:"Translate mandate, government priorities and environmental change into strategy, policy and operating priorities."},
+   {t:"Statutory Governance & Delegations",d:"Maintain lawful governance, decision rights, delegations, committees and executive accountability for the corporation sole."},
+   {t:"Ministerial & Parliamentary Accountability",d:"Support ministerial direction, statutory reporting, parliamentary scrutiny and transparent disclosures."},
+   {t:"Performance & Outcomes Management",d:"Define measures, monitor service standards and outcomes, report performance and direct improvement."},
+   {t:"Portfolio, Program & Change Governance",d:"Select, govern and realise benefits from transformation, reform, capital and enterprise-change initiatives."},
+   {t:"Public Integrity & Ethical Governance",d:"Set and enforce integrity, conflict-of-interest, gifts, disclosure and ethical-decision expectations."},
+ ]},
+ {cls:"gov",band:"gov",code:"8",title:"Sector Partnerships & Interoperability",purpose:"Sustain the agreements and relationships required for complementary, interoperable emergency services.",caps:[
+   {t:"Emergency Management Sector Coordination",d:"Plan and govern FRV's participation in Victoria's all-hazards system with EMV and response partners."},
+   {t:"CFA Service & Secondment Management",d:"Plan, provide and assure agreed FRV operational and management support to CFA, including seconded personnel."},
+   {t:"Joint Doctrine & Interoperability",d:"Align doctrine, terminology, communications, exercises, equipment interfaces and service arrangements across agencies."},
+   {t:"Mutual Aid & External Deployment Partnerships",d:"Maintain reciprocal assistance and deployment arrangements within Victoria and across jurisdictions."},
+   {t:"Government, Regulator, Industry & Research Relations",d:"Build relationships that advance fire safety, research, standards, service design and shared risk reduction."},
+   {t:"Workplace Representative & Strategic Stakeholder Relations",d:"Engage workforce representatives and other strategic stakeholders in lawful, transparent enterprise decisions."},
+ ]},
+ {cls:"gov",band:"gov",code:"9",title:"Enterprise Risk, Assurance & Compliance",purpose:"Manage enterprise obligations, integrity, controls, assurance and risk.",caps:[
+   {t:"Enterprise & Operational Risk Management",d:"Identify, assess, treat, monitor and escalate strategic, operational, safety, financial and emerging risks."},
+   {t:"Internal Control, Audit & Assurance",d:"Design controls, conduct assurance, support independent audit and track remediation to closure."},
+   {t:"Legal Services & Litigation",d:"Provide legal advice, manage disputes and litigation, interpret powers and protect legal privilege."},
+   {t:"Regulatory Compliance & Obligations",d:"Maintain an obligations register, assign accountability, evidence compliance and respond to regulators."},
+   {t:"Privacy, FOI & Information Rights",d:"Lawfully collect, use, disclose, retain and provide access to personal, health and public-sector information."},
+   {t:"Complaints, Disclosures & Internal Investigations",d:"Receive, triage, investigate, resolve and report complaints, misconduct concerns and protected-disclosure interfaces."},
+   {t:"Security, Fraud & Corruption Risk Management",d:"Prevent, detect and respond to physical, personnel, information, fraud and corruption threats."},
+   {t:"Environmental & Climate Governance",d:"Manage environmental impacts, climate-related risks, sustainability obligations and transition commitments."},
+ ]},
+ {cls:"enabling",band:"enabling",code:"10",title:"People, Culture, Health & Capability",purpose:"Build, deploy, develop and protect a capable, safe, inclusive and sustainable workforce.",caps:[
+   {t:"Workforce Planning & Recruitment",d:"Forecast workforce demand; recruit, select and onboard diverse operational, technical and corporate employees."},
+   {t:"Rostering, Deployment & Workforce Administration",d:"Maintain workforce records, rosters, availability, entitlements, pay inputs, establishment and deployment status."},
+   {t:"Industrial & Employee Relations",d:"Manage enterprise agreements, consultation, workplace representation, grievances and employment relations."},
+   {t:"Learning, Qualification & RTO Management",d:"Design, deliver, record and assure recruit, operational, specialist, leadership and corporate learning."},
+   {t:"Performance, Career & Succession Management",d:"Set expectations, assess performance, enable mobility and promotion, and develop future leaders and talent."},
+   {t:"Culture, Inclusion & Conduct",d:"Create a respectful, inclusive, child-safe, values-led workplace and address harmful or unethical behaviour."},
+   {t:"Occupational Health & Safety",d:"Eliminate or control workplace hazards; maintain safe systems, consultation, incident reporting and compliance."},
+   {t:"Health, Wellbeing, Injury & Recovery Management",d:"Protect physical and psychological health, manage injury and compensation, enable safe return to work."},
+ ]},
+ {cls:"enabling",band:"enabling",code:"11",title:"Assets, Fleet, Equipment & Logistics",purpose:"Provide and sustain stations, appliances, equipment, supplies and related commercial services.",caps:[
+   {t:"Fleet Lifecycle Management",d:"Specify, acquire, commission, maintain, allocate, assure and retire appliances, boats and other vehicles."},
+   {t:"Station & Property Lifecycle Management",d:"Plan, acquire, lease, maintain, secure and dispose of stations, offices, workshops and training facilities."},
+   {t:"Operational Equipment & PPE Lifecycle Management",d:"Assure availability, fitness, traceability and maintenance of protective and operational equipment."},
+   {t:"Inventory, Warehousing & Logistics",d:"Forecast, source, store, distribute, replenish and account for consumables, spares and incident logistics."},
+   {t:"Capital Works & Infrastructure Delivery",d:"Plan and deliver new or upgraded stations, training assets and operational infrastructure."},
+   {t:"Commercial Fire Equipment Services",d:"Contracted inspection, maintenance, testing, reporting and training services for external clients (FES)."},
+ ]},
+ {cls:"enabling",band:"enabling",code:"12",title:"Digital, Data & Operational Communications",purpose:"Provide secure digital, information, communications and analytical capabilities.",caps:[
+   {t:"Digital Strategy & Enterprise Architecture",d:"Set technology direction, target architectures, standards, roadmaps and investment priorities."},
+   {t:"Applications & Platform Services",d:"Acquire, configure, integrate, operate and support corporate and operational applications and shared platforms."},
+   {t:"Technology Infrastructure & End-User Services",d:"Provide reliable networks, hosting, devices, identity, collaboration and service support."},
+   {t:"Operational Communications Technology",d:"Assure radio, station turnout, telephony, alerting and field comms and their interfaces with providers."},
+   {t:"Cybersecurity & Digital Resilience",d:"Prevent, detect, respond to and recover from cyber events while maintaining mission-critical operations."},
+   {t:"Data Management, Analytics & Intelligence",d:"Govern data, assure quality, integrate sources and deliver analysis, geospatial intelligence and decision support."},
+   {t:"Records & Knowledge Management",d:"Capture, classify, retain, retrieve and lawfully dispose of records; make authoritative knowledge accessible."},
+   {t:"Partner Information Exchange",d:"Exchange timely, secure, semantically usable incident, risk and operational information with partners."},
+ ]},
+ {cls:"enabling",band:"enabling",code:"13",title:"Finance, Procurement & Corporate Services",purpose:"Steward finances and deliver procurement, commercial and enterprise-administration services.",caps:[
+   {t:"Financial Planning & Budgeting",d:"Forecast, allocate and control financial resources in line with strategy, demand and government funding."},
+   {t:"Accounting, Treasury & Financial Reporting",d:"Maintain accounts, cash, assets, liabilities, taxation and compliant financial statements."},
+   {t:"Revenue, Cost Recovery & Commercial Finance",d:"Manage fees, charges, contracts, debtor revenue and financial performance of commercial services."},
+   {t:"Procurement, Contract & Supplier Management",d:"Source goods and services, manage contracts and suppliers, demonstrate value, probity and policy compliance."},
+   {t:"Insurance & Claims Management",d:"Maintain appropriate insurance and manage property, liability and other enterprise claims."},
+   {t:"Corporate Administration & Secretariat Services",d:"Provide enterprise correspondence, scheduling, committee support, document coordination and executive administration."},
+   {t:"Media, Communications & Reputation Management",d:"Communicate with employees, media, government and public and protect trust before, during and after events."},
+ ]},
+];
+
+const BANDS = [
+  {key:"core", label:"Core / Mission Capabilities"},
+  {key:"enabling", label:"Enabling / Supporting Capabilities"},
+  {key:"gov", label:"Governance / Strategic Capabilities"},
+];
+
+const map = document.getElementById("map");
+BANDS.forEach(b => {
+  const lbl = document.createElement("div"); lbl.className="band-label"; lbl.textContent=b.label; map.appendChild(lbl);
+  const band = document.createElement("div"); band.className="band band-"+b.key;
+  DOMAINS.filter(d=>d.band===b.key).forEach(d=>{
+    const dom = document.createElement("div"); dom.className="domain "+d.cls;
+    dom.innerHTML = `<div class="domain-head"><span class="code">${d.code}</span>${d.title}<span class="purpose">${d.purpose}</span></div>`;
+    const caps = document.createElement("div"); caps.className="caps";
+    d.caps.forEach(c=>{
+      const cap = document.createElement("div"); cap.className="cap";
+      cap.innerHTML = `${c.t}<div class="def">${c.d}</div>`;
+      caps.appendChild(cap);
+    });
+    dom.appendChild(caps); band.appendChild(dom);
+  });
+  map.appendChild(band);
+});
+</script>
+</body>
+</html>
