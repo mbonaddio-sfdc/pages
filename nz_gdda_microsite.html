@@ -1329,22 +1329,22 @@
       </tr>
       <tr>
         <td><strong>Data Dictionary</strong></td>
-        <td>Domain 04 · Integration Fabric</td>
+        <td>Domain 05 · Integration Fabric</td>
         <td>MuleSoft Anypoint DataGraph + canonical schema</td>
       </tr>
       <tr>
         <td><strong>Data &amp; Services Catalogue</strong></td>
-        <td>Domain 04 · Integration Fabric</td>
+        <td>Domain 05 · Integration Fabric</td>
         <td>MuleSoft Anypoint Exchange</td>
       </tr>
       <tr>
         <td><strong>Data, API and AI Services Exchange</strong></td>
-        <td>Domain 04 · Integration Fabric</td>
+        <td>Domain 05 · Integration Fabric</td>
         <td>MuleSoft (API + event fabric)</td>
       </tr>
       <tr>
         <td><strong>Data platform &amp; services</strong></td>
-        <td>Domain 05 · Data Foundation &amp; Governance</td>
+        <td>Domain 06 · Data Foundation &amp; Governance</td>
         <td>Snowflake · Databricks · Salesforce Data Cloud</td>
       </tr>
       <tr>
@@ -1353,9 +1353,14 @@
         <td>OmniStudio Business Rules Engine (authoring) + DPI Rules Library (publication)</td>
       </tr>
       <tr>
-        <td><strong>Notifications &amp; Messaging System</strong></td>
-        <td>Central shared service · consumed by Domain 03</td>
+        <td><strong>Notifications &amp; Messaging System</strong> <em style="color: rgba(0,30,91,0.65); font-weight: 400;">(transactional)</em></td>
+        <td>Central shared service · consumed by Domain 03 for service-triggered messages (application confirmed, decision recorded, appointment reminder)</td>
         <td>Central notification API + Salesforce Digital Engagement (agency-side)</td>
+      </tr>
+      <tr>
+        <td><strong>Outbound campaigns &amp; engagement journeys</strong> <em style="color: rgba(0,30,91,0.65); font-weight: 400;">(campaign scope)</em></td>
+        <td>Domain 04 · Communications &amp; Engagement <em>— sits at agency level, distinct from DPI transactional messaging above</em></td>
+        <td>Salesforce Marketing Cloud · Adobe/Marketo · MS Dynamics CI-J (Approved multi-vendor field, no Reference designation)</td>
       </tr>
       <tr>
         <td><strong>Payments Management</strong></td>
@@ -1379,18 +1384,18 @@
       </tr>
       <tr>
         <td><strong>All-of-Government service catalogue</strong></td>
-        <td>Content published from Domain 02, indexed by Domain 04</td>
+        <td>Content published from Domain 02, indexed by Domain 05</td>
         <td>NZ SDP taxonomy + MuleSoft Services Catalogue</td>
       </tr>
     </tbody>
   </table>
 
   <div class="callout">
-    <strong>What this shows.</strong> Fifteen DPI components; each maps unambiguously to one or two capability domains in the certified architecture. Nothing in the DPI target state is orphaned. Nothing in the certified stack is redundant. The distinction between the two is not competitive — it's structural: DPI describes what the ecosystem needs; the certified stack describes what each agency deploys to participate in that ecosystem.
+    <strong>What this shows.</strong> Sixteen DPI components and adjacent capabilities; each maps unambiguously to one or two capability domains in the certified architecture (with Communications &amp; Engagement mapped alongside DPI Notifications to make the transactional-vs-campaign distinction explicit). Nothing in the DPI target state is orphaned. Nothing in the certified stack is redundant. The distinction between the two is not competitive — it's structural: DPI describes what the ecosystem needs; the certified stack describes what each agency deploys to participate in that ecosystem.
   </div>
 
   <div class="prose" style="margin-top: 20px;">
-    <p><strong>A practical illustration.</strong> When a Ministry for Pacific Peoples applicant applies for a Toloa Fund grant: they sign in through DPI Identity Services (Domain 01); browse fund information via a page served by DPI's headless CMS (Domain 02); complete their application inside Salesforce, which runs eligibility rules published to the DPI Rules Library (Domain 03); the application publishes an event to the DPI Services Exchange (Domain 04); the decision, once made, is written to the DPI outcome feed which lands in the Data Foundation (Domain 05); a whole-of-Government dashboard consumes from the analytics layer (Domain 06); and payment goes through the central DPI Payments Management service. <strong>Every part of the journey passes through both an agency's certified platform and the DPI.</strong> The two don't compete — they combine.</p>
+    <p><strong>A practical illustration.</strong> A Pacific youth is invited to apply for a Toloa Fund grant via an outbound Language Week campaign run in Marketing Cloud (Domain 04 · Communications &amp; Engagement — the agency's campaign platform, not DPI). She signs in through DPI Identity Services (Domain 01); browses fund information via a page served by DPI's headless CMS (Domain 02); completes her application inside Salesforce, which runs eligibility rules published to the DPI Rules Library (Domain 03); the application publishes an event to the DPI Services Exchange (Domain 05); a DPI transactional notification confirms receipt (central shared service, not campaign scope); the decision, once made, is written to the DPI outcome feed which lands in the Data Foundation (Domain 06); a whole-of-Government dashboard consumes from the analytics layer (Domain 07); and payment goes through the central DPI Payments Management service. <strong>Every part of the journey passes through both an agency's certified platform and the DPI.</strong> The two don't compete — they combine.</p>
   </div>
 </section>
 
@@ -1400,6 +1405,35 @@
   <h2 class="chap-title"><span class="num">06</span>Three ministries on the reference stack</h2>
   <p class="chap-subtitle">Pacific Peoples, Women, and Whaikaha (Disabled People). Small &ldquo;people ministries&rdquo;. ~80% shared across all three; the differences are agency-specific overlays on the same blueprints.</p>
   <div class="reading-time-hero"><strong>Reading time:</strong> 4 minutes</div>
+
+  <div class="prose">
+    <p><strong>One certified architecture, three flavours of reference stack.</strong> The certification framework produces different reference-stack variants for different agency profiles — a 100-FTE policy ministry and a 12,000-FTE operational agency shouldn't build the same architecture, even though they conform to the same interop patterns. Which platforms are certified doesn't change with agency size; <em>how they're deployed</em> does.</p>
+  </div>
+
+  <div class="grid-3" style="margin-bottom: 24px;">
+    <div class="card">
+      <div class="card-tag">Tier 1 · up to ~250 FTE</div>
+      <h4>Small policy or advisory agencies</h4>
+      <p>Thin IT footprint, minimal domain-specific systems. Consume shared central tenants for HR, Finance, Staff Service Management, Productivity. Adopt reference blueprints largely out of the box. Agency-specific overlays sit only where legitimately needed (relationship model, cultural context, accessibility posture).</p>
+      <p><em>Examples: MPP, MfW, Whaikaha, Ministry for Ethnic Communities, small Crown entities.</em></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Tier 2 · ~250–2000 FTE</div>
+      <h4>Medium delivery or regulatory agencies</h4>
+      <p>In-house IT capability, some domain-specific systems that don't easily consolidate. Mix of shared tenants and dedicated instances. Reference blueprints with agency-specific extensions in the citizen-service, integration, and data layers.</p>
+      <p><em>Examples: MPI, MFAT, DIA, DoC, MoJ, MBIE.</em></p>
+    </div>
+    <div class="card">
+      <div class="card-tag">Tier 3 · 2000+ FTE</div>
+      <h4>Large operational agencies</h4>
+      <p>Deep IT capability, complex domain-specific delivery systems. Selective adoption of shared services (identity, integration fabric, data foundation) with dedicated agency tenants at higher tiers of the stack. Reference blueprints inform their builds; customisation is significant.</p>
+      <p><em>Examples: MSD, IRD, ACC, Ministry of Health, Ministry of Education.</em></p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The three ministries in this section are Tier 1 exemplars.</strong> The stack shown below is the <em>Tier 1 reference stack</em> — full shared central tenants, out-of-the-box blueprints, minimal agency-specific configuration outside the citizen-service platform. If we illustrated a Tier 3 agency, several back-office layers would show dedicated tenants (Workday dedicated, TechOne dedicated) and the citizen-service platform would carry significantly more agency-specific configuration on top of the same reference blueprints. The <em>certified platforms</em> stay the same; the <em>deployment topology</em> shifts.
+  </div>
 
   <div class="grid-3">
     <div class="card navy">
