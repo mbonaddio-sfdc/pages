@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ministry for Pacific Peoples — Process Architecture (working outside-in view)</title>
+<title>NZ Government — End-to-End Process Walkthroughs</title>
 <style>
 @font-face {
     font-family: 'AvantGardeSF';
@@ -46,8 +46,8 @@
     --blue-primary: #066AFE; --blue-secondary: #0250D9;
     --cloud-blue: #00B3FF; --cloud-blue-light: #90D0FE;
     --bg-page: #EAF5FE; --bg-tile: #FFFFFF; --bg-tile-alt: #F5FAFE;
-    --bg-cert: #DCEBFD;
-    --teal: #06A59A; --teal-tint: rgba(6,165,154,0.10); --teal-text: #04544D;
+    --bg-cert: #DCEBFD; --bg-shared: #DCEBFD;
+    --teal: #06A59A; --teal-tint: rgba(6,165,154,0.10); --teal-text: #04544D; --teal-2: #04E1CB;
     --pink: #B60554; --pink-tint: rgba(182,5,84,0.08);
     --yellow: #E4A201; --violet: #730394; --white: #FFFFFF;
     --text: #001E5B; --text-2: #002775; --text-muted: rgba(0,30,91,0.7);
@@ -73,309 +73,217 @@
     color: var(--text-strong); margin: 0;
     letter-spacing: -0.01em; font-weight: 700;
   }
-  .page { max-width: 1600px; margin: 0 auto; padding: var(--s-6) var(--s-7) var(--s-8); }
+  .page { max-width: 1780px; margin: 0 auto; padding: var(--s-6) var(--s-7) var(--s-8); }
 
   /* TITLE */
   header.title {
     padding-bottom: var(--s-4);
     border-bottom: 1px solid rgba(0,30,91,0.12);
     margin-bottom: var(--s-5);
-  }
-  header.title .kicker {
-    font-size: var(--fs-xs); letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--blue-primary);
-    font-weight: 700; margin-bottom: var(--s-2);
+    display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: var(--s-4);
   }
   header.title h1 {
-    font-size: var(--fs-h1); line-height: 1.15;
-    margin: 0 0 var(--s-2); max-width: 1200px;
+    font-size: var(--fs-h1);
+    line-height: 1.15;
+    margin: 0;
+    max-width: 1100px;
   }
   header.title h1 .accent { color: var(--blue-primary); }
-  header.title .subtitle {
-    font-size: var(--fs-lg); color: var(--text-2);
-    line-height: 1.65; margin: 0 0 var(--s-3); max-width: 1200px;
+  header.title .caption {
+    font-size: var(--fs-xs);
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.5;
   }
-  header.title .subtitle strong { color: var(--text-strong); }
-  header.title .subtitle em { color: var(--text-2); font-style: italic; }
-  header.title .meta { font-size: var(--fs-xs); color: var(--text-muted); }
+  header.title .caption strong { color: var(--text-strong); }
 
-  /* CAVEAT */
-  .caveat {
-    background: rgba(228, 162, 1, 0.08);
-    border-left: 4px solid var(--yellow);
+  /* PRINCIPLE CALLOUT */
+  .principle {
+    background: var(--bg-tile);
+    border-left: 4px solid var(--blue-primary);
     border-radius: var(--r-md);
     padding: var(--s-3) var(--s-4);
-    margin-bottom: var(--s-5);
-    font-size: var(--fs-sm);
+    margin: 0 0 var(--s-4) 0;
+    font-size: var(--fs-md);
     line-height: 1.65;
     color: var(--text);
-    max-width: 1250px;
-  }
-  .caveat strong { color: #8B5F00; }
-
-  /* SECTIONS */
-  .section { margin-bottom: var(--s-6); }
-  .section-title {
-    font-size: var(--fs-h2); line-height: 1.2;
-    margin: 0 0 var(--s-2);
-    display: flex; align-items: baseline; gap: var(--s-3);
-  }
-  .section-title .number {
-    color: var(--blue-primary); font-size: 26px; font-weight: 700;
-  }
-  .section-lede {
-    font-size: var(--fs-md); color: var(--text-2);
-    line-height: 1.65; margin: 0 0 var(--s-4); max-width: 1200px;
-  }
-
-  /* MANDATE CONTEXT (3-block navy panel) */
-  .mandate {
-    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-2) 100%);
-    color: var(--white);
-    border-radius: var(--r-lg);
-    padding: var(--s-4) var(--s-5);
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: var(--s-5);
-  }
-  .mandate-block h4 {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-xs);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--cloud-blue-light);
-    margin: 0 0 var(--s-2); font-weight: 700;
-  }
-  .mandate-block p {
-    font-size: var(--fs-sm); line-height: 1.6;
-    color: var(--white); margin: 0;
-  }
-  .mandate-block ul {
-    margin: var(--s-1) 0 0; padding: 0; list-style: none;
-  }
-  .mandate-block li {
-    font-size: var(--fs-sm); line-height: 1.55;
-    color: var(--white); padding-left: var(--s-3);
-    position: relative; margin-bottom: var(--s-1);
-  }
-  .mandate-block li::before {
-    content: ''; width: 4px; height: 4px;
-    border-radius: 50%; background: var(--cloud-blue-light);
-    position: absolute; left: 0; top: 8px;
-  }
-
-  /* L1 DOMAIN OVERVIEW GRID */
-  .domain-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--s-3);
-  }
-  .domain-card {
-    background: var(--bg-tile);
-    border-radius: var(--r-lg);
-    padding: var(--s-3) var(--s-4);
+    max-width: 1300px;
     box-shadow: var(--shadow-sm);
-    display: flex; flex-direction: column; gap: var(--s-2);
-    border-top: 4px solid var(--blue-primary);
   }
-  .domain-card .num {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-h2);
-    color: var(--blue-primary);
-    font-weight: 700; line-height: 1;
-  }
-  .domain-card .name {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-md);
-    color: var(--text-strong);
-    font-weight: 700; line-height: 1.2;
-  }
-  .domain-card p {
-    font-size: var(--fs-sm); line-height: 1.55;
-    color: var(--text-2); margin: 0;
-  }
-  .domain-card.external { border-top-color: var(--blue-primary); }
-  .domain-card.mixed { border-top-color: var(--teal); }
-  .domain-card.internal { border-top-color: var(--navy); }
+  .principle strong { color: var(--blue-primary); font-weight: 700; }
+  .principle em { color: var(--text-2); font-style: italic; }
 
   /* LEGEND */
   .legend {
     display: flex; flex-wrap: wrap;
-    gap: var(--s-3);
-    padding: var(--s-2) var(--s-4);
+    gap: var(--s-4);
+    padding: var(--s-3) var(--s-4);
     background: var(--bg-tile);
     border-radius: var(--r-lg);
-    margin-bottom: var(--s-4);
-    font-size: var(--fs-xs);
+    margin-bottom: var(--s-5);
+    font-size: var(--fs-sm);
     color: var(--text);
     align-items: center;
     box-shadow: var(--shadow-sm);
   }
-  .legend .item { display: flex; align-items: center; gap: var(--s-1); }
+  .legend .item { display: flex; align-items: center; gap: var(--s-2); }
+  .legend .swatch {
+    width: 16px; height: 16px; border-radius: var(--r-sm);
+    display: inline-block;
+    border: 1px solid rgba(0,30,91,0.15);
+  }
 
-  /* DOMAIN DETAIL */
-  .domain-detail {
+  /* PROCESS BLOCK */
+  .process {
     background: var(--bg-tile);
     border-radius: var(--r-xl);
-    padding: var(--s-5) var(--s-5);
-    margin-bottom: var(--s-3);
+    padding: var(--s-5);
+    margin-bottom: var(--s-5);
     box-shadow: var(--shadow-md);
   }
-  .domain-detail-header {
-    display: flex; align-items: baseline;
-    gap: var(--s-3);
+  .process-header {
+    display: flex; align-items: baseline; gap: var(--s-3);
     margin-bottom: var(--s-1);
-    padding-bottom: var(--s-2);
-    border-bottom: 1px solid rgba(0,30,91,0.1);
+    flex-wrap: wrap;
   }
-  .domain-detail-header .num {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 28px;
-    color: var(--blue-primary);
-    font-weight: 700; line-height: 1;
-  }
-  .domain-detail-header .name {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-h3);
-    color: var(--text-strong);
-    font-weight: 700; line-height: 1.2;
-  }
-  .domain-detail-header .facing {
-    margin-left: auto;
-    font-size: var(--fs-2xs);
-    letter-spacing: 0.06em;
+  .process-agency {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--text-muted);
-    padding: 3px 10px;
-    background: var(--bg-page);
-    border-radius: var(--r-pill);
-  }
-
-  /* L2 GRID (categories within a domain) */
-  .l2-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s-3);
-    margin-top: var(--s-3);
-  }
-  .l2-grid.two-col { grid-template-columns: repeat(2, 1fr); }
-  .l2-block {
-    background: var(--bg-tile-alt);
-    border-radius: var(--r-md);
-    padding: var(--s-3) var(--s-3);
-  }
-  .l2-block h3 {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-sm);
-    color: var(--text-strong);
-    margin: 0 0 var(--s-2);
+    color: var(--blue-primary);
     font-weight: 700;
   }
-  .l2-block ul {
-    margin: 0; padding: 0; list-style: none;
-    display: flex; flex-direction: column; gap: var(--s-2);
-  }
-
-  /* L3 ITEMS (individual processes) */
-  .l3-item {
-    font-size: var(--fs-xs);
-    line-height: 1.5;
-    color: var(--text);
-    padding: var(--s-2) var(--s-2);
-    background: var(--bg-tile);
-    border-radius: var(--r-sm);
-    display: flex; flex-direction: column; gap: 3px;
-  }
-  .l3-item .name { font-weight: 600; font-size: var(--fs-sm); }
-  .l3-item .tags {
-    display: flex; flex-wrap: wrap; gap: 3px;
-    font-size: 9px; font-weight: 700;
-    letter-spacing: 0.04em; text-transform: uppercase;
-  }
-
-  /* TAG BADGES */
-  .tag {
-    padding: 2px 6px;
-    border-radius: var(--r-pill);
-    line-height: 1.4;
-    color: var(--white);
-    font-size: 9.5px;
-  }
-  .tag.ext { background: var(--teal); }
-  .tag.int { background: var(--navy); }
-  .tag.mix { background: var(--blue-secondary); }
-  .tag.common { background: var(--blue-primary); }
-  .tag.agency { background: var(--pink); }
-
-  /* Platform tags (lighter background variants) */
-  .tag.sf { background: rgba(6, 106, 254, 0.15); color: var(--blue-primary); }
-  .tag.workday { background: rgba(182, 5, 84, 0.15); color: var(--pink); }
-  .tag.techone { background: rgba(228, 162, 1, 0.18); color: #8B5F00; }
-  .tag.servicenow { background: rgba(115, 3, 148, 0.15); color: var(--violet); }
-  .tag.m365 { background: rgba(0, 30, 91, 0.14); color: var(--navy); }
-  .tag.sdp { background: rgba(6, 165, 154, 0.15); color: var(--teal-text); }
-  .tag.mule { background: rgba(2, 80, 217, 0.15); color: var(--blue-secondary); }
-  .tag.data { background: rgba(6, 106, 254, 0.20); color: var(--navy-2); }
-  .tag.identity { background: rgba(0, 179, 255, 0.20); color: var(--navy-2); }
-
-  /* COMMONS PANEL (blue gradient at bottom) */
-  .commons {
-    background: linear-gradient(90deg, var(--blue-primary) 0%, var(--blue-secondary) 100%);
-    color: var(--white);
-    border-radius: var(--r-xl);
-    padding: var(--s-5) var(--s-5);
-    margin-top: var(--s-5);
-  }
-  .commons h2 {
+  .process-title {
     font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
     font-size: var(--fs-h2);
-    color: var(--white);
-    margin: 0 0 var(--s-2);
+    color: var(--text-strong);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
   }
-  .commons .lede {
+  .process-tagline {
     font-size: var(--fs-md);
-    color: rgba(255,255,255,0.88);
-    line-height: 1.65;
-    margin: 0 0 var(--s-4);
-    max-width: 1100px;
-  }
-  .common-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--s-2);
-  }
-  .common-card {
-    background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: var(--r-md);
-    padding: var(--s-3) var(--s-4);
-  }
-  .common-card h4 {
-    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: var(--fs-sm);
-    letter-spacing: 0.04em;
-    color: var(--white);
-    margin: 0 0 var(--s-2);
-    font-weight: 700;
-  }
-  .common-card p {
-    font-size: var(--fs-sm);
+    color: var(--text-2);
+    margin: var(--s-2) 0 var(--s-4);
     line-height: 1.6;
-    color: rgba(255,255,255,0.92);
-    margin: 0;
+    max-width: 1200px;
   }
-  .common-card .platform {
-    display: inline-block;
-    margin-top: var(--s-2);
-    padding: 3px 10px;
-    background: rgba(255,255,255,0.22);
-    border-radius: var(--r-pill);
-    font-size: var(--fs-2xs);
-    font-weight: 700;
-    letter-spacing: 0.04em;
+
+  /* SWIM LANES */
+  .lanes {
+    display: grid;
+    grid-template-columns: 220px repeat(9, 1fr);
+    gap: var(--s-1);
+    background: var(--bg-page);
+    padding: var(--s-1);
+    border-radius: var(--r-md);
+  }
+  .step-header {
+    background: var(--navy);
     color: var(--white);
-    text-transform: uppercase;
+    border-radius: var(--r-sm);
+    padding: var(--s-2) var(--s-1);
+    text-align: center;
+    font-size: var(--fs-2xs);
+    line-height: 1.35;
   }
+  .step-header .num {
+    display: block;
+    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: var(--fs-md);
+    color: var(--cloud-blue-light);
+    font-weight: 700;
+    margin-bottom: var(--s-1);
+  }
+  .step-header.corner { background: transparent; color: transparent; }
+
+  .lane-label {
+    background: var(--navy-2);
+    color: var(--white);
+    border-radius: var(--r-sm);
+    padding: var(--s-2) var(--s-3);
+    display: flex; flex-direction: column;
+    justify-content: center;
+    font-size: var(--fs-xs);
+    line-height: 1.35;
+  }
+  .lane-label .name {
+    font-family: 'AvantGardeSF', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+  }
+  .lane-label .sub {
+    font-size: var(--fs-2xs);
+    color: rgba(255,255,255,0.8);
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+  .lane-label.sf {
+    background: linear-gradient(90deg, var(--blue-primary) 0%, var(--blue-secondary) 100%);
+  }
+  .lane-label.citizen {
+    background: linear-gradient(90deg, var(--teal) 0%, var(--teal-2) 100%);
+    color: var(--navy);
+  }
+  .lane-label.citizen .sub { color: rgba(0,30,91,0.72); }
+
+  .cell {
+    background: var(--bg-tile);
+    border-radius: var(--r-sm);
+    padding: var(--s-2);
+    font-size: var(--fs-xs);
+    line-height: 1.4;
+    color: var(--text);
+    min-height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    text-align: center;
+  }
+  .cell.empty {
+    background: rgba(255,255,255,0.4);
+    color: rgba(0,30,91,0.15);
+    font-size: var(--fs-md);
+  }
+  .cell.sf {
+    background: var(--bg-cert);
+    color: var(--text-strong);
+    border: 1.5px solid var(--blue-primary);
+    font-weight: 600;
+  }
+  .cell.citizen {
+    background: rgba(6, 165, 154, 0.15);
+    color: var(--teal-text);
+  }
+
+  .process-note {
+    margin-top: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    background: var(--bg-page);
+    border-radius: var(--r-md);
+    font-size: var(--fs-sm);
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+  .process-note strong { color: var(--text-strong); font-weight: 700; }
+  .process-note .accent { color: var(--blue-primary); font-weight: 600; }
+  .process-note em { color: var(--text-2); font-style: italic; }
+
+  /* FOOTER NOTE */
+  .footer-note-block {
+    margin-top: var(--s-4);
+    padding: var(--s-4) var(--s-5);
+    background: var(--bg-tile);
+    border-radius: var(--r-lg);
+    font-size: var(--fs-md);
+    line-height: 1.65;
+    color: var(--text);
+    max-width: 1400px;
+    box-shadow: var(--shadow-sm);
+  }
+  .footer-note-block p { margin: 0 0 var(--s-3); }
+  .footer-note-block p:last-child { margin-bottom: 0; }
+  .footer-note-block strong { color: var(--text-strong); font-weight: 700; }
+  .footer-note-block .accent { color: var(--blue-primary); font-weight: 600; }
+  .footer-note-block em { color: var(--text-2); font-style: italic; }
 
   footer.doc-footer {
     margin-top: var(--s-5);
@@ -392,570 +300,489 @@
 <div class="page">
 
   <header class="title">
-    <div class="kicker">Working outside-in view · for GDDA common-process discussion</div>
-    <h1>Ministry for Pacific Peoples — <span class="accent">process architecture</span></h1>
-    <p class="subtitle">
-      A holistic first-principles view of the services offered and the internal processes required to deliver them. Structured as a service catalogue and process library from Level 1 (domains) to Level 3 (processes). Purpose: to surface which processes are genuinely common across small &ldquo;people ministries&rdquo; — and are therefore candidates for a shared blueprint under the certification framework.
-    </p>
-    <div class="meta">Version 0.1 · working outside-in view · to be validated with MPP</div>
+    <h1>End-to-End <span class="accent">Process Walkthroughs</span></h1>
+    <div class="caption">
+      <strong>Three agencies · one platform per process</strong><br>
+      Working sketch · v0.1 · for dialogue
+    </div>
   </header>
 
-  <div class="caveat">
-    <strong>Caveat.</strong> This is an outside-in view built from public information about MPP's statutory mandate, published strategy documents, funding programs, and typical ministry-of-advocacy patterns. It is not a validated internal view. Some named programs (Toloa Fund, Language Weeks, Pacific Business Trust support) are drawn from public information; other process elements are generalised from what a ministry of this shape typically does. Every element here should be checked with MPP before being used in a Cabinet paper or investment case.
+  <div class="principle">
+    <strong>One platform owns each end-to-end process.</strong> Salesforce is the anchor for intake, assessment, decision, fulfilment, notification, and closure. Other systems are <em>called</em> for specific capability the process consumes — payments, records, finance postings, cross-agency data — but the process itself is never handed off across a platform boundary.
+    <br>
+    <strong>The failure mode this avoids.</strong> A &ldquo;customer experience&rdquo; platform integrated to a separate &ldquo;service delivery&rdquo; platform with a different data model, workflow engine, and UX. The seam between them is always the failure point. See MPI.
   </div>
 
-  <!-- ===================================================== -->
-  <!-- 1. Mandate context                                     -->
-  <!-- ===================================================== -->
-  <div class="section">
-    <h2 class="section-title"><span class="number">01</span>Mandate context</h2>
-    <p class="section-lede">
-      The starting point for any process architecture is the statutory mandate — what the Crown has instructed this ministry to do. Every process below traces back to one or more elements below.
-    </p>
-
-    <div class="mandate">
-      <div class="mandate-block">
-        <h4>Statutory mandate</h4>
-        <p>Principal advisor to the Crown on policies, programmes, and interventions to improve outcomes for Pacific communities in New Zealand.</p>
-        <ul>
-          <li>Reports to the Minister for Pacific Peoples</li>
-          <li>Established as a departmental agency; ~100 FTE</li>
-          <li>Small policy shop with some direct-delivery programmes</li>
-        </ul>
-      </div>
-      <div class="mandate-block">
-        <h4>Core functions</h4>
-        <ul>
-          <li>Policy advice to government on Pacific issues</li>
-          <li>Champion Pacific perspective across whole-of-government</li>
-          <li>Fund and administer targeted programmes</li>
-          <li>Convene Pacific communities and represent their voice</li>
-          <li>Monitor Pacific outcomes across sectors</li>
-          <li>Represent NZ at Pacific regional forums</li>
-        </ul>
-      </div>
-      <div class="mandate-block">
-        <h4>Strategic frameworks</h4>
-        <ul>
-          <li>Lalanga Fou (four strategic goals for Pacific Aotearoa)</li>
-          <li>Pacific Aotearoa strategy — long-term direction</li>
-          <li>Pacific Wellbeing Strategy — cross-sector approach</li>
-          <li>Sector-specific Pacific strategies (Health, Education, etc.) — co-developed with lead agencies</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================== -->
-  <!-- 2. L1 domain overview                                  -->
-  <!-- ===================================================== -->
-  <div class="section">
-    <h2 class="section-title"><span class="number">02</span>Level 1 — Process domains</h2>
-    <p class="section-lede">
-      Eight top-level domains describe the full activity of the ministry. Five are externally-facing (deliver something to citizens, communities, or other agencies). Three are internal (deliver capability to the ministry itself). All small ministries of this shape share this L1 pattern; differences appear at Level 2 and below.
-    </p>
-
-    <div class="domain-grid">
-      <div class="domain-card mixed">
-        <div class="num">D1</div>
-        <div class="name">Policy &amp; Strategic Advice</div>
-        <p>Advice to government, cross-agency policy contribution, strategic framework development.</p>
-      </div>
-      <div class="domain-card external">
-        <div class="num">D2</div>
-        <div class="name">Community Investment</div>
-        <p>Grants, funding programmes, contracts with delivery partners. Where public money reaches communities.</p>
-      </div>
-      <div class="domain-card external">
-        <div class="num">D3</div>
-        <div class="name">Community Engagement &amp; Cultural Leadership</div>
-        <p>Stakeholder register, consultation, cultural events, language weeks, community forums.</p>
-      </div>
-      <div class="domain-card mixed">
-        <div class="num">D4</div>
-        <div class="name">Cross-Agency Advocacy &amp; Coordination</div>
-        <p>Sector-specific Pacific coordination (Health, Education, MSD, MBIE, Justice). Whole-of-govt outcomes monitoring.</p>
-      </div>
-      <div class="domain-card external">
-        <div class="num">D5</div>
-        <div class="name">International &amp; Diaspora Relations</div>
-        <p>Pacific Islands Forum representation, bilateral relationships, diaspora engagement, migration policy input.</p>
-      </div>
-      <div class="domain-card mixed">
-        <div class="num">D6</div>
-        <div class="name">Monitoring, Research &amp; Evaluation</div>
-        <p>Pacific outcomes data, research commissioning, programme evaluation, reporting.</p>
-      </div>
-      <div class="domain-card internal">
-        <div class="num">D7</div>
-        <div class="name">Ministerial Servicing</div>
-        <p>Correspondence, briefings, OIA requests, parliamentary questions, Select Committee support.</p>
-      </div>
-      <div class="domain-card internal">
-        <div class="num">D8</div>
-        <div class="name">Corporate Services</div>
-        <p>HR, finance, IT, records, communications, governance, health &amp; safety. Small back office consuming shared services.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================== -->
-  <!-- Legend                                                 -->
-  <!-- ===================================================== -->
   <div class="legend">
-    <div class="item"><span class="tag ext">Ext</span>Customer/external-facing</div>
-    <div class="item"><span class="tag int">Int</span>Internal / staff-facing</div>
-    <div class="item"><span class="tag mix">Mix</span>Mixed</div>
-    <div class="item"><span class="tag common">Common</span>Common across small ministries — blueprint candidate</div>
-    <div class="item"><span class="tag agency">MPP</span>Agency-specific</div>
-    <div class="item"><span class="tag sf">SF</span>Salesforce</div>
-    <div class="item"><span class="tag mule">Mule</span>MuleSoft</div>
-    <div class="item"><span class="tag sdp">SDP</span>NZ SDP</div>
-    <div class="item"><span class="tag identity">ID</span>Digital Identity</div>
-    <div class="item"><span class="tag workday">Wday</span>Workday</div>
-    <div class="item"><span class="tag techone">T1</span>TechOne / Oracle</div>
-    <div class="item"><span class="tag servicenow">SNow</span>ServiceNow</div>
-    <div class="item"><span class="tag m365">M365</span>Microsoft 365</div>
-    <div class="item"><span class="tag data">Data</span>Data Cloud / Tableau</div>
+    <div class="item"><span class="swatch" style="background:#CFE9FE; border-color:#066AFE"></span>Salesforce — process owner</div>
+    <div class="item"><span class="swatch" style="background:rgba(6,165,154,0.2); border-color:#06A59A"></span>Citizen action</div>
+    <div class="item"><span class="swatch" style="background:#FFFFFF"></span>System called by the process</div>
+    <div class="item"><span class="swatch" style="background:rgba(255,255,255,0.4)"></span>System not on this step</div>
   </div>
 
   <!-- ===================================================== -->
-  <!-- 3. Detailed process library                            -->
+  <!-- PROCESS 1: MPP Toloa Fund / Community Grant           -->
   <!-- ===================================================== -->
-  <div class="section">
-    <h2 class="section-title"><span class="number">03</span>Level 2 &amp; 3 — Detailed process library</h2>
-    <p class="section-lede">
-      For each domain, Level 2 categories group related processes; Level 3 lists the specific processes MPP runs (or would run in a greenfield build). Each Level 3 item is tagged for external/internal, common/agency-specific, and primary certified reference platform.
-    </p>
-  </div>
-
-  <!-- ===== DOMAIN 1: Policy & Strategic Advice ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D1</div>
-      <div class="name">Policy &amp; Strategic Advice</div>
-      <div class="facing">Mixed · policy-shop core function</div>
+  <div class="process">
+    <div class="process-header">
+      <span class="process-agency">Ministry for Pacific Peoples</span>
+      <span class="process-title">Toloa Fund — Community grant application</span>
     </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>1.1 Advisory function</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Ministerial briefings</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Cabinet paper drafting &amp; coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Consultation responses to other agencies</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Regulatory impact analysis (Pacific lens)</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Speaking notes &amp; talking points</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Speaking-engagement request handling</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>1.2 Strategy development</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Strategic framework refresh (Lalanga Fou)</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Sector strategy co-development (Health, Ed, etc.)</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Annual strategic planning &amp; SOI/SPE</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Emerging-issues horizon scanning</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>1.3 Legislative &amp; parliamentary support</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Legislative bill analysis &amp; input</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Regulation drafting support</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Parliamentary question preparation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 2: Community Investment ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D2</div>
-      <div class="name">Community Investment (Grants &amp; Funding)</div>
-      <div class="facing">Customer-facing · flagship function</div>
-    </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>2.1 Grant program administration</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Grant program design</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Grant application intake</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag identity">ID</span></span></li>
-          <li class="l3-item"><span class="name">Eligibility assessment (automated + manual)</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Merit assessment &amp; scoring</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Award decision &amp; sign-off</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Grant disbursement</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Milestone &amp; reporting tracking</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Outcome reporting from recipients</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Program evaluation &amp; refresh</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>2.2 Named MPP programmes</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Toloa Fund (Pacific STEAM)</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Community grants (capacity building)</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Pacific Language Week funding</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Cultural events funding</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Leadership programme funding</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Pacific Business Trust support</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>2.3 Contract &amp; delivery partner management</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Delivery partner selection</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Contract negotiation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Contract performance monitoring</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Variation &amp; renewal</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Contract closure &amp; reconciliation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag techone">T1</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 3: Community Engagement ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D3</div>
-      <div class="name">Community Engagement &amp; Cultural Leadership</div>
-      <div class="facing">Customer-facing · voice-of-community function</div>
-    </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>3.1 Stakeholder register &amp; relationship management</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Community leader register (matai, faifeau, elders)</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Diaspora &amp; community organisation register</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Whakapapa / aiga / kāinga relationship model</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Engagement history &amp; contact log</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Cultural competence documentation</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sdp">SDP</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>3.2 Consultation &amp; engagement</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Community consultation events</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Community forum coordination</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Feedback capture &amp; synthesis</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Public submissions on consultations</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">Youth engagement programmes</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>3.3 Cultural events &amp; activities</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Pacific Language Weeks (planning)</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Pacific Language Weeks (delivery)</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">Pacific Music Awards / cultural celebrations</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Event registration &amp; attendance tracking</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 4: Cross-Agency Advocacy ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D4</div>
-      <div class="name">Cross-Agency Advocacy &amp; Coordination</div>
-      <div class="facing">Mixed · whole-of-govt influencing function</div>
-    </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>4.1 Whole-of-govt Pacific outcomes</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Pacific outcomes data collection from agencies</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag data">Data</span><span class="tag mule">Mule</span></span></li>
-          <li class="l3-item"><span class="name">Pacific outcomes dashboards</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag data">Data</span></span></li>
-          <li class="l3-item"><span class="name">Cross-agency Pacific lens policy review</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Whole-of-govt Pacific reporting to Cabinet</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>4.2 Sector-specific coordination</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Health Pacific coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Education Pacific coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Employment / MSD coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Housing / HUD coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Justice / Corrections coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Chief Executive forum participation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>4.3 Emergency &amp; specialised response</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Pacific emergency response coordination</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Cultural liaison for other agencies</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Pandemic / health emergency response</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 5: International & Diaspora ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D5</div>
-      <div class="name">International &amp; Diaspora Relations</div>
-      <div class="facing">Externally-facing · regional &amp; diaspora function</div>
-    </div>
-    <div class="l2-grid two-col">
-      <div class="l2-block">
-        <h3>5.1 International representation</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Pacific Islands Forum participation</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Bilateral relationships with Pacific nation governments</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">International conference participation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">MFAT coordination on regional policy</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>5.2 Diaspora engagement</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Diaspora community register</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Cultural exchange programmes</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Migration policy input to MBIE</span><span class="tags"><span class="tag int">Int</span><span class="tag agency">MPP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Diaspora skills / return programmes</span><span class="tags"><span class="tag ext">Ext</span><span class="tag agency">MPP</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 6: Monitoring, Research & Evaluation ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D6</div>
-      <div class="name">Monitoring, Research &amp; Evaluation</div>
-      <div class="facing">Mixed · evidence &amp; accountability function</div>
-    </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>6.1 Research</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Research commissioning (external providers)</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">In-house research &amp; analysis</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Research publication &amp; dissemination</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">Stats NZ / IDI collaboration</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>6.2 Evaluation</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Programme evaluation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag data">Data</span></span></li>
-          <li class="l3-item"><span class="name">Outcome evaluation (long-term impact)</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag data">Data</span></span></li>
-          <li class="l3-item"><span class="name">Value-for-money assessment</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>6.3 Reporting</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Annual report</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">SOI / SPE (Statement of Intent / Perf. Expectations)</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Quarterly ministerial reporting</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Public dashboards &amp; open data</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag data">Data</span><span class="tag sdp">SDP</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 7: Ministerial Servicing ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D7</div>
-      <div class="name">Ministerial Servicing</div>
-      <div class="facing">Internal · deeply common across all ministries</div>
-    </div>
-    <div class="l2-grid two-col">
-      <div class="l2-block">
-        <h3>7.1 Correspondence &amp; briefings</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Ministerial correspondence handling</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">OIA (Official Information Act) request handling</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Weekly ministerial briefing package</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Media Q&amp;A preparation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>7.2 Parliamentary support</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Parliamentary questions preparation</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Select Committee appearances</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Estimates / financial review briefings</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Public events with Minister</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DOMAIN 8: Corporate Services ===== -->
-  <div class="domain-detail">
-    <div class="domain-detail-header">
-      <div class="num">D8</div>
-      <div class="name">Corporate Services (back office)</div>
-      <div class="facing">Internal · shared services, deeply common</div>
-    </div>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>8.1 Human Resources</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Recruitment</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag workday">Wday</span></span></li>
-          <li class="l3-item"><span class="name">Payroll</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag workday">Wday</span></span></li>
-          <li class="l3-item"><span class="name">Learning &amp; development</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag workday">Wday</span></span></li>
-          <li class="l3-item"><span class="name">Performance management</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag workday">Wday</span></span></li>
-          <li class="l3-item"><span class="name">Workforce planning</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag workday">Wday</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>8.2 Finance</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Budget management</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Financial reporting</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Procurement</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Accounts payable / receivable</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag techone">T1</span></span></li>
-          <li class="l3-item"><span class="name">Year-end close &amp; audit support</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag techone">T1</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>8.3 IT &amp; Digital</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Desktop &amp; endpoint services</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag servicenow">SNow</span></span></li>
-          <li class="l3-item"><span class="name">Application support</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag servicenow">SNow</span></span></li>
-          <li class="l3-item"><span class="name">Cybersecurity operations</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag servicenow">SNow</span></span></li>
-          <li class="l3-item"><span class="name">Identity &amp; access management</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag identity">ID</span><span class="tag servicenow">SNow</span></span></li>
-          <li class="l3-item"><span class="name">Data management &amp; governance</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag data">Data</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>8.4 Records &amp; Information</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Records classification &amp; retention</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Public records transfer to Archives NZ</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Information / privacy requests</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sf">SF</span></span></li>
-          <li class="l3-item"><span class="name">Privacy Act compliance</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>8.5 Communications &amp; Marketing</h3>
-        <ul>
-          <li class="l3-item"><span class="name">Website management</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">Social media &amp; digital comms</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sdp">SDP</span></span></li>
-          <li class="l3-item"><span class="name">Media relations</span><span class="tags"><span class="tag mix">Mix</span><span class="tag common">Common</span><span class="tag sf">SF</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Publications production</span><span class="tags"><span class="tag ext">Ext</span><span class="tag common">Common</span><span class="tag sdp">SDP</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Internal communications</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>8.6 Governance &amp; Compliance</h3>
-        <ul>
-          <li class="l3-item"><span class="name">CE / Board reporting</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Risk management</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span><span class="tag servicenow">SNow</span></span></li>
-          <li class="l3-item"><span class="name">Internal audit</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Legal advisory</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag m365">M365</span></span></li>
-          <li class="l3-item"><span class="name">Health, safety &amp; wellbeing</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag servicenow">SNow</span><span class="tag workday">Wday</span></span></li>
-          <li class="l3-item"><span class="name">Property &amp; facilities</span><span class="tags"><span class="tag int">Int</span><span class="tag common">Common</span><span class="tag servicenow">SNow</span><span class="tag techone">T1</span></span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===================================================== -->
-  <!-- 4. Common process candidates                          -->
-  <!-- ===================================================== -->
-  <div class="commons">
-    <h2>Common process candidates — where a shared blueprint pays back fastest</h2>
-    <p class="lede">
-      The processes below appear in near-identical shape across MPP, Ministry for Women, Whaikaha, and by extension most small policy-focused ministries. They are the strongest candidates for centralised reference blueprints under the certification framework — build once, deploy many, save Cabinet the cost of every agency doing it independently.
+    <p class="process-tagline">
+      A Pacific youth or community organisation applies for a grant, is assessed against eligibility and merit, receives a decision, is paid, and reports outcomes — all owned by one Salesforce case from discovery to closure.
     </p>
 
-    <div class="common-grid">
-      <div class="common-card">
-        <h4>Grants &amp; funding lifecycle</h4>
-        <p>End-to-end grant admin — design, intake, eligibility, merit assessment, award, disbursement, milestone tracking, outcome reporting. Every small ministry does variants of this.</p>
-        <span class="platform">Salesforce PSS Grants blueprint</span>
-      </div>
-      <div class="common-card">
-        <h4>Stakeholder register &amp; engagement</h4>
-        <p>Person and Business Hub with relationship models, engagement history, community forum coordination, consultation events. Agency-specific overlays (Whakapapa, etc.) sit on top.</p>
-        <span class="platform">Salesforce Person + Business Hub</span>
-      </div>
-      <div class="common-card">
-        <h4>Ministerial servicing</h4>
-        <p>Correspondence, OIA requests, briefings, PQs, Select Committee support. Almost identical across every ministry. Highest-value early consolidation opportunity.</p>
-        <span class="platform">Salesforce case + M365</span>
-      </div>
-      <div class="common-card">
-        <h4>Consultation &amp; submissions</h4>
-        <p>Public consultation event runs, submission intake, feedback synthesis, publication of responses. Same shape whether it's Pacific policy or gender policy.</p>
-        <span class="platform">Salesforce + NZ SDP</span>
-      </div>
-      <div class="common-card">
-        <h4>Contract &amp; delivery-partner management</h4>
-        <p>Delivery partner selection, contract negotiation, performance monitoring, variation, closure. Common to every ministry funding external delivery.</p>
-        <span class="platform">Salesforce + TechOne/Oracle</span>
-      </div>
-      <div class="common-card">
-        <h4>Cross-agency outcomes reporting</h4>
-        <p>Data collection from other agencies via integration fabric, harmonisation, dashboarding, reporting to Cabinet. Same shape whether the lens is Pacific, women, or disabled people.</p>
-        <span class="platform">Data Cloud + MuleSoft + Tableau</span>
-      </div>
-      <div class="common-card">
-        <h4>Corporate services baseline</h4>
-        <p>HR (Workday), Finance (TechOne), Records (M365 Purview), IT (ServiceNow), Website (SDP). Should never be built agency-by-agency for a ministry under 200 FTE.</p>
-        <span class="platform">Shared services stack</span>
-      </div>
-      <div class="common-card">
-        <h4>Research &amp; evaluation</h4>
-        <p>Research commissioning, external panel management, evaluation lifecycle, publication. Shared research commissioning platform reduces duplication.</p>
-        <span class="platform">Salesforce + TechOne + SDP</span>
-      </div>
-      <div class="common-card">
-        <h4>Annual reporting cycle</h4>
-        <p>SOI, SPE, Annual Report, Estimates. Highly templated, ministry-agnostic in structure. Shared authoring &amp; publishing platform cuts weeks of duplicated effort.</p>
-        <span class="platform">M365 + SDP</span>
-      </div>
+    <div class="lanes">
+      <!-- Header row -->
+      <div class="step-header corner"></div>
+      <div class="step-header"><span class="num">01</span>Discover</div>
+      <div class="step-header"><span class="num">02</span>Sign in</div>
+      <div class="step-header"><span class="num">03</span>Apply</div>
+      <div class="step-header"><span class="num">04</span>Validate &amp; route</div>
+      <div class="step-header"><span class="num">05</span>Assess</div>
+      <div class="step-header"><span class="num">06</span>Decide</div>
+      <div class="step-header"><span class="num">07</span>Notify &amp; disburse</div>
+      <div class="step-header"><span class="num">08</span>Deliver &amp; report</div>
+      <div class="step-header"><span class="num">09</span>Close &amp; learn</div>
+
+      <!-- Citizen lane -->
+      <div class="lane-label citizen"><span class="name">Citizen / Community Org</span><span class="sub">Applicant</span></div>
+      <div class="cell citizen">Reads eligibility on SDP</div>
+      <div class="cell citizen">Signs in with RealMe</div>
+      <div class="cell citizen">Completes application in portal</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell citizen">Receives notification, sees status</div>
+      <div class="cell citizen">Reports outcomes via portal</div>
+      <div class="cell empty">·</div>
+
+      <!-- SDP -->
+      <div class="lane-label"><span class="name">NZ Single Digital Presence</span><span class="sub">Content · unauthenticated</span></div>
+      <div class="cell">Serves fund page, eligibility, timelines</div>
+      <div class="cell">Redirects to identity gateway</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Publishes anonymised outcomes summary</div>
+
+      <!-- Identity -->
+      <div class="lane-label"><span class="name">Digital Identity</span><span class="sub">RealMe / next-gen</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell">Authenticates, issues token with assurance level</div>
+      <div class="cell">Passes org authority claim if org application</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Salesforce -->
+      <div class="lane-label sf"><span class="name">Salesforce</span><span class="sub">Process owner · end-to-end</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell sf">Creates Person / Business record on first sign-in</div>
+      <div class="cell sf">Grant application intake, evidence upload, Person Hub link</div>
+      <div class="cell sf">Rules eligibility check, routes to assessor pool</div>
+      <div class="cell sf">Assessor works case, Agentforce assist, evidence review</div>
+      <div class="cell sf">Decision recorded, sign-off workflow, funding letter</div>
+      <div class="cell sf">Triggers notification &amp; payment; records milestones</div>
+      <div class="cell sf">Milestone case, outcome reporting, evidence uploads</div>
+      <div class="cell sf">Closes case, tags outcome, releases capacity</div>
+
+      <!-- Rules Library -->
+      <div class="lane-label"><span class="name">Rules Library</span><span class="sub">OmniStudio / DPI-published</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Applies eligibility rules; publishes to DPI</div>
+      <div class="cell">Scoring rules applied to assessment</div>
+      <div class="cell">Decision-authority rules applied</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Notifications & Payments -->
+      <div class="lane-label"><span class="name">Notifications &amp; Payments</span><span class="sub">DPI central services</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Confirmation SMS/email + inbox</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Status updates to central inbox</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Sends award notification + disburses payment</div>
+      <div class="cell">Milestone reminders</div>
+      <div class="cell">Closure confirmation</div>
+
+      <!-- Integration & cross-agency -->
+      <div class="lane-label"><span class="name">Integration Fabric</span><span class="sub">MuleSoft · DPI Exchange</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Community org verification via NZBN / Charities Register</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Prior-award check across agencies</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Publishes &ldquo;grant awarded&rdquo; event to DPI</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Emits closure event</div>
+
+      <!-- Data & Insights -->
+      <div class="lane-label"><span class="name">Data &amp; Insights</span><span class="sub">Data Foundation · Analytics · Agentforce</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Pacific-language translation agent supports form completion</div>
+      <div class="cell">Fraud &amp; anomaly signals raised</div>
+      <div class="cell">Assessor copilot summarises evidence, prior applications</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Aggregates outcomes into whole-of-Govt outcomes view</div>
+      <div class="cell">Feeds impact analytics</div>
+
+      <!-- Records / M365 -->
+      <div class="lane-label"><span class="name">Records</span><span class="sub">M365 Purview</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Decision record stored with retention policy</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Outcome evidence retained</div>
+      <div class="cell">Case records retained under schedule</div>
+
+      <!-- Finance / TechOne -->
+      <div class="lane-label"><span class="name">Finance / ERP</span><span class="sub">TechOne / Oracle</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Encumbers funding on approval</div>
+      <div class="cell">Posts grant disbursement journal</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Financial close &amp; reporting</div>
+    </div>
+
+    <div class="process-note">
+      <strong>What to notice.</strong> The Salesforce row is present in every meaningful step from application onward. No system other than Salesforce owns any part of the case. Payments, records, and finance are <span class="accent">called out to</span> — they do not <span class="accent">take over</span> the process. Even the outcome reporting stays inside the Salesforce case; TechOne receives a posting, Purview receives a record, but the applicant experience is one continuous journey on one platform.
     </div>
   </div>
 
   <!-- ===================================================== -->
-  <!-- 5. What this suggests                                  -->
+  <!-- PROCESS 2: MfW Nominations Service                    -->
   <!-- ===================================================== -->
-  <div class="section" style="margin-top:22px;">
-    <h2 class="section-title"><span class="number">04</span>What this suggests for the certification framework</h2>
-    <p class="section-lede">
-      Three implications for how GDDA might sequence the common-process work under the certification framework:
+  <div class="process">
+    <div class="process-header">
+      <span class="process-agency">Ministry for Women</span>
+      <span class="process-title">Nominations Service — Women onto state-sector boards</span>
+    </div>
+    <p class="process-tagline">
+      A woman self-nominates (or is nominated by a supporter) for state-sector board positions; MfW enriches, matches, curates, and recommends her to the Public Service Commission and appointing ministers. All curation and matching lives on one platform.
     </p>
-    <div class="l2-grid">
-      <div class="l2-block">
-        <h3>1. Nine common blueprints unlock most of the value</h3>
-        <ul>
-          <li class="l3-item">The common process candidates above cover roughly 70–80% of what MPP does day-to-day, and the same proportion for Ministry for Women and Whaikaha.</li>
-          <li class="l3-item">Building these nine as certified reference blueprints delivers the Cabinet savings without needing every process to be shared.</li>
-          <li class="l3-item">Agency-specific processes (Toloa Fund, Nominations Service, Provider Oversight) sit as agency overlays on the same blueprints, not as separate builds.</li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>2. Start with ministerial servicing, not grants</h3>
-        <ul>
-          <li class="l3-item">Grants is the most visible common process, but ministerial servicing (correspondence, OIA, briefings, PQs) is the highest-frequency and highest-commonality across all ministries.</li>
-          <li class="l3-item">Starting with ministerial servicing gets faster adoption because every ministry does it, every day.</li>
-          <li class="l3-item">Grants is a strong second — high value, but longer lifecycle and more agency-specific variation.</li>
-        </ul>
-      </div>
-      <div class="l2-block">
-        <h3>3. The reference blueprint <em>is</em> the common process</h3>
-        <ul>
-          <li class="l3-item">GDDA's common process model doesn't need to be a separate policy document — it can be codified <em>as</em> the certified reference blueprints.</li>
-          <li class="l3-item">This side-steps the "8-levels-deep documentation" trap Andy is currently in. The process is the configuration.</li>
-          <li class="l3-item">Common process governance becomes: EDA maintains the blueprints, agencies adopt them, deviations require justification.</li>
-        </ul>
-      </div>
+
+    <div class="lanes">
+      <!-- Header row -->
+      <div class="step-header corner"></div>
+      <div class="step-header"><span class="num">01</span>Discover</div>
+      <div class="step-header"><span class="num">02</span>Sign in</div>
+      <div class="step-header"><span class="num">03</span>Nominate</div>
+      <div class="step-header"><span class="num">04</span>Enrich</div>
+      <div class="step-header"><span class="num">05</span>Match</div>
+      <div class="step-header"><span class="num">06</span>Curate</div>
+      <div class="step-header"><span class="num">07</span>Recommend</div>
+      <div class="step-header"><span class="num">08</span>Appoint &amp; record</div>
+      <div class="step-header"><span class="num">09</span>Ongoing engagement</div>
+
+      <!-- Citizen -->
+      <div class="lane-label citizen"><span class="name">Nominee / Nominator</span><span class="sub">Woman or supporter</span></div>
+      <div class="cell citizen">Reads about boards, vacancies</div>
+      <div class="cell citizen">Signs in with RealMe</div>
+      <div class="cell citizen">Completes nomination profile</div>
+      <div class="cell citizen">Reviews auto-enriched profile</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell citizen">Receives &ldquo;shortlisted&rdquo; notification</div>
+      <div class="cell citizen">Notified of appointment outcome</div>
+      <div class="cell citizen">Ongoing engagement invitations</div>
+
+      <!-- SDP -->
+      <div class="lane-label"><span class="name">NZ Single Digital Presence</span><span class="sub">Content · unauthenticated</span></div>
+      <div class="cell">Board vacancies, program info, guidance</div>
+      <div class="cell">Redirects to identity gateway</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Publishes new-appointment announcements</div>
+      <div class="cell empty">·</div>
+
+      <!-- Identity -->
+      <div class="lane-label"><span class="name">Digital Identity</span><span class="sub">RealMe / next-gen</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell">Authenticates nominee &amp; nominator identities</div>
+      <div class="cell">Verifies delegated-nomination authority</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Salesforce -->
+      <div class="lane-label sf"><span class="name">Salesforce</span><span class="sub">Process owner · end-to-end</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell sf">Creates / updates Person record</div>
+      <div class="cell sf">Nomination case created, profile intake</div>
+      <div class="cell sf">Enriches profile using data sources, deduplicates</div>
+      <div class="cell sf">Matching engine (OmniStudio) scores vs vacancies</div>
+      <div class="cell sf">Curator reviews, adjusts, adds context, short-lists</div>
+      <div class="cell sf">Recommendation package assembled &amp; sent</div>
+      <div class="cell sf">Appointment recorded, term tracked, diversity metric updated</div>
+      <div class="cell sf">Ongoing engagement plan, follow-ups scheduled</div>
+
+      <!-- Rules -->
+      <div class="lane-label"><span class="name">Rules Library</span><span class="sub">OmniStudio / DPI-published</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Nomination validity rules</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Board eligibility &amp; scoring rules</div>
+      <div class="cell">Conflict-of-interest rules applied</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Appointment authority rules</div>
+      <div class="cell empty">·</div>
+
+      <!-- Notifications -->
+      <div class="lane-label"><span class="name">Notifications</span><span class="sub">DPI central services</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Nomination confirmation</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Short-list notification to nominee</div>
+      <div class="cell">Appointment outcome notification</div>
+      <div class="cell">Engagement invitations, term-end reminders</div>
+
+      <!-- Integration -->
+      <div class="lane-label"><span class="name">Integration Fabric</span><span class="sub">MuleSoft · DPI Exchange</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Public data enrichment (Companies Office, professional registries)</div>
+      <div class="cell">PSC board register &amp; vacancy exchange</div>
+      <div class="cell">Cross-agency conflict check</div>
+      <div class="cell">Sends recommendation package to PSC / minister</div>
+      <div class="cell">PSC updates central register</div>
+      <div class="cell empty">·</div>
+
+      <!-- Data / AI -->
+      <div class="lane-label"><span class="name">Data &amp; Insights</span><span class="sub">Data Foundation · Analytics · Agentforce</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Enrichment agent finds credentials, prior boards</div>
+      <div class="cell">Matching agent explains score, suggests alternatives</div>
+      <div class="cell">Bias-check agent flags representation gaps</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Feeds whole-of-Govt board diversity dashboard</div>
+      <div class="cell">Ongoing outcomes analysis</div>
+
+      <!-- Records -->
+      <div class="lane-label"><span class="name">Records</span><span class="sub">M365 Purview</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Curator notes retained</div>
+      <div class="cell">Recommendation record stored</div>
+      <div class="cell">Appointment record with retention policy</div>
+      <div class="cell empty">·</div>
+
+      <!-- Finance -->
+      <div class="lane-label"><span class="name">Finance / ERP</span><span class="sub">TechOne / Oracle</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Board fees encumbered where applicable</div>
+      <div class="cell">Board fee payments (via appointing agency)</div>
+    </div>
+
+    <div class="process-note">
+      <strong>What to notice.</strong> The matching engine is the interesting bit — it lives entirely inside Salesforce (OmniStudio matching + Rules), even though it consumes cross-agency data via MuleSoft (PSC board register, Companies Office). There's no separate &ldquo;matching platform&rdquo; and no hand-off to a &ldquo;decision system.&rdquo; The curator, the recommendation, and the appointment record all sit on the same case. PSC is a downstream consumer, not a process owner.
     </div>
   </div>
 
-  <footer class="doc-footer">
-    Working outside-in view of Ministry for Pacific Peoples process architecture. Version 0.1 · to be validated with MPP · 2026-07. Companion to the certification framework and reference architecture artefacts.
-  </footer>
+  <!-- ===================================================== -->
+  <!-- PROCESS 3: Whaikaha Accessibility Complaint            -->
+  <!-- ===================================================== -->
+  <div class="process">
+    <div class="process-header">
+      <span class="process-agency">Ministry for Disabled People (Whaikaha)</span>
+      <span class="process-title">Accessibility complaint &amp; provider oversight loop</span>
+    </div>
+    <p class="process-tagline">
+      A disabled person, family, or advocate reports an accessibility failure or provider concern. Whaikaha triages, investigates, engages the provider, resolves, and feeds the finding back into provider oversight and Enabling Good Lives outcomes — one case, one platform, from report to systemic learning.
+    </p>
+
+    <div class="lanes">
+      <!-- Header row -->
+      <div class="step-header corner"></div>
+      <div class="step-header"><span class="num">01</span>Report</div>
+      <div class="step-header"><span class="num">02</span>Triage</div>
+      <div class="step-header"><span class="num">03</span>Route</div>
+      <div class="step-header"><span class="num">04</span>Investigate</div>
+      <div class="step-header"><span class="num">05</span>Engage provider</div>
+      <div class="step-header"><span class="num">06</span>Resolve</div>
+      <div class="step-header"><span class="num">07</span>Provider action</div>
+      <div class="step-header"><span class="num">08</span>Publish outcome</div>
+      <div class="step-header"><span class="num">09</span>Learning loop</div>
+
+      <!-- Citizen -->
+      <div class="lane-label citizen"><span class="name">Complainant</span><span class="sub">Disabled person, whānau, advocate</span></div>
+      <div class="cell citizen">Reports via accessible SDP or portal (Easy Read, NZSL, text)</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell citizen">May be contacted for more info</div>
+      <div class="cell empty">·</div>
+      <div class="cell citizen">Receives resolution + choice of remedy</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- SDP -->
+      <div class="lane-label"><span class="name">NZ Single Digital Presence</span><span class="sub">Content · accessibility-first</span></div>
+      <div class="cell">Accessible complaint form + guidance</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Publishes anonymised aggregate patterns</div>
+      <div class="cell empty">·</div>
+
+      <!-- Identity -->
+      <div class="lane-label"><span class="name">Digital Identity</span><span class="sub">RealMe · assisted-identity option</span></div>
+      <div class="cell">Optional sign-in with assisted-identity flow</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Salesforce -->
+      <div class="lane-label sf"><span class="name">Salesforce</span><span class="sub">Process owner · end-to-end</span></div>
+      <div class="cell sf">Complaint case created, evidence &amp; context captured</div>
+      <div class="cell sf">Agentforce triage classifies severity, sensitivity, category</div>
+      <div class="cell sf">Rules route: Whaikaha vs referral to MSD/HDC/Ombudsman</div>
+      <div class="cell sf">Case worker investigates, links to provider contract case</div>
+      <div class="cell sf">Provider engaged via case (portal or officer)</div>
+      <div class="cell sf">Resolution recorded, remedy actioned</div>
+      <div class="cell sf">Provider contract oversight case updated (compliance action)</div>
+      <div class="cell sf">Outcome tagged for reporting, anonymised extract produced</div>
+      <div class="cell sf">Signal fed to Enabling Good Lives outcomes case</div>
+
+      <!-- Rules -->
+      <div class="lane-label"><span class="name">Rules Library</span><span class="sub">OmniStudio / DPI-published</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell">Severity &amp; sensitivity classification rules</div>
+      <div class="cell">Jurisdiction &amp; routing rules</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Remedy authority rules applied</div>
+      <div class="cell">Provider compliance thresholds applied</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Notifications -->
+      <div class="lane-label"><span class="name">Notifications</span><span class="sub">DPI central services</span></div>
+      <div class="cell">Confirmation to complainant (accessible formats)</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Follow-up requests to complainant</div>
+      <div class="cell">Formal engagement notice to provider</div>
+      <div class="cell">Resolution &amp; remedy communication</div>
+      <div class="cell">Compliance directive to provider</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Integration -->
+      <div class="lane-label"><span class="name">Integration Fabric</span><span class="sub">MuleSoft · DPI Exchange</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Cross-agency referral to MSD DSS / HDC / Ombudsman as needed</div>
+      <div class="cell">Provider &amp; contract data cross-checked</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Contract-adjustment event published</div>
+      <div class="cell">Anonymised signal to DPI outcome feed</div>
+      <div class="cell empty">·</div>
+
+      <!-- Data / AI -->
+      <div class="lane-label"><span class="name">Data &amp; Insights</span><span class="sub">Data Foundation · Analytics · Agentforce</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell">Triage agent classifies &amp; recommends handling</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Investigator copilot summarises prior cases against provider</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Risk-flag agent updates provider risk score</div>
+      <div class="cell">Aggregates patterns to accessibility signal dashboard</div>
+      <div class="cell">Feeds Enabling Good Lives outcomes analytics</div>
+
+      <!-- Records -->
+      <div class="lane-label"><span class="name">Records</span><span class="sub">M365 Purview</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Investigation notes retained</div>
+      <div class="cell">Provider correspondence retained</div>
+      <div class="cell">Resolution record retained</div>
+      <div class="cell">Compliance action retained</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+
+      <!-- Finance -->
+      <div class="lane-label"><span class="name">Finance / ERP</span><span class="sub">TechOne / Oracle</span></div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Contract-value adjustment posted if applicable</div>
+      <div class="cell empty">·</div>
+      <div class="cell">Cost-of-oversight reporting</div>
+    </div>
+
+    <div class="process-note">
+      <strong>What to notice.</strong> The complaint case and the provider contract case are <em>linked</em> inside Salesforce — one process feeds the other without a hand-off. Cross-agency referral (to MSD DSS, HDC, or Ombudsman) is a <span class="accent">notification event</span>, not a process transfer — Whaikaha retains oversight of its own case even when the substantive investigation moves elsewhere. The Enabling Good Lives outcomes loop runs entirely inside the same platform: every resolved case updates the outcomes evidence base without leaving Salesforce.
+    </div>
+  </div>
+
+  <!-- ===================================================== -->
+  <!-- FOOTER NOTES                                          -->
+  <!-- ===================================================== -->
+  <div class="footer-note-block">
+    <strong>The pattern across all three.</strong> The Salesforce row is the only row present in every substantive process step. Every other lane is intermittent — called when needed, dark when not. That's what a process owned by one platform looks like on paper.
+    <br><br>
+    <strong>Where the MPI failure would have shown up.</strong> If we split the citizen-facing intake and the officer-facing service delivery across two platforms (as MPI did), the Salesforce row would go dark somewhere in the middle of the flow and a different platform would light up — with all the state, context, and data transfer problems that implies. Executives reading this should see the empty cells where those hand-offs would otherwise be.
+    <br><br>
+    <strong>Where the "one platform" principle explicitly relaxes.</strong> Finance postings, records retention, cross-agency data exchange, notifications, and payments are all handled by other systems — but they are transactional callouts, not process transfers. The process itself never leaves Salesforce. That's the line.
+  </div>
 
 </div>
 </body>
