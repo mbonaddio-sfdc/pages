@@ -98,18 +98,21 @@ td strong{color:var(--navy);}
 
 .flow{display:flex;align-items:stretch;gap:0;margin:var(--s-4) 0;}
 /* ---- boundary grouping ---- */
-.boundaries{display:flex;align-items:stretch;gap:var(--s-4);margin:var(--s-4) 0;}
-.boundary{border-radius:var(--r-lg);padding:var(--s-3) var(--s-4) var(--s-4);position:relative;}
-.boundary.internal{flex:0 0 auto;border:2px solid var(--teal);background:var(--teal-tint);}
+.boundaries{display:flex;align-items:stretch;gap:var(--s-3);margin:var(--s-3) 0 0;}
+.boundary{border-radius:var(--r-lg);padding:var(--s-3);position:relative;display:flex;flex-direction:column;}
+.boundary.internal{flex:3;border:2px solid var(--teal);background:var(--teal-tint);}
 .boundary.external{flex:1;border:2px dashed var(--pink);background:var(--pink-tint);}
-.boundary-label{font-family:'AvantGardeSF','Helvetica Neue',Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em;font-size:var(--fs-3xs);font-weight:700;margin-bottom:var(--s-3);display:flex;align-items:center;gap:8px;}
+.boundary-label{font-family:'AvantGardeSF','Helvetica Neue',Helvetica,Arial,sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:var(--fs-2xs);font-weight:700;margin-bottom:var(--s-2);display:flex;align-items:center;gap:8px;}
 .boundary.internal .boundary-label{color:var(--teal-text);}
 .boundary.external .boundary-label{color:var(--pink);}
-.boundary-label .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto;}
+.boundary-label .dot{width:10px;height:10px;border-radius:50%;flex:0 0 auto;}
 .boundary.internal .boundary-label .dot{background:var(--teal);}
 .boundary.external .boundary-label .dot{background:var(--pink);}
 .boundary .flow{margin:0;}
-.boundary-join{display:flex;align-items:center;justify-content:center;color:var(--blue-primary);font-size:24px;font-weight:700;flex:0 0 auto;}
+.boundary-note{margin-top:var(--s-3);font-size:var(--fs-sm);line-height:1.4;color:var(--text);}
+.boundary.internal .boundary-note strong{color:var(--teal-text);}
+.boundary.external .boundary-note strong{color:var(--pink);}
+.boundary-join{display:flex;align-items:center;justify-content:center;color:var(--blue-primary);font-size:26px;font-weight:700;flex:0 0 auto;}
 /* larger step labels for the planner loop */
 .flow.steps-lg .flow-step .fs-label{font-size:var(--fs-lg);letter-spacing:.02em;margin-bottom:8px;}
 .flow.steps-lg .flow-step p{font-size:var(--fs-sm);}
@@ -198,7 +201,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
     <div><strong>Version</strong>v2 · August 2026</div>
     <div><strong>Compiled by</strong>Michael Bonaddio</div>
     <div><strong>Audience</strong>Internal AEs &amp; SEs</div>
-    <div><strong>Slides</strong>14</div>
+    <div><strong>Slides</strong>15</div>
   </div>
 </section>
 
@@ -268,33 +271,34 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
   <div class="slide-scroll">
     <div class="kicker">The map</div>
     <h2><span class="num">03</span>Where each layer physically sits</h2>
-    <p class="subtitle">Follow a request from record to model. Everything up to the LLM stays in the Salesforce trust boundary in Sydney; the model call is transient and geo-routed.</p>
+    <p class="subtitle">Follow a request from record to model. Everything up to the model call stays in the Salesforce trust boundary in Sydney; only the model call itself is transient and geo-routed.</p>
     <div class="boundaries">
       <div class="boundary internal">
-        <div class="boundary-label"><span class="dot"></span>Salesforce trust boundary · in AU (Sydney)</div>
+        <div class="boundary-label"><span class="dot"></span>Salesforce trust boundary &mdash; in AU (Sydney)</div>
         <div class="flow">
           <div class="flow-step" style="--c:#001E5B">
             <div class="fs-label">Layer 1</div>
             <h4>Core Platform</h4>
-            <p>Records &amp; metadata. Hyperforce AU (Sydney). At rest, encrypted.</p>
+            <p>Records &amp; metadata. Hyperforce AU, encrypted at rest.</p>
           </div>
           <div class="flow-arrow">&rarr;</div>
           <div class="flow-step" style="--c:#0250D9">
             <div class="fs-label">Layer 2</div>
             <h4>Data&nbsp;360</h4>
-            <p>Grounding data, retrieval, audit logs. Provisioned in Sydney.</p>
+            <p>Grounding, retrieval &amp; audit logs. Provisioned in Sydney.</p>
           </div>
           <div class="flow-arrow">&rarr;</div>
           <div class="flow-step" style="--c:#066AFE">
             <div class="fs-label">Layer 3</div>
             <h4>Einstein Trust Layer</h4>
-            <p>Masking, ZDR, injection defence, toxicity scoring. Inside SF boundary, Sydney.</p>
+            <p>Masking, ZDR, injection defence, toxicity scoring.</p>
           </div>
         </div>
+        <p class="boundary-note"><strong>Stays in-region.</strong> The Trust Layer is not a US proxy — it runs inside the AU boundary, then hands off to the model host.</p>
       </div>
       <div class="boundary-join">&rarr;</div>
       <div class="boundary external">
-        <div class="boundary-label"><span class="dot"></span>External model boundary · transient, geo-routed</div>
+        <div class="boundary-label"><span class="dot"></span>External model boundary</div>
         <div class="flow">
           <div class="flow-step" style="--c:#00B3FF">
             <div class="fs-label">Layer 4</div>
@@ -302,16 +306,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
             <p>Transient inference. Geo-routed to AU primary; may fail over to the US unless disabled.</p>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="two-col">
-      <div class="callout info">
-        <div class="co-title">In the SF trust boundary (Sydney)</div>
-        <p>Layers 1&ndash;3 stay in-region. The Trust Layer is not a proxy in the US — it runs within the AU boundary and hands off to the model host.</p>
-      </div>
-      <div class="callout correct">
-        <div class="co-title">The transient layer is where residency is decided</div>
-        <p>Layer 4 is the only place data may leave AU — and only if fallback is enabled and the AU endpoint is unavailable. That's the lever the rest of this deck focuses on.</p>
+        <p class="boundary-note"><strong>Where residency is decided.</strong> The only place data may leave AU — and only on fallback when the AU endpoint is down.</p>
       </div>
     </div>
   </div>
@@ -347,7 +342,57 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
     </div>
     <div class="callout info">
       <div class="co-title">Say this out loud</div>
-      <p>"Masking off for agents is a <strong>permanent architectural decision</strong>, not a gap on the roadmap. It's how the planner works — and here's what protects you instead." (Next slide.)</p>
+      <p>"Masking off for agents is a <strong>permanent architectural decision</strong>, not a gap on the roadmap. It's how the planner works — and the controls that protect you instead are coming up in slide 06."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5B. HOW A REQUEST FLOWS END-TO-END (intro) ============ -->
+<section class="slide">
+  <div class="slide-scroll">
+    <div class="kicker">The lifecycle</div>
+    <h2><span class="num">05</span>How a request flows end-to-end</h2>
+    <p class="subtitle">Before the controls, the mental model: one request can take two very different routes. The planner service decides which, and that choice is what drives masking, residency and access behaviour downstream.</p>
+    <div class="flow">
+      <div class="flow-step" style="--c:#001E5B">
+        <div class="fs-label">1 · Request</div>
+        <h4>User asks</h4>
+        <p>A person (or a system event) invokes an AI capability — a chat message, a "summarise" click, a triggered flow.</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step" style="--c:#066AFE">
+        <div class="fs-label">2 · Planner service</div>
+        <h4>Atlas Reasoning Engine</h4>
+        <p>Interprets intent and decides the route: a single-shot prompt, or a multi-step plan that calls agent actions.</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step" style="--c:#00B3FF">
+        <div class="fs-label">3 · Execution</div>
+        <h4>Prompt or agent actions</h4>
+        <p>Either one grounded prompt call, or a loop of actions (Flow, Apex, prompts) reasoning over real record values.</p>
+      </div>
+      <div class="flow-arrow">&rarr;</div>
+      <div class="flow-step" style="--c:#06A59A">
+        <div class="fs-label">4 · Response</div>
+        <h4>Return &amp; log</h4>
+        <p>Result is returned to the user; the full generation is written to the audit trail in Data&nbsp;360.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card green">
+        <span class="tag">Route A · Prompt path</span>
+        <h4>Single-shot template</h4>
+        <p>The planner (or a direct feature call) issues <strong>one</strong> grounded prompt — a summary, a service reply, a draft email. It does one pass and returns. Because there's no follow-on action, PII can be <strong>masked</strong> going out and unmasked on return.</p>
+      </div>
+      <div class="card pink">
+        <span class="tag">Route B · Agent path</span>
+        <h4>Planner + agent actions</h4>
+        <p>The planner runs a <strong>plan &rarr; act &rarr; observe &rarr; re-plan</strong> loop, invoking agent actions with real record values so each step can build on the last. This is powerful but is why masking is <strong>off</strong> and access control becomes the primary safeguard (next slide).</p>
+      </div>
+    </div>
+    <div class="callout info">
+      <div class="co-title">The through-line</div>
+      <p>The planner service is the fork in the road. <strong>Which route it picks determines everything downstream</strong> — whether data is masked, whether the loop needs real values, and which controls actually protect you. The prompt-vs-agent slide before this and the controls slide after it are the two sides of that fork.</p>
     </div>
   </div>
 </section>
@@ -356,7 +401,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Under the covers</div>
-    <h2><span class="num">05</span>The planner &amp; controls for data access</h2>
+    <h2><span class="num">06</span>The planner &amp; controls for data access</h2>
     <p class="subtitle">The Atlas Reasoning Engine drives the agent loop. Because masking is off on this path, access control &mdash; not masking &mdash; is the primary protection.</p>
     <div class="flow steps-lg">
       <div class="flow-step" style="--c:#066AFE"><div class="fs-label">Plan</div><p>Interpret the goal, select topics &amp; actions.</p></div>
@@ -394,7 +439,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Residency vs uptime</div>
-    <h2><span class="num">06</span>Cross-region AI processing &amp; fallback</h2>
+    <h2><span class="num">07</span>Cross-region AI processing &amp; fallback</h2>
     <p class="subtitle">Model calls are geo-routed to an AU primary endpoint. By default some providers will fail over to the US if AU is unavailable — this is the behaviour you control.</p>
     <table>
       <thead><tr><th>Provider / path</th><th>Where it runs</th><th>Default fallback</th><th>Disable?</th></tr></thead>
@@ -418,7 +463,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Fail-safe over failover</div>
-    <h2><span class="num">07</span>When fallback is disabled — what happens</h2>
+    <h2><span class="num">08</span>When fallback is disabled — what happens</h2>
     <p class="subtitle">Turning on "In-Region Model Requests Only" trades availability for residency. Set the customer's expectation before they flip it.</p>
     <div class="two-col">
       <div class="card">
@@ -447,7 +492,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">The centrepiece</div>
-    <h2><span class="num">08</span>Portfolio genAI residency matrix</h2>
+    <h2><span class="num">09</span>LLM Residency by Product or Feature</h2>
     <p class="subtitle">Every genAI capability, one view. This is the slide reps most often get wrong — especially Tableau Next and Slack.</p>
     <table>
       <thead><tr><th>Capability</th><th>Onshore AU?</th><th>Service / path</th><th>Fallback</th><th>Masking</th></tr></thead>
@@ -474,7 +519,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Observability</div>
-    <h2><span class="num">09</span>Audit trail — what's captured &amp; where</h2>
+    <h2><span class="num">10</span>Audit trail — what's captured &amp; where</h2>
     <p class="subtitle">The Trust Layer logs every generation to the customer's own Data&nbsp;360 — not a central Salesforce store.</p>
     <div class="two-col">
       <div>
@@ -507,7 +552,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Govern the logs themselves</div>
-    <h2><span class="num">10</span>Audit trail — PII, access &amp; retention</h2>
+    <h2><span class="num">11</span>Audit trail — PII, access &amp; retention</h2>
     <p class="subtitle">Because masking is off on the agent path, the audit log can contain unmasked PII. The log becomes sensitive data you must govern like any other.</p>
     <div class="callout warn">
       <div class="co-title">The key caveat</div>
@@ -536,7 +581,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Assurance</div>
-    <h2><span class="num">11</span>Compliance &amp; assurance</h2>
+    <h2><span class="num">12</span>Compliance &amp; assurance</h2>
     <p class="subtitle">What you can point to for AU public sector and regulated customers — and the nuances that matter.</p>
     <div class="cards c3">
       <div class="card">
@@ -577,7 +622,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide">
   <div class="slide-scroll">
     <div class="kicker">Things to be aware of</div>
-    <h2><span class="num">12</span>Considerations &amp; caveats</h2>
+    <h2><span class="num">13</span>Considerations &amp; caveats</h2>
     <p class="subtitle">The edges that trip reps up — pre-empt these before the customer does.</p>
     <div class="two-col">
       <div>
@@ -610,7 +655,7 @@ sup.cite{color:var(--blue-primary);font-weight:700;font-size:.72em;padding:0 1px
 <section class="slide closing">
   <div class="slide-scroll">
     <div class="kicker">Takeaway</div>
-    <h2><span class="num">13</span>What to carry into every conversation</h2>
+    <h2><span class="num">14</span>What to carry into every conversation</h2>
     <p class="subtitle" style="color:rgba(255,255,255,.86)">AU residency is a configuration outcome — not a default. Your job is to know the map and set expectations honestly.</p>
     <ul class="bullets">
       <li><strong>Know where each product processes</strong> — the matrix is your cheat sheet; Slack &amp; Tableau Next Stage 2 are the traps.</li>
