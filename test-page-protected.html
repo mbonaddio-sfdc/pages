@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Enter access code</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f4f6fb; color: #1a1a2e;
+  }
+  #gate { min-height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .card {
+    width: 100%; max-width: 400px; background: #fff; border: 1px solid #e3e8f2;
+    border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.08); padding: 34px 32px;
+  }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  .sub { font-size: 13.5px; color: #5a6b86; margin: 0 0 22px; line-height: 1.5; }
+  label { display: block; font-size: 12.5px; font-weight: 600; color: #43597e; margin-bottom: 6px; }
+  .row { display: flex; gap: 8px; }
+  input[type="password"], input[type="text"] {
+    flex: 1; width: 100%; padding: 11px 12px; font-size: 15px; border: 1px solid #cdd6e6;
+    border-radius: 9px; outline: none; color: #1a1a2e;
+  }
+  input:focus { border-color: #1264c0; box-shadow: 0 0 0 3px rgba(18,100,192,.15); }
+  button {
+    margin-top: 16px; width: 100%; padding: 11px 14px; font-size: 15px; font-weight: 600;
+    color: #fff; background: #1264c0; border: 0; border-radius: 9px; cursor: pointer;
+  }
+  button:hover { background: #0f56a6; }
+  button:disabled { opacity: .6; cursor: default; }
+  .toggle { padding: 0 12px; border: 1px solid #cdd6e6; border-radius: 9px; background: #f4f6fb; font-size: 12px; color: #43597e; cursor: pointer; }
+  .err { margin-top: 12px; font-size: 13px; color: #b02121; min-height: 18px; }
+  .note { margin-top: 18px; font-size: 11.5px; color: #8494ad; line-height: 1.5; }
+  #frame { display: none; border: 0; width: 100%; height: 100vh; }
+  body.unlocked { background: #fff; }
+  body.unlocked #gate { display: none; }
+  body.unlocked #frame { display: block; }
+</style>
+</head>
+<body>
+  <div id="gate">
+    <form class="card" id="form" autocomplete="off">
+      <h1>Enter access code</h1>
+      <p class="sub">This page is protected. Enter the code to continue.</p>
+      <label for="pw">Access code</label>
+      <div class="row">
+        <input id="pw" type="password" autocomplete="off" autofocus>
+        <span class="toggle" id="toggle">Show</span>
+      </div>
+      <button id="go" type="submit">Unlock</button>
+      <div class="err" id="err"></div>
+      <p class="note">Content is AES-256 encrypted. The code is used only to decrypt it in your browser and is never sent anywhere or stored.</p>
+    </form>
+  </div>
+  <iframe id="frame" title="Content" sandbox="allow-scripts allow-same-origin allow-popups"></iframe>
+<script>
+(function () {
+  const SALT_B64 = "IasUxssr8OCTqxpeGIkyow==";
+  const IV_B64   = "9hWtvEuWQQGFceV4";
+  const ITER     = 250000;
+  const PAYLOAD_B64 = "HjQlB+UEBc6a+mZgPm9EfaAuijAdamfeHKs6sSA2lpSWaRd9zZRR92A2SLm0AxNWupOH/oi9yuhTuUTDT2QRERNsIFCIY1cSgckD3BhXJg4aXTdsp6c471bEMbKQlA6HQ2xrJDnMsi2YErlxdFZKsQIradvukQoz9RfbVE5k+PrOWvYpy5x/wGAQcflCln6ifDjOxvXiMxZkCeAUHJ+aKuHeFE1aBddgW2GSnpPQnpgxwix41U54dckuajmNQ7wud0gsbCrcwOL5IySic/mI38tlOqkv0V7J7tTMg6qVSnJvq+KVFy23SNOTmXhu+UPrsmmJ0sdNj8Wd0k+SM1lbzQT8vO9omIZho+Zs2nRn09ynrKQ42m5hvfQT1r6Za9mAqB3W3mENYWzIR3bOOYbR2ACjoj9zxwDllbhOTS5YN6FYY6rmDppZoPkj1+wguUQOBIi33PACY+sDYakAaClz0ELXd0pehaMmrl2RqEm7zG6VK7fjikWkwtwrpd79xk/2QZdtCCpTWFrwGZqR08U7St0Df1RmaYezMtvilYMoyQEvgPkaClWVpi1rcwaWaMTlsjqXc6TfyXFSXJ0dZEccWdswoSxAHNUtEl8hCSdDVW1m4JVBvWuAHvBwnCpNVR3+30s3uBWJNSEHCmJlY547bE9RdGC/LUqXNYVQHAJ55DH3dMch4MA92YG0XtbQ18mrfLwKtfKEKfo+o6MQxoP2cGecHT5mzddS0bE0bWXO2tZX32oHIeX/hTK4kqAr75olyZ9sF1o2Jos07kJC334LWz6pAalHxG1AeFGygohXZMBKSLFTzPDuZ0Kkvprac3EDNv5uPNvLGimLJ6m40SmaWg==";
+  const b64ToBytes = (b64) => {
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  };
+  const form = document.getElementById('form');
+  const pw = document.getElementById('pw');
+  const err = document.getElementById('err');
+  const go = document.getElementById('go');
+  const toggle = document.getElementById('toggle');
+  toggle.addEventListener('click', () => {
+    const showing = pw.type === 'text';
+    pw.type = showing ? 'password' : 'text';
+    toggle.textContent = showing ? 'Show' : 'Hide';
+    pw.focus();
+  });
+  async function unlock(password) {
+    const enc = new TextEncoder();
+    const salt = b64ToBytes(SALT_B64);
+    const iv = b64ToBytes(IV_B64);
+    const payload = b64ToBytes(PAYLOAD_B64);
+    const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt, iterations: ITER, hash: 'SHA-256' }, baseKey, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    const plainBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, payload);
+    return new TextDecoder().decode(plainBuf);
+  }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.textContent = '';
+    go.disabled = true; go.textContent = 'Unlocking…';
+    try {
+      const html = await unlock(pw.value);
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const frame = document.getElementById('frame');
+      frame.src = url;
+      document.body.classList.add('unlocked');
+    } catch (ex) {
+      err.textContent = 'Incorrect access code — please try again.';
+      go.disabled = false; go.textContent = 'Unlock';
+      pw.select();
+    }
+  });
+})();
+</script>
+</body>
+</html>
