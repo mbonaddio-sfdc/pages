@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRV At Risk Groups — System Design Explorer</title>
+<style>
+:root{
+  color-scheme: light;
+  --navy:#032d60; --ink:#16325c; --muted:#54698d; --faint:#7183a2;
+  --line:#e5ebf4; --line2:#dfe6f0; --bg:#f3f6fb; --panel:#ffffff; --panel2:#f7f9fc;
+  --blue:#0176d3; --blue-d:#014486; --cyan:#00b3ff;
+  --intake:#7b4fbd; --intake-d:#5a3690;
+  --case:#0176d3; --case-d:#014486;
+  --alert:#ba0517; --alert-d:#8e0413;
+  --gov:#396547; --gov-d:#274832;
+  /* evidence labels */
+  --e-conf:#1c6b3a; --e-conf-bg:#e7f4ec;
+  --e-hist:#8a6205; --e-hist-bg:#fbf3df;
+  --e-inf:#0b5c8a; --e-inf-bg:#e4f1fa;
+  --e-des:#5a3690; --e-des-bg:#efe8fa;
+  --e-open:#ba0517; --e-open-bg:#fbe7e9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Salesforce Sans",-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; line-height:1.5;
+}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- Layout ---------- */
+.shell{display:grid; grid-template-columns:290px 1fr; min-height:100vh}
+nav.side{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  background:linear-gradient(180deg,#032d60,#021d3f); color:#dce7f5; padding:22px 16px 40px;
+}
+nav.side .brand{font-size:16px;font-weight:700;color:#fff;letter-spacing:-.2px;line-height:1.3}
+nav.side .brand small{display:block;font-weight:400;font-size:11.5px;color:#9db8dc;margin-top:5px;letter-spacing:.3px}
+nav.side .neutral{
+  margin:14px 0 18px;font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:#7fa8dc;
+  border:1px solid #1b3f6e;border-radius:5px;padding:5px 8px;background:rgba(255,255,255,.03);text-align:center
+}
+nav.side .grp{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:#6f93c4;margin:18px 4px 6px}
+nav.side a.navlink{
+  display:block;color:#c3d5ee;font-size:13px;padding:7px 10px;border-radius:6px;cursor:pointer;
+  border-left:2px solid transparent;transition:background .12s,color .12s
+}
+nav.side a.navlink:hover{background:rgba(255,255,255,.06);text-decoration:none;color:#fff}
+nav.side a.navlink.active{background:rgba(1,118,211,.22);color:#fff;border-left-color:var(--cyan);font-weight:600}
+nav.side a.navlink .n{display:inline-block;width:20px;color:#7fa8dc;font-weight:700;font-size:11px}
+
+main{padding:0 0 60px;max-width:1180px}
+.topbar{
+  position:sticky;top:0;z-index:20;background:rgba(243,246,251,.92);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line2);padding:14px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap
+}
+.topbar h1{font-size:16px;color:var(--navy);font-weight:700}
+.topbar .legend{display:flex;gap:9px;flex-wrap:wrap;margin-left:auto}
+.section{padding:30px 40px 10px;display:none}
+.section.show{display:block}
+.section h2{font-size:23px;color:var(--navy);font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.section .lede{font-size:14.5px;color:var(--muted);max-width:900px;margin-bottom:20px;line-height:1.6}
+h3{font-size:16px;color:var(--navy);font-weight:700;margin:26px 0 10px}
+h4{font-size:13.5px;color:var(--ink);font-weight:700;margin:16px 0 7px;letter-spacing:.2px}
+p{margin:0 0 11px;font-size:13.6px}
+p.tight{margin-bottom:6px}
+ul.clean{list-style:none;margin:0 0 12px}
+ul.clean li{position:relative;padding:4px 0 4px 18px;font-size:13.4px}
+ul.clean li::before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--blue)}
+
+/* ---------- Cards & panels ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;
+  box-shadow:0 1px 3px rgba(3,45,96,.06),0 4px 12px rgba(3,45,96,.04);margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:1000px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+/* evidence label chips */
+.e{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 7px;border-radius:4px;vertical-align:middle;white-space:nowrap}
+.e-conf{color:var(--e-conf);background:var(--e-conf-bg)}
+.e-hist{color:var(--e-hist);background:var(--e-hist-bg)}
+.e-inf{color:var(--e-inf);background:var(--e-inf-bg)}
+.e-des{color:var(--e-des);background:var(--e-des-bg)}
+.e-open{color:var(--e-open);background:var(--e-open-bg)}
+
+/* domain color tags */
+.dtag{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;color:#fff}
+.d-intake{background:var(--intake)} .d-case{background:var(--case)}
+.d-alert{background:var(--alert)} .d-gov{background:var(--gov)}
+
+.callout{border-left:4px solid var(--blue);background:#eef6fe;border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0;font-size:13.3px}
+.callout.warn{border-left-color:var(--alert);background:#fdeff0}
+.callout.principle{border-left-color:var(--gov);background:#eef5f0}
+.callout b{color:var(--navy)}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:12.6px;margin:8px 0 16px}
+table.tbl th{background:var(--navy);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:11.5px;letter-spacing:.3px}
+table.tbl td{border:1px solid var(--line);padding:7px 10px;vertical-align:top;background:#fff}
+table.tbl tr:nth-child(even) td{background:var(--panel2)}
+table.tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+.pill{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+  padding:3px 11px;font-size:11.5px;font-weight:600;color:var(--muted);margin:3px 4px 3px 0}
+
+/* persona / journey cards */
+.persona{border-radius:9px;border:1px solid var(--line);background:#fff;padding:13px 14px}
+.persona .role{font-weight:700;font-size:13.2px;color:var(--navy)}
+.persona .need{font-size:12.2px;color:var(--muted);margin-top:5px;line-height:1.45}
+
+.journey{border:1px solid var(--line);border-radius:9px;background:#fff;margin-bottom:10px;overflow:hidden}
+.journey summary{cursor:pointer;list-style:none;padding:12px 15px;font-weight:600;font-size:13.6px;color:var(--navy);
+  display:flex;align-items:center;gap:10px;background:var(--panel2)}
+.journey summary::-webkit-details-marker{display:none}
+.journey summary .arw{margin-left:auto;color:var(--faint);transition:transform .15s}
+.journey[open] summary .arw{transform:rotate(90deg)}
+.journey .body{padding:14px 16px;border-top:1px solid var(--line)}
+.steps{counter-reset:s;list-style:none}
+.steps li{counter-increment:s;position:relative;padding:6px 0 6px 34px;font-size:13.2px;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:22px;height:22px;border-radius:50%;
+  background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.jmeta{font-size:11.8px;color:var(--muted);margin-top:10px;padding-top:9px;border-top:1px solid var(--line)}
+.jmeta b{color:var(--gov)}
+
+/* bounded context grid */
+.bc{border-radius:9px;padding:12px 13px;color:#fff;position:relative;min-height:96px}
+.bc h5{font-size:13px;font-weight:700;margin-bottom:5px}
+.bc p{font-size:11.3px;color:rgba(255,255,255,.92);margin:0;line-height:1.4}
+.bc .auth{position:absolute;bottom:8px;left:13px;font-size:9.5px;letter-spacing:.4px;text-transform:uppercase;opacity:.8}
+
+figure{margin:14px 0 20px}
+figure svg{max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px}
+figcaption{font-size:11.5px;color:var(--faint);margin-top:7px;text-align:center}
+
+.legend .e{cursor:default}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12px}
+
+.two-col{columns:2;column-gap:26px}
+@media(max-width:900px){.two-col{columns:1}}
+.footer-note{padding:24px 40px 10px;font-size:11.5px;color:var(--faint);line-height:1.6;border-top:1px solid var(--line2);margin-top:30px}
+.anchor-note{font-size:11.5px;color:var(--faint);font-style:italic;margin-top:4px}
+.kbd{font-family:ui-monospace,monospace;background:#eef2f8;border:1px solid #d4deeb;border-radius:4px;padding:1px 6px;font-size:11px}
+.smrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}
+.st{display:inline-flex;align-items:center;background:var(--panel2);border:1px solid var(--line);border-radius:16px;
+  padding:5px 11px;font-size:11.8px;font-weight:600;color:var(--ink)}
+.st.term{background:#f0f2f6;color:var(--muted);border-style:dashed}
+.st.gate{background:#eef5f0;border-color:#396547;color:#274832}
+.st.branch{background:#fdeff0;border-color:#ba0517;color:#8e0413}
+.sarrow{color:var(--faint);font-size:13px}
+[data-jump]{cursor:pointer;border-bottom:1px dotted var(--blue)}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<nav class="side">
+  <div class="brand">Fire Rescue Victoria<small>At Risk Groups — Conceptual &amp; Logical System Design</small></div>
+  <div class="neutral">Vendor-neutral · design hypothesis</div>
+
+  <div class="grp">Orientation</div>
+  <a class="navlink active" data-t="overview"><span class="n">00</span>Overview</a>
+  <a class="navlink" data-t="scope"><span class="n">01</span>Scope &amp; principles</a>
+
+  <div class="grp">People &amp; flow</div>
+  <a class="navlink" data-t="personas"><span class="n">02</span>Personas</a>
+  <a class="navlink" data-t="journeys"><span class="n">03</span>Service journeys</a>
+
+  <div class="grp">Architecture</div>
+  <a class="navlink" data-t="contexts"><span class="n">04</span>Bounded contexts</a>
+  <a class="navlink" data-t="architecture"><span class="n">05</span>Architecture &amp; options</a>
+  <a class="navlink" data-t="data"><span class="n">06</span>Data model</a>
+  <a class="navlink" data-t="states"><span class="n">07</span>State machines</a>
+
+  <div class="grp">Assurance</div>
+  <a class="navlink" data-t="privacy"><span class="n">08</span>Privacy, records &amp; security</a>
+  <a class="navlink" data-t="resilience"><span class="n">09</span>Reliability &amp; resilience</a>
+  <a class="navlink" data-t="reporting"><span class="n">10</span>Reporting &amp; outcomes</a>
+
+  <div class="grp">Execution</div>
+  <a class="navlink" data-t="delivery"><span class="n">11</span>Delivery plan</a>
+  <a class="navlink" data-t="decisions"><span class="n">12</span>Decisions needed</a>
+  <a class="navlink" data-t="evidence"><span class="n">13</span>Evidence &amp; sources</a>
+</nav>
+
+<main>
+  <div class="topbar">
+    <h1 id="crumb">Overview</h1>
+    <div class="legend">
+      <span class="e e-conf">Confirmed</span>
+      <span class="e e-hist">Historical</span>
+      <span class="e e-inf">Inference</span>
+      <span class="e e-des">Design implication</span>
+      <span class="e e-open">Open question</span>
+    </div>
+  </div>
+
+  <!-- ============ 00 OVERVIEW ============ -->
+  <section class="section show" id="overview">
+    <h2>At Risk Groups — a system that improves safety without building a hidden register</h2>
+    <p class="lede">FRV's At Risk Groups function receives referrals about people and properties with elevated residential fire risk, provides advice, assessment and risk-reduction support, and can create a property-based advance warning for responding crews. This is a vendor-neutral conceptual and logical design for the technology that would support it — grounded in public evidence, explicit about what must still be validated with FRV.</p>
+
+    <div class="grid3">
+      <div class="card" style="border-top:3px solid var(--intake)">
+        <span class="dtag d-intake">Domain 1</span>
+        <h3 style="margin-top:9px">Intake &amp; Referral</h3>
+        <p>Public, partner, health-provider and firefighter referrals converge on <b>one auditable queue</b> — never forwarded email as the system of record.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--case)">
+        <span class="dtag d-case">Domain 2</span>
+        <h3 style="margin-top:9px">Specialist Case Management</h3>
+        <p>Triage, risk assessment, advice, home visits, consent, partner coordination, follow-up and outcomes — the specialist workspace where humans decide.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--alert)">
+        <span class="dtag d-alert">Domain 3</span>
+        <h3 style="margin-top:9px">Operational Alert Projection</h3>
+        <p>A deliberately <b>minimal, human-verified</b> property-hazard alert to turnout/dispatch. No names, diagnoses or case notes.</p>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <b>The single highest-risk mistake</b> would be to treat all referrals as one undifferentiated workflow, or to let a raw public report flow straight into dispatch. These are three linked-but-separate security and information domains with different users, purposes, urgency, retention and privacy exposure.
+    </div>
+
+    <h3>The controlled publication boundary</h3>
+    <p>Everything in this design hangs off one idea: a human-governed gate between what is <em>collected</em> and what is <em>shown to responding crews</em>.</p>
+    <figure>
+      <svg viewBox="0 0 960 300" role="img" aria-label="Controlled publication boundary flow diagram">
+        <defs>
+          <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#54698d"/></marker>
+        </defs>
+        <!-- intake -->
+        <rect x="20" y="120" width="170" height="60" rx="9" fill="#7b4fbd"/>
+        <text x="105" y="146" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Public &amp; agency</text>
+        <text x="105" y="164" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">intake</text>
+        <!-- case -->
+        <rect x="250" y="120" width="180" height="60" rx="9" fill="#0176d3"/>
+        <text x="340" y="146" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Specialist case</text>
+        <text x="340" y="164" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">workspace</text>
+        <!-- gate -->
+        <polygon points="490,150 560,110 630,150 560,190" fill="#396547"/>
+        <text x="560" y="146" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Human</text>
+        <text x="560" y="160" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">verify + basis</text>
+        <!-- outputs -->
+        <rect x="690" y="40" width="250" height="52" rx="9" fill="#eef4fc" stroke="#0176d3"/>
+        <text x="815" y="62" text-anchor="middle" fill="#16325c" font-size="12" font-weight="600">Advice / assessment /</text>
+        <text x="815" y="79" text-anchor="middle" fill="#16325c" font-size="12" font-weight="600">partner actions</text>
+        <rect x="690" y="130" width="250" height="52" rx="9" fill="#ba0517"/>
+        <text x="815" y="152" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Minimal property-hazard</text>
+        <text x="815" y="169" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">alert</text>
+        <rect x="690" y="220" width="250" height="46" rx="9" fill="#eef5f0" stroke="#396547"/>
+        <text x="815" y="248" text-anchor="middle" fill="#274832" font-size="12" font-weight="600">Renewal, discontinuation, outcomes</text>
+        <!-- dispatch -->
+        <rect x="690" y="200" width="0" height="0"/>
+        <!-- arrows -->
+        <line x1="190" y1="150" x2="245" y2="150" stroke="#54698d" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="430" y1="150" x2="488" y2="150" stroke="#54698d" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="630" y1="140" x2="686" y2="80" stroke="#54698d" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="630" y1="156" x2="686" y2="156" stroke="#54698d" stroke-width="2" marker-end="url(#arw)"/>
+        <line x1="560" y1="190" x2="560" y2="243" stroke="#54698d" stroke-width="2"/>
+        <line x1="560" y1="243" x2="686" y2="243" stroke="#54698d" stroke-width="2" marker-end="url(#arw)"/>
+        <!-- dispatch consumption -->
+        <text x="815" y="196" text-anchor="middle" fill="#8e0413" font-size="10" font-weight="700">→ consumed by turnout / dispatch</text>
+      </svg>
+      <figcaption>Raw reports, health details, resident narratives and partner notes never flow directly to crews. Only verified, necessary, responder-relevant facts cross into the alert domain. <span class="e e-des">Design implication</span></figcaption>
+    </figure>
+
+    <h3>How to read this explorer</h3>
+    <p>Every material claim carries an evidence label so design decisions can be traced to what is actually known versus what must be validated in discovery:</p>
+    <ul class="clean">
+      <li><span class="e e-conf">Confirmed</span> directly supported by a current FRV, Victorian Government, regulator or authoritative source.</li>
+      <li><span class="e e-hist">Historical</span> documented by the Metropolitan Fire Brigade (FRV's predecessor) or an older source — useful for the operating model, not proof of current practice.</li>
+      <li><span class="e e-inf">Inference</span> a reasonable conclusion from multiple sources, requiring stakeholder confirmation.</li>
+      <li><span class="e e-des">Design implication</span> a requirement or architectural consequence suggested by the evidence.</li>
+      <li><span class="e e-open">Open question</span> cannot be answered reliably from public information — a decision point for discovery.</li>
+    </ul>
+    <div class="callout">
+      <b>Status.</b> This is a system-design hypothesis built entirely on public sources (inspected to 25 August 2026). It is strong enough to frame a design exercise and prevent major category errors. It is <b>not</b> strong enough to select a product, fix a final architecture, or estimate delivery without internal FRV discovery. It is deliberately <b>vendor-neutral</b> — no platform, product or API is named or assumed.
+    </div>
+  </section>
+
+  <!-- ============ 01 SCOPE & PRINCIPLES ============ -->
+  <section class="section" id="scope">
+    <h2>Scope, assumptions &amp; design principles</h2>
+    <p class="lede">What this system is for, what it explicitly is not, what we can rely on, and the principles that must hold no matter which architecture is chosen.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 style="margin-top:0">In scope</h3>
+        <ul class="clean">
+          <li>Omnichannel intake of residential fire-risk referrals (public web, firefighter, email/phone-assisted, partner agency).</li>
+          <li>Specialist triage, risk assessment, advice, home visits, smoke-alarm activity, PEEPs and presentations.</li>
+          <li>Consent and legal-basis capture, scoped by action.</li>
+          <li>A minimal, human-governed property-hazard alert projected to turnout/dispatch.</li>
+          <li>Renewal, review, discontinuation and occupancy-change management of alerts.</li>
+          <li>FRV↔CFA case/alert coordination for CFA-area addresses.</li>
+          <li>Records, audit, FOI/correction, retention and de-identified outcome reporting.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-top:0">Out of scope</h3>
+        <ul class="clean">
+          <li>Emergency incident response and dispatch decisioning itself (this system <em>informs</em> turnout, it does not dispatch).</li>
+          <li>Building/commercial fire-safety regulation and false-alarm handling — separate FRV channels. <span class="e e-conf">Confirmed</span></li>
+          <li>Clinical treatment, property cleaning and enforcement — At Risk Groups is a prevention/advice function, not a clinical, regulatory or cleaning service. <span class="e e-conf">Confirmed</span></li>
+          <li>The Firelighting Consequence Awareness Program (Fire-CAP) — a referral/handoff, not shared case ownership. <span class="e e-des">Design implication</span></li>
+          <li>General emergencies → Triple Zero (000).</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Confirmed assumptions vs hypotheses</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>We can rely on (confirmed)</h4>
+        <ul class="clean">
+          <li>The function exists as the <b>At Risk Groups Unit</b> and receives multi-source referrals. <span class="e e-conf">Confirmed</span></li>
+          <li>Referral information may be used to give crews advance notice; hoarding notifications are recorded in the turnout system. <span class="e e-conf">Confirmed</span></li>
+          <li>Consent is <b>not</b> required to share for public/firefighter safety; consent <b>is</b> required for home entry, assessment or alarm installation. <span class="e e-conf">Confirmed</span></li>
+          <li>The current public intake is a Microsoft Form; the website CMS privacy statement may not cover it. <span class="e e-conf">Confirmed</span> / <span class="e e-open">Open</span></li>
+          <li>PDPA 2014, Health Records Act 2001, Public Records Act 1973 and VPDSS apply. <span class="e e-conf">Confirmed</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>Working hypotheses (validate)</h4>
+        <ul class="clean">
+          <li>The MFB pattern — address-based alert excluding occupant names, ~2-yearly renewal, discontinuation on move/threshold — broadly still holds. <span class="e e-hist">Historical</span></li>
+          <li>Service lines behave as distinct products with different workflows and completion criteria. <span class="e e-inf">Inference</span></li>
+          <li>Referral categories are not necessarily mutually exclusive or unique people/properties. <span class="e e-inf">Inference</span></li>
+          <li>Meaningful manual email/spreadsheet/re-entry work exists today. <span class="e e-inf">Inference</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Architecture-significant unknowns</h3>
+    <p>These are not documented publicly and materially change the architecture — each is carried as a decision point (see <a data-jump="decisions">Decisions needed</a>):</p>
+    <div class="two-col">
+      <ul class="clean">
+        <li>Team headcount, roles, delegation and approval matrix. <span class="e e-open">Open</span></li>
+        <li>Whether an internal case-management system already exists. <span class="e e-open">Open</span></li>
+        <li>Whether "Fire Safety Issue Notification System" is a product or a process. <span class="e e-open">Open</span></li>
+        <li>Turnout/dispatch interface specification and device surface. <span class="e e-open">Open</span></li>
+        <li>Current alert renewal interval and approval workflow. <span class="e e-open">Open</span></li>
+        <li>PROV retention/disposal classes for each record type. <span class="e e-open">Open</span></li>
+        <li>FRV/CFA data ownership, transfer instrument and closure responsibility. <span class="e e-open">Open</span></li>
+        <li>Microsoft Forms tenant region, retention, export and downstream automation. <span class="e e-open">Open</span></li>
+        <li>Information classification / Business Impact Level and RTO/RPO tiers. <span class="e e-open">Open</span></li>
+      </ul>
+    </div>
+
+    <h3>Design principles (non-negotiable)</h3>
+    <div class="grid2">
+      <div class="callout principle">Human approval before publishing, materially changing or removing an operational alert.</div>
+      <div class="callout principle">No raw public report flows directly to dispatch.</div>
+      <div class="callout principle">Consent is scoped by action — never one global boolean.</div>
+      <div class="callout principle">A no-consent public-safety basis requires recorded rationale and decision accountability.</div>
+      <div class="callout principle">Person data and property-alert data have separate access and retention treatment.</div>
+      <div class="callout principle">Every publication/removal has destination acknowledgement and an audit trail.</div>
+      <div class="callout principle">Property alerts have review and discontinuation workflows.</div>
+      <div class="callout principle">A resident move does not silently transfer person-related risk to a new occupant.</div>
+      <div class="callout principle">Integrations are idempotent, observable and safely recoverable.</div>
+      <div class="callout principle">Analytics use de-identified / aggregated data wherever possible.</div>
+      <div class="callout principle">AI may assist structuring or summarisation only with human validation, approved data governance and no automatic service or dispatch decisions.</div>
+      <div class="callout principle">Do not build a broad hidden register of vulnerable people — model property-centric hazards and person-centric needs separately.</div>
+    </div>
+  </section>
+
+  <!-- ============ 02 PERSONAS ============ -->
+  <section class="section" id="personas">
+    <h2>Personas &amp; access posture</h2>
+    <p class="lede">Thirteen actors with materially different needs, urgency and data exposure. Access separates "need to administer the platform" from "need to read case content", and dispatch users only ever see the approved alert projection.</p>
+
+    <div class="grid3" id="personaGrid"></div>
+
+    <h3>Access principles</h3>
+    <ul class="clean">
+      <li>Field-level or domain separation for health, behavioural and referrer-confidential information.</li>
+      <li>Dispatch users see only the approved alert projection — never the case.</li>
+      <li>Partner access is case-specific, time-limited and purpose-bound; partners do not get general system access by default.</li>
+      <li>Break-glass access (if supported) requires reason capture and review; sensitive-case access raises alerts and undergoes periodic entitlement review.</li>
+      <li>No shared mailboxes or generic accounts as the only accountability mechanism.</li>
+      <li>Reporting extracts default to de-identified data. <span class="e e-des">Design implication</span></li>
+    </ul>
+  </section>
+
+  <!-- ============ 03 SERVICE JOURNEYS ============ -->
+  <section class="section" id="journeys">
+    <h2>Service journeys</h2>
+    <p class="lede">Eleven journeys the system must support well. Each shows the human decision points, the consent/legal basis, and — critically — whether and how an operational alert is touched. Click to expand.</p>
+    <div id="journeyList"></div>
+  </section>
+
+  <!-- ============ 04 BOUNDED CONTEXTS ============ -->
+  <section class="section" id="contexts">
+    <h2>Bounded contexts</h2>
+    <p class="lede">Twelve contexts with clear boundaries. They are grouped by the three information domains plus a cross-cutting governance/records band. Each names the authoritative source for its data.</p>
+
+    <h3>Context map</h3>
+    <figure>
+      <svg viewBox="0 0 980 470" role="img" aria-label="Context map of the twelve bounded contexts">
+        <defs><marker id="a2" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#54698d"/></marker></defs>
+        <!-- trust boundary: public -->
+        <rect x="10" y="30" width="230" height="410" rx="12" fill="#f4eefb" stroke="#7b4fbd" stroke-dasharray="5 4"/>
+        <text x="125" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#5a3690">PUBLIC / PARTNER ZONE</text>
+        <!-- internal case -->
+        <rect x="260" y="30" width="420" height="410" rx="12" fill="#eef6fe" stroke="#0176d3" stroke-dasharray="5 4"/>
+        <text x="470" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#014486">SPECIALIST INTERNAL ZONE</text>
+        <!-- alert/dispatch -->
+        <rect x="700" y="30" width="270" height="410" rx="12" fill="#fdeff0" stroke="#ba0517" stroke-dasharray="5 4"/>
+        <text x="835" y="22" text-anchor="middle" font-size="11" font-weight="700" fill="#8e0413">RESPONDER / DISPATCH ZONE</text>
+
+        <!-- boxes -->
+        <g font-size="11" font-weight="600" fill="#16325c">
+          <rect x="30" y="55" width="190" height="46" rx="7" fill="#fff" stroke="#7b4fbd"/><text x="125" y="83" text-anchor="middle">Intake &amp; Referral</text>
+          <rect x="30" y="120" width="190" height="46" rx="7" fill="#fff" stroke="#7b4fbd"/><text x="125" y="148" text-anchor="middle">Partner Coordination</text>
+          <rect x="30" y="185" width="190" height="46" rx="7" fill="#fff" stroke="#7b4fbd"/><text x="125" y="213" text-anchor="middle">Notification &amp; Scheduling</text>
+
+          <rect x="280" y="55" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="370" y="83" text-anchor="middle">Case &amp; Service Mgmt</text>
+          <rect x="480" y="55" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="570" y="83" text-anchor="middle">Person / Occupancy</text>
+          <rect x="280" y="120" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="370" y="148" text-anchor="middle">Property &amp; Jurisdiction</text>
+          <rect x="480" y="120" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="570" y="148" text-anchor="middle">Risk Obs. &amp; Assessment</text>
+          <rect x="280" y="185" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="370" y="213" text-anchor="middle">Consent &amp; Legal Basis</text>
+          <rect x="480" y="185" width="180" height="46" rx="7" fill="#fff" stroke="#0176d3"/><text x="570" y="213" text-anchor="middle">Analytics &amp; Evaluation</text>
+
+          <rect x="720" y="90" width="230" height="52" rx="7" fill="#fff" stroke="#ba0517"/><text x="835" y="112" text-anchor="middle">Operational Alert</text><text x="835" y="128" text-anchor="middle">Governance</text>
+          <rect x="720" y="165" width="230" height="52" rx="7" fill="#fff" stroke="#ba0517"/><text x="835" y="187" text-anchor="middle">Dispatch / Turnout</text><text x="835" y="203" text-anchor="middle">Publication</text>
+        </g>
+        <!-- cross-cutting records band -->
+        <rect x="30" y="270" width="920" height="44" rx="7" fill="#eef5f0" stroke="#396547"/>
+        <text x="490" y="297" text-anchor="middle" font-size="11.5" font-weight="700" fill="#274832">Records, Audit &amp; Legal Hold — cross-cutting, append-only, spans all zones</text>
+
+        <!-- flows -->
+        <line x1="220" y1="78" x2="278" y2="78" stroke="#54698d" stroke-width="2" marker-end="url(#a2)"/>
+        <line x1="460" y1="143" x2="478" y2="143" stroke="#54698d" stroke-width="1.6"/>
+        <line x1="660" y1="128" x2="718" y2="120" stroke="#8e0413" stroke-width="2.4" marker-end="url(#a2)"/>
+        <text x="690" y="112" font-size="9.5" font-weight="700" fill="#8e0413">human gate →</text>
+        <line x1="835" y1="142" x2="835" y2="163" stroke="#8e0413" stroke-width="2" marker-end="url(#a2)"/>
+        <text x="360" y="360" font-size="11" fill="#54698d">Async, signed, versioned, acknowledged publications only ⟶ dispatch</text>
+      </svg>
+      <figcaption>Trust boundaries are explicit. The only path into the responder zone is through the Operational Alert Governance context — the human gate. <span class="e e-des">Design implication</span></figcaption>
+    </figure>
+
+    <h3>The twelve contexts</h3>
+    <div class="grid4" id="bcGrid"></div>
+    <p class="anchor-note">Authoritative source shown per context. Where it reads "discovery", the system of record is an <span class="e e-open">Open question</span> for FRV to confirm.</p>
+  </section>
+
+  <!-- ============ 05 ARCHITECTURE ============ -->
+  <section class="section" id="architecture">
+    <h2>Architecture &amp; options</h2>
+    <p class="lede">Because key FRV internals are unknown, the design is expressed as a container view plus two viable architecture options with trade-offs, rather than a single prescribed build.</p>
+
+    <h3>Container view (logical)</h3>
+    <figure>
+      <svg viewBox="0 0 980 430" role="img" aria-label="Logical container diagram">
+        <defs><marker id="a3" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#54698d"/></marker></defs>
+        <!-- channels -->
+        <g font-size="10.5" fill="#fff" font-weight="600">
+          <rect x="20" y="40" width="150" height="34" rx="6" fill="#7b4fbd"/><text x="95" y="62" text-anchor="middle">Public web intake</text>
+          <rect x="20" y="86" width="150" height="34" rx="6" fill="#7b4fbd"/><text x="95" y="108" text-anchor="middle">Firefighter referral</text>
+          <rect x="20" y="132" width="150" height="34" rx="6" fill="#7b4fbd"/><text x="95" y="154" text-anchor="middle">Email/phone assisted</text>
+          <rect x="20" y="178" width="150" height="34" rx="6" fill="#7b4fbd"/><text x="95" y="200" text-anchor="middle">Partner agency</text>
+        </g>
+        <!-- intake queue -->
+        <rect x="215" y="86" width="150" height="80" rx="8" fill="#eef4fc" stroke="#0176d3"/>
+        <text x="290" y="118" text-anchor="middle" font-size="11" font-weight="700" fill="#16325c">Single auditable</text>
+        <text x="290" y="134" text-anchor="middle" font-size="11" font-weight="700" fill="#16325c">intake queue</text>
+        <!-- case core -->
+        <rect x="410" y="60" width="200" height="150" rx="10" fill="#0176d3"/>
+        <text x="510" y="92" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Case &amp; service</text>
+        <text x="510" y="110" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">management core</text>
+        <text x="510" y="138" text-anchor="middle" font-size="10" fill="#dCEBFb">risk · consent · tasks</text>
+        <text x="510" y="154" text-anchor="middle" font-size="10" fill="#dCEBFb">person · property</text>
+        <!-- gate -->
+        <polygon points="660,135 720,100 780,135 720,170" fill="#396547"/>
+        <text x="720" y="132" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">approval</text>
+        <text x="720" y="146" text-anchor="middle" fill="#fff" font-size="10" font-weight="700">gate</text>
+        <!-- alert store + publisher -->
+        <rect x="815" y="60" width="150" height="52" rx="8" fill="#ba0517"/>
+        <text x="890" y="82" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Alert store</text>
+        <text x="890" y="98" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">(isolated)</text>
+        <rect x="815" y="128" width="150" height="52" rx="8" fill="#8e0413"/>
+        <text x="890" y="150" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Publisher +</text>
+        <text x="890" y="166" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">queue (idempotent)</text>
+        <!-- dispatch -->
+        <rect x="815" y="210" width="150" height="40" rx="8" fill="#16325c"/>
+        <text x="890" y="234" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Turnout / dispatch</text>
+        <!-- shared services -->
+        <g font-size="10" fill="#274832" font-weight="600">
+          <rect x="215" y="250" width="170" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="300" y="274" text-anchor="middle">Address / GIS / jurisdiction</text>
+          <rect x="405" y="250" width="150" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="480" y="274" text-anchor="middle">Identity / SSO / roles</text>
+          <rect x="575" y="250" width="150" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="650" y="274" text-anchor="middle">Notification / scheduling</text>
+          <rect x="215" y="300" width="170" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="300" y="324" text-anchor="middle">Records / document mgmt</text>
+          <rect x="405" y="300" width="150" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="480" y="324" text-anchor="middle">De-identified analytics</text>
+          <rect x="575" y="300" width="150" height="40" rx="7" fill="#eef5f0" stroke="#396547"/><text x="650" y="324" text-anchor="middle">SIEM / monitoring</text>
+        </g>
+        <!-- audit band -->
+        <rect x="20" y="360" width="945" height="34" rx="7" fill="#032d60"/>
+        <text x="492" y="382" text-anchor="middle" fill="#fff" font-size="11" font-weight="700">Append-only audit &amp; record lifecycle — every decision, disclosure, publication and removal</text>
+        <!-- arrows -->
+        <line x1="170" y1="103" x2="213" y2="118" stroke="#54698d" stroke-width="1.6" marker-end="url(#a3)"/>
+        <line x1="170" y1="149" x2="213" y2="130" stroke="#54698d" stroke-width="1.6" marker-end="url(#a3)"/>
+        <line x1="365" y1="126" x2="408" y2="130" stroke="#54698d" stroke-width="2" marker-end="url(#a3)"/>
+        <line x1="610" y1="135" x2="658" y2="135" stroke="#54698d" stroke-width="2" marker-end="url(#a3)"/>
+        <line x1="780" y1="120" x2="813" y2="95" stroke="#8e0413" stroke-width="2" marker-end="url(#a3)"/>
+        <line x1="890" y1="112" x2="890" y2="126" stroke="#54698d" stroke-width="2" marker-end="url(#a3)"/>
+        <line x1="890" y1="180" x2="890" y2="208" stroke="#54698d" stroke-width="2" marker-end="url(#a3)"/>
+      </svg>
+      <figcaption>Async, signed, versioned publications between the case core and dispatch. The alert store is isolated so it survives a case-system outage. <span class="e e-des">Design implication</span></figcaption>
+    </figure>
+
+    <h3>Two architecture options</h3>
+    <div class="grid2">
+      <div class="card" style="border-top:3px solid var(--blue)">
+        <h4 style="margin-top:0">Option A — Integrated case platform + thin alert projection</h4>
+        <p>A single specialist case-management capability owns intake, case, person, property, consent and analytics. A small, isolated <b>alert projection service</b> is the only thing that talks to dispatch, fed through the approval gate.</p>
+        <p class="tight"><b>For:</b> fewer moving parts; one audit spine; simpler role model; faster MVP.</p>
+        <p class="tight"><b>Against:</b> tighter coupling risk; the projection must be genuinely isolatable for outage resilience; vendor lock potential.</p>
+        <p class="tight"><b>Best when:</b> FRV has (or will acquire) one platform and dispatch exposes a clean publish interface.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--gov)">
+        <h4 style="margin-top:0">Option B — Composed services around a shared event/audit backbone</h4>
+        <p>Separate intake, case, and alert-governance services communicate over an event backbone with an independent, append-only audit/record store. Dispatch publication is its own service with a durable queue.</p>
+        <p class="tight"><b>For:</b> strong domain isolation; the alert path can stay up independently; easier to swap components; clearer data-owner boundaries.</p>
+        <p class="tight"><b>Against:</b> more integration surface; higher operational maturity needed; more upfront design.</p>
+        <p class="tight"><b>Best when:</b> resilience/segregation are paramount and multiple existing systems must interoperate (incl. CFA).</p>
+      </div>
+    </div>
+    <div class="callout">
+      <b>Decision hinges on unknowns.</b> The choice between A and B depends on whether an internal case system already exists, the turnout/dispatch interface, and the required RTO/RPO for the alert path. Both options honour every non-negotiable principle; they differ in coupling and operational cost. Carry both into discovery. <span class="e e-open">Open question</span>
+    </div>
+
+    <h3>Synchronous vs asynchronous</h3>
+    <table class="tbl">
+      <tr><th>Interaction</th><th>Mode</th><th>Why</th></tr>
+      <tr><td>Address validation / geocoding / jurisdiction at intake</td><td>Synchronous</td><td>Needed to route and de-duplicate before a case exists.</td></tr>
+      <tr><td>Identity / SSO / role resolution</td><td>Synchronous</td><td>Access decisions must be live.</td></tr>
+      <tr><td>Alert publication &amp; removal to dispatch</td><td>Asynchronous, queued, acknowledged</td><td>Must survive outages; retries must be idempotent; acknowledgement recorded.</td></tr>
+      <tr><td>Partner / CFA transfer</td><td>Asynchronous, versioned, acknowledged</td><td>Cross-agency; rejection and reconciliation handling required.</td></tr>
+      <tr><td>Analytics extract</td><td>Asynchronous, batch, de-identified</td><td>No routine case-content movement; small-cell suppression.</td></tr>
+    </table>
+
+    <h3>Degradation &amp; recovery behaviour</h3>
+    <ul class="clean">
+      <li>Case management down → <b>active dispatch alerts remain available</b>; controlled offline/manual intake opens.</li>
+      <li>Dispatch integration down → alert changes queue as signed/versioned events; backlog age is visible and escalated.</li>
+      <li>Public intake down → no impact on operational alerts; assisted phone channel continues.</li>
+      <li>On recovery → idempotent replay; reconciliation of manual entries; nothing silently lost. <span class="e e-des">Design implication</span></li>
+    </ul>
+  </section>
+
+  <!-- ============ 06 DATA MODEL ============ -->
+  <section class="section" id="data">
+    <h2>Logical data model</h2>
+    <p class="lede">A design hypothesis for validation, not a prescribed physical database. The defining move is separating a <b>property at a point in time</b> from a <b>person</b>, joined by dated occupancy — so a property alert never assumes it describes every future occupant.</p>
+
+    <h3>Core entities</h3>
+    <table class="tbl">
+      <tr><th style="width:150px">Entity</th><th>Purpose</th><th style="width:32%">Key data</th></tr>
+      <tr><td><b>Referral</b></td><td>Original request / notification</td><td>channel, received time, referrer, stated reason, source reliability, raw submission, acknowledgement</td></tr>
+      <tr><td><b>Case</b></td><td>Specialist work container</td><td>owner/team, priority, statuses, services requested, jurisdiction, due dates, outcome</td></tr>
+      <tr><td><b>Property</b></td><td>Stable location context</td><td>normalised address, geocode, property identifier, tenure/type, station/district, occupancy periods</td></tr>
+      <tr><td><b>Resident / subject</b></td><td>Person context where necessary</td><td>minimum identity/contact, language, accessibility, household role, occupancy period — <b>segregated from crew alert</b></td></tr>
+      <tr><td><b>Referrer</b></td><td>Source &amp; follow-up contact</td><td>identity, agency, role, contact, authority, preferred channel</td></tr>
+      <tr><td><b>Risk observation</b></td><td>Time-bound evidence</td><td>taxonomy, description, location, severity, observed date, source, verification, attachments</td></tr>
+      <tr><td><b>Assessment</b></td><td>Professional evaluation</td><td>assessor, method/version, findings, recommendations, review date</td></tr>
+      <tr><td><b>Service request</b></td><td>Work to be delivered</td><td>advice, alarm install, home visit, TAC/SDA/SIL assessment, PEEP, presentation, partner referral</td></tr>
+      <tr><td><b>Action / task</b></td><td>Operational work</td><td>assignee, due date, dependency, completion evidence, escalation</td></tr>
+      <tr><td><b>Consent / legal basis</b></td><td>Authority for an action</td><td>subject, scope, giver, capacity, wording, date, expiry/withdrawal, non-consent basis &amp; rationale</td></tr>
+      <tr><td><b>Partner interaction</b></td><td>Cross-agency coordination</td><td>organisation, contact, purpose, data disclosed, acknowledgement, status, outcome</td></tr>
+      <tr><td><b>Operational alert</b></td><td>Responder-facing hazard</td><td>property, minimal hazard codes, verified narrative, responder implications, active/review dates, approval</td></tr>
+      <tr><td><b>Alert publication</b></td><td>Integration evidence</td><td>target system/agency, version, sent/acknowledged time, errors, retry, supersession/removal</td></tr>
+      <tr><td><b>Outcome</b></td><td>Effect of intervention</td><td>hazards reduced, alarm status, escape plan, service linkage, feedback, residual risk</td></tr>
+      <tr><td><b>Record / audit event</b></td><td>Accountability</td><td>actor/service, event, before/after reference, purpose, timestamp, legal hold/disposal status</td></tr>
+    </table>
+
+    <h3>Person ⟷ property separation</h3>
+    <figure>
+      <svg viewBox="0 0 900 240" role="img" aria-label="Person-occupancy-property relationship">
+        <rect x="40" y="90" width="180" height="60" rx="9" fill="#0176d3"/><text x="130" y="118" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Resident /</text><text x="130" y="136" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">subject</text>
+        <rect x="360" y="90" width="180" height="60" rx="9" fill="#396547"/><text x="450" y="112" text-anchor="middle" fill="#fff" font-size="12" font-weight="700">Occupancy</text><text x="450" y="130" text-anchor="middle" fill="#fff" font-size="10" fill-opacity=".9">dated relationship</text>
+        <rect x="680" y="90" width="180" height="60" rx="9" fill="#8e0413"/><text x="770" y="118" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Property</text><text x="770" y="136" text-anchor="middle" fill="#fff" font-size="10" fill-opacity=".9">+ operational alert</text>
+        <line x1="220" y1="120" x2="358" y2="120" stroke="#54698d" stroke-width="2"/>
+        <line x1="540" y1="120" x2="678" y2="120" stroke="#54698d" stroke-width="2"/>
+        <text x="290" y="112" text-anchor="middle" font-size="10.5" fill="#54698d">0..* over time</text>
+        <text x="610" y="112" text-anchor="middle" font-size="10.5" fill="#54698d">0..* over time</text>
+        <text x="450" y="185" text-anchor="middle" font-size="11.5" fill="#8e0413" font-weight="600">Renewal checks BOTH hazard persistence AND occupancy change</text>
+      </svg>
+      <figcaption>Residents move; properties change owners; multiple people occupy one dwelling; one person has many addresses over time. Occupancy is a dated relationship — never assume an alert describes every future occupant. <span class="e e-des">Design implication</span></figcaption>
+    </figure>
+
+    <h3>Lifecycle, provenance &amp; correction (all entities)</h3>
+    <p>Every entity carries: effective/valid-from &amp; to dates; version history; provenance (source + who recorded it); verification status; correction history that preserves the original record and the authorised amendment; and deletion/retention controls governed by an approved PROV class — <em>privacy does not authorise premature deletion of a public record</em>. <span class="e e-conf">Confirmed</span></p>
+
+    <h3>Minimal operational-alert schema</h3>
+    <p>The alert domain carries only what a crew needs — and expressly excludes the rest. Every field must justify itself to responder safety.</p>
+    <div class="grid2">
+      <div class="card" style="border-top:3px solid var(--alert)">
+        <h4 style="margin-top:0">Included — necessary to responders</h4>
+        <ul class="clean">
+          <li>Authoritative property/address identifier + geocode</li>
+          <li>Alert category codes</li>
+          <li>Verified, responder-relevant description</li>
+          <li>Operational implications — restricted access/egress, high fuel load, medical oxygen, inability to self-evacuate, aggression, hazmat</li>
+          <li>Source / verification confidence suitable for operational use</li>
+          <li>Creator, approver, approval time</li>
+          <li>Effective, review and expiry dates; status &amp; version</li>
+          <li>Owning agency + contact for urgent correction</li>
+          <li>Removal / supersession reason</li>
+          <li>Publication acknowledgement from turnout/dispatch</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid var(--faint)">
+        <h4 style="margin-top:0">Expressly excluded — unless FRV demonstrates specific necessity &amp; lawfulness</h4>
+        <ul class="clean">
+          <li>Resident names</li>
+          <li>Diagnoses or clinical labels</li>
+          <li>Support-provider narratives</li>
+          <li>Case notes and assessment detail</li>
+          <li>Referrer-confidential information</li>
+        </ul>
+        <p class="anchor-note">Placing clinical labels into responder alerts is on the "do not do without explicit approval and evidence" list.</p>
+      </div>
+    </div>
+
+    <h3>Data-quality controls</h3>
+    <div class="two-col">
+      <ul class="clean">
+        <li>Authoritative address validation &amp; geocoding</li>
+        <li>FRV/CFA jurisdiction determination</li>
+        <li>Duplicate detection by address, referrer and time</li>
+        <li>Structured risk codes plus bounded narrative</li>
+        <li>Observation date, and "unknown" distinct from "no risk"</li>
+        <li>Mutually-exclusive validation for "no risks" checkboxes</li>
+        <li>Source and verification status on every observation</li>
+        <li>Controlled vocabularies with versioning</li>
+        <li>Stale-data and occupancy warnings</li>
+        <li>Review of conflicting reports</li>
+        <li>Correction without loss of history</li>
+        <li>Attachment malware scanning &amp; redaction if uploads are introduced</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 07 STATE MACHINES ============ -->
+  <section class="section" id="states">
+    <h2>State machines</h2>
+    <p class="lede">Five independent lifecycles. The load-bearing rule: <b>case completion must not automatically remove a valid alert, and alert removal must not destroy the case record.</b> They are linked, not fused.</p>
+
+    <div class="card">
+      <h3 style="margin-top:0"><span class="dtag d-case">1</span> Referral / Case</h3>
+      <div id="sm-case" class="smrow"></div>
+      <p class="anchor-note">States are <span class="e e-inf">proposed</span>, not confirmed FRV terminology — validate in discovery.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0"><span class="dtag d-case">2</span> Service request</h3>
+      <div id="sm-svc" class="smrow"></div>
+      <p class="anchor-note">One case can hold several service requests, each running its own lifecycle to its own completion definition.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0"><span class="dtag d-gov">3</span> Consent / legal basis</h3>
+      <div id="sm-consent" class="smrow"></div>
+      <p class="anchor-note">Consent is scoped by action; withdrawal and expiry are first-class transitions. A no-consent path records a legal basis instead.</p>
+    </div>
+    <div class="card" style="border:1px solid var(--alert)">
+      <h3 style="margin-top:0"><span class="dtag d-alert">4</span> Operational alert <span style="font-size:12px;color:var(--muted);font-weight:400">— independent of case state</span></h3>
+      <div id="sm-alert" class="smrow"></div>
+      <p class="anchor-note">Draft → Verified → Approved → Active → Review due → Renewal/Change → Discontinuation → Removed → Archived. Removal is an explicit, versioned, acknowledged event.</p>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0"><span class="dtag d-gov">5</span> Cross-agency (FRV↔CFA) transfer</h3>
+      <div id="sm-transfer" class="smrow"></div>
+      <p class="anchor-note">Rejection and reconciliation are explicit states; acknowledgement is recorded, never assumed.</p>
+    </div>
+
+    <div class="callout warn">
+      <b>Coupling rule made concrete.</b> When a Case reaches <span class="pill">Completed</span>, any linked alert in <span class="pill">Active</span> stays Active until its own <span class="pill">Discontinuation</span> path runs. When an alert reaches <span class="pill">Removed</span>, the Case and its audit history remain intact under the applicable retention rule.
+    </div>
+  </section>
+
+  <!-- ============ 08 PRIVACY / RECORDS / SECURITY ============ -->
+  <section class="section" id="privacy">
+    <h2>Privacy, records &amp; security</h2>
+    <p class="lede">This function collects precise addresses alongside disability, cognition, mobility, medical-oxygen, substance and behavioural information — much of it personal and/or health information even when the resident's name is absent. Controls map to the Victorian regime.</p>
+
+    <h3>Regulatory mapping</h3>
+    <table class="tbl">
+      <tr><th style="width:30%">Obligation</th><th>What the design must do</th></tr>
+      <tr><td>Privacy &amp; Data Protection Act 2014 (Vic) — IPPs <span class="e e-conf">Confirmed</span></td><td>Collect only what a lawful FRV function needs; purpose/basis per use; indirect-collection notice (subject to safety exceptions); accuracy; access &amp; correction; limit identifiers; control transborder transfer.</td></tr>
+      <tr><td>Health Records Act 2001 (Vic) — HPPs <span class="e e-conf">Confirmed</span></td><td>Use health information only for the primary or a directly-related reasonably-expected purpose unless another lawful ground applies.</td></tr>
+      <tr><td>Serious-threat exception (IPP 2.1(d)) <span class="e e-conf">Confirmed</span></td><td>Permits use/disclosure to lessen a serious threat — but the belief and necessity must be defensible on the evidence at the time; only necessary info to an agency positioned to act. "No consent" is not a global bypass.</td></tr>
+      <tr><td>Public Records Act 1973 (Vic) + PROV standards <span class="e e-conf">Confirmed</span></td><td>Records exist from creation/receipt; capture authentic, complete records with mandatory metadata; managed authorised disposal only.</td></tr>
+      <tr><td>Freedom of Information <span class="e e-conf">Confirmed</span></td><td>Access to documents and amendment of incorrect personal information; correction preserves original + amendment trail.</td></tr>
+      <tr><td>Victorian Protective Data Security Standards <span class="e e-conf">Confirmed</span></td><td>Risk-managed controls across governance, information lifecycle, personnel, ICT, physical, incident, external parties, BC/DR; equivalent contractual obligations on providers.</td></tr>
+      <tr><td>Data location / transborder <span class="e e-open">Open</span></td><td>Verify hosting region, subprocessors, backups and telemetry paths — "Australian hosting" alone is not sufficient.</td></tr>
+      <tr><td>WCAG 2.2 AA + multilingual <span class="e e-conf">Confirmed</span></td><td>Accessible public and staff experiences; credentialed translation, not unchecked machine output.</td></tr>
+    </table>
+
+    <h3>Consent &amp; legal-basis record (what the system captures)</h3>
+    <div class="two-col">
+      <ul class="clean">
+        <li>Subject of consent</li>
+        <li>Action covered (contact / entry / assessment / photography / alarm install / partner referral)</li>
+        <li>Person granting consent + capacity / authority</li>
+        <li>Date, channel, wording / version, expiry / withdrawal</li>
+        <li>Legal basis when consent is not relied upon</li>
+        <li>Decision-maker</li>
+        <li>Threat rationale + source reliability where an exception is used</li>
+        <li>Data disclosed, recipient and purpose</li>
+        <li>Later notice to the resident where required and safe</li>
+      </ul>
+    </div>
+
+    <h3>Access model — RBAC / ABAC matrix</h3>
+    <p>Rows are personas; columns are data domains. <b>V</b>=view, <b>E</b>=edit, <b>A</b>=approve, <b>P</b>=projection only, <b>—</b>=no access. Attribute conditions (jurisdiction, case-assignment, break-glass) refine every "V/E".</p>
+    <table class="tbl">
+      <tr><th>Persona</th><th>Intake queue</th><th>Case + health/behavioural</th><th>Consent/basis</th><th>Operational alert</th><th>Audit</th><th>Analytics</th></tr>
+      <tr><td>Triage officer</td><td>V/E</td><td>V (limited)</td><td>V/E</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Practitioner / assessor</td><td>V</td><td>V/E</td><td>V/E</td><td>request</td><td>—</td><td>—</td></tr>
+      <tr><td>Manager / approver</td><td>V</td><td>V</td><td>A</td><td>A (publish/change/remove)</td><td>V</td><td>V (aggregate)</td></tr>
+      <tr><td>Dispatch administrator</td><td>—</td><td>—</td><td>—</td><td>V/E (projection admin)</td><td>V (alert only)</td><td>—</td></tr>
+      <tr><td>Responding crew</td><td>—</td><td>—</td><td>—</td><td><b>P</b> (approved projection)</td><td>—</td><td>—</td></tr>
+      <tr><td>CFA counterpart</td><td>—</td><td>case-specific, time-bound</td><td>V (shared subset)</td><td>V/E (CFA-area, agreed)</td><td>—</td><td>—</td></tr>
+      <tr><td>Partner worker</td><td>submit</td><td>case-specific only</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+      <tr><td>Privacy/FOI/Records/Security</td><td>V</td><td>V (for access/hold/disposal)</td><td>V</td><td>V</td><td>V/E</td><td>—</td></tr>
+      <tr><td>Analyst / evaluator</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>V (de-identified)</td></tr>
+      <tr><td>System / integration admin</td><td>health only</td><td>—</td><td>—</td><td>health only</td><td>V</td><td>—</td></tr>
+    </table>
+
+    <h3>Security controls &amp; threat model</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4 style="margin-top:0">Baseline controls</h4>
+        <ul class="clean">
+          <li>PIA + security risk assessment before procurement/build</li>
+          <li>Formal information classification &amp; Business Impact Level</li>
+          <li>Least privilege; RBAC/ABAC; strong identity + MFA; privileged-access controls</li>
+          <li>Encryption in transit and at rest; key management</li>
+          <li>Restrict bulk export; monitor anomalous access</li>
+          <li>Separate public intake / case workspace / alert stores</li>
+          <li>Service-to-service auth + schema validation on integrations</li>
+          <li>Tamper-evident logs independent of ordinary case editing</li>
+          <li>Contractual security/privacy/records controls on cloud vendors</li>
+          <li>Tested backup, DR and manual fallback; breach playbooks</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Threat model (headline risks)</h4>
+        <ul class="clean">
+          <li><b>Over-disclosure to crews</b> — a name/diagnosis leaks into an alert. Control: minimal schema + approval gate + projection-only access.</li>
+          <li><b>Hidden register drift</b> — the hazard store becomes a de-facto vulnerable-persons database. Control: property-centric alerts, person data segregated, retention split.</li>
+          <li><b>Malicious/neighbour-dispute referral</b> — weaponised intake. Control: verification before any contact or alert; no auto-contact on third-party address.</li>
+          <li><b>Insider / excessive access</b> — browsing sensitive cases. Control: sensitive-case access alerts, break-glass with reason, entitlement review.</li>
+          <li><b>Stale alert harm</b> — a crew acts on a hazard that no longer exists / wrong occupant. Control: review cadence, occupancy check, discontinuation workflow.</li>
+          <li><b>Integration replay / duplication</b> — retries create duplicate alerts. Control: idempotency keys, correlation IDs, recorded acknowledgement.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout"><b>Not for me to set.</b> Final security classification and retention periods must be validated by FRV Records/Security — this design identifies the decision, not the value. <span class="e e-open">Open question</span></div>
+  </section>
+
+  <!-- ============ 09 RESILIENCE ============ -->
+  <section class="section" id="resilience">
+    <h2>Reliability &amp; cyber resilience</h2>
+    <p class="lede">FRV's December 2022 cyber attack disrupted email and systems and caused long-lived reporting and renewal problems — the 2024–25 hoarding-notification spike was partly a renewal catch-up afterwards. <span class="e e-conf">Confirmed</span>. Resilience is therefore a first-order design driver, not an afterthought.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h4 style="margin-top:0">Isolation &amp; availability</h4>
+        <ul class="clean">
+          <li>Isolation between public intake, case management and operational alerts.</li>
+          <li>Active-alert availability maintained during upstream outage.</li>
+          <li>Public intake failure cannot erase or corrupt operational alerts.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Safe publication &amp; recovery</h4>
+        <ul class="clean">
+          <li>Signed / versioned queued publications.</li>
+          <li>Positive acknowledgement and idempotent retry.</li>
+          <li>Manual / offline intake with controlled reconciliation.</li>
+          <li>Backup restoration and rehearsed DR; point-in-time recovery.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>RTO / RPO decision framework</h3>
+    <table class="tbl">
+      <tr><th>Capability</th><th>Availability posture</th><th>RTO / RPO stance (to confirm)</th></tr>
+      <tr><td>Active operational alerts (read at turnout)</td><td>Highest — must survive other outages</td><td>Near-zero RTO; RPO minimal. <span class="e e-open">Open</span></td></tr>
+      <tr><td>Alert publish / change / remove</td><td>Queue &amp; retry; degrade to manual dispatch note</td><td>Short RTO; no lost events. <span class="e e-open">Open</span></td></tr>
+      <tr><td>Case management</td><td>Important; offline capture bridges outage</td><td>Hours RTO; RPO to last sync. <span class="e e-open">Open</span></td></tr>
+      <tr><td>Public intake</td><td>Recoverable; phone channel continues</td><td>Longer RTO acceptable. <span class="e e-open">Open</span></td></tr>
+      <tr><td>Analytics / reporting</td><td>Lowest; reproducible from event history</td><td>Longest RTO. <span class="e e-open">Open</span></td></tr>
+    </table>
+
+    <h3>Operational monitoring</h3>
+    <p>Expose integration health, backlog age, failed synchronisation and stale alerts as live signals. Make reporting reproducible from durable event/history data — never solely from a mutable current-state table. <span class="e e-des">Design implication</span></p>
+  </section>
+
+  <!-- ============ 10 REPORTING ============ -->
+  <section class="section" id="reporting">
+    <h2>Reporting &amp; outcomes</h2>
+    <p class="lede">Measure a funnel, not a headcount. <b>Referral volume alone is not a success measure</b> — the Fire Services Implementation Monitor has previously asked for better explanation of how prevention influences preventable fires, fatalities and injuries. Use privacy-safe aggregation and small-cell suppression throughout.</p>
+
+    <h3>Published activity (context, with caveats)</h3>
+    <table class="tbl">
+      <tr><th>Category</th><th class="num">2022–23</th><th class="num">2023–24</th><th class="num">2024–25</th></tr>
+      <tr><td>Residential fire-safety issue notifications</td><td class="num">219</td><td class="num">236</td><td class="num">240</td></tr>
+      <tr><td>External referrals of people at significant risk</td><td class="num">280</td><td class="num">329</td><td class="num">301</td></tr>
+      <tr><td>External hoarding-property notifications</td><td class="num">188</td><td class="num">199</td><td class="num">317</td></tr>
+      <tr><td><b>Sum of categories</b></td><td class="num"><b>687</b></td><td class="num"><b>764</b></td><td class="num"><b>858</b></td></tr>
+    </table>
+    <p class="anchor-note">Rose ~11.2% then ~12.3%. These are <b>not necessarily unique people, properties or cases</b>, and categories may not be mutually exclusive — validate definitions before any trend migration. <span class="e e-conf">Confirmed</span> / <span class="e e-open">Open</span></p>
+
+    <h3>Outcome framework — four lenses</h3>
+    <div class="grid2">
+      <div class="card"><h4 style="margin-top:0">Demand &amp; access</h4><p>Referrals by channel, geography, source, service type, cohort; assisted/offline submissions; language &amp; accessibility needs; rejected/redirected/duplicate/transferred; abandoned forms.</p></div>
+      <div class="card"><h4 style="margin-top:0">Timeliness &amp; quality</h4><p>Time to acknowledgement, triage, first contact, assessment, completed action; queue age &amp; overdue by priority; duplicate rate &amp; address-match quality; % with documented legal basis and current risk review; partner acknowledgement time.</p></div>
+      <div class="card" style="border-top:3px solid var(--gov)"><h4 style="margin-top:0">Risk reduction</h4><p>Working alarms confirmed/installed; exits/pathways improved; ignition hazards mitigated; escape plan/PEEP completed; support agency engaged; residual risk at closure/review; repeat referral / re-escalation.</p></div>
+      <div class="card" style="border-top:3px solid var(--alert)"><h4 style="margin-top:0">Operational alert assurance</h4><p>Active alerts by hazard/region; % acknowledged by destination; publication/removal latency; reviews due/overdue; alerts discontinued (moved / risk reduced); incidents at alerted properties + post-incident validation; false-positive/stale corrections.</p></div>
+    </div>
+    <div class="callout warn">Equity &amp; safety measures (outcomes by geography, language, disability, tenure; privacy complaints; staff-visit safety; firefighter feedback on alert usefulness) use privacy-safe aggregation. <b>Do not publish small-cell breakdowns that can re-identify vulnerable residents or addresses.</b></div>
+  </section>
+
+  <!-- ============ 11 DELIVERY ============ -->
+  <section class="section" id="delivery">
+    <h2>Delivery plan</h2>
+    <p class="lede">Discovery-first, incremental, with the alert path proven early under realistic conditions. No product selection or final architecture until internal discovery closes the open questions.</p>
+
+    <h3>Discovery &amp; validation (mandatory before build)</h3>
+    <div class="grid3">
+      <div class="card"><h4 style="margin-top:0">Phase 1 — observe &amp; inventory</h4><p>Shadow intake→triage→assessment→publish→renewal→closure; map every form, spreadsheet, mailbox, database and manual handoff; trace one alert from referral to turnout display and later removal; document current metrics and reconciliation work.</p></div>
+      <div class="card"><h4 style="margin-top:0">Phase 2 — governance &amp; risk</h4><p>Run a PIA; classify each information asset and integration; identify applicable PROV retention/disposal classes; confirm legal bases and consent wording with Legal/Privacy; document FRV/CFA data-sharing responsibilities; threat model + BC analysis.</p></div>
+      <div class="card"><h4 style="margin-top:0">Phase 3 — co-design &amp; validate</h4><p>Co-design with At Risk staff, firefighters, Communications, CFA, referrers and people with lived experience; prototype the minimal crew alert under realistic response conditions; test outage / stale-alert / move / false-report scenarios; formal acceptance.</p></div>
+    </div>
+
+    <h3>Capability increments (MVP → maturity)</h3>
+    <table class="tbl">
+      <tr><th style="width:90px">Increment</th><th>Scope</th><th>Proves</th></tr>
+      <tr><td><b>MVP</b></td><td>Single auditable intake queue; address/jurisdiction/duplicate; structured risk with dates/source; separate case / person-property / alert domains; human approval gate; minimal alert + acknowledgement; consent/legal-basis records; audit.</td><td>The three-domain boundary and the human gate work end-to-end.</td></tr>
+      <tr><td><b>Inc 2</b></td><td>Task ownership/SLA/escalation; renewal/review/discontinuation + occupancy check; FRV↔CFA transfer with audit; RBAC/ABAC + MFA; PROV capture/retention/hold; FOI export.</td><td>Currency, cross-agency and records obligations.</td></tr>
+      <tr><td><b>Inc 3</b></td><td>WCAG 2.2 AA + assisted/multilingual; resilient operation, backup/restore, queues, manual reconciliation; de-identified reporting &amp; outcome measures; configurable vocabularies/rules/intervals.</td><td>Accessibility, resilience and measurable outcomes.</td></tr>
+      <tr><td><b>Should-have</b></td><td>Mobile offline field assessment; room-by-room CIRS capture; alarm inventory/install evidence; PEEP workflow; partner closed-loop; incident-at-address feedback; dashboards.</td><td>Depth once the core is trusted.</td></tr>
+      <tr><td><b>Could-have</b></td><td>Human-in-the-loop decision support (suggest never decide); NLP structuring of free text with validation; de-identified geographic risk analysis.</td><td>After governance maturity — never autonomous service/dispatch decisions.</td></tr>
+    </table>
+
+    <h3>Test strategy</h3>
+    <p>Explicit scenarios beyond functional coverage: accessibility (screen-reader, keyboard, Easy Read, interpreter), privacy (minimisation, no-consent basis, indirect-collection notice), integration (idempotency, acknowledgement, rejection), outage &amp; recovery, stale-alert, resident-move, and false/malicious report.</p>
+
+    <h3>Governance / RACI (headline)</h3>
+    <table class="tbl">
+      <tr><th>Decision area</th><th>R</th><th>A</th><th>C</th><th>I</th></tr>
+      <tr><td>Alert publish / change / remove</td><td>Practitioner (request)</td><td>Manager/approver</td><td>Dispatch admin</td><td>Crew</td></tr>
+      <tr><td>No-consent legal basis</td><td>Triage/practitioner</td><td>Manager + Privacy</td><td>Legal</td><td>Records</td></tr>
+      <tr><td>FRV↔CFA transfer terms</td><td>Program lead</td><td>FRV + CFA data owners</td><td>Legal, Privacy</td><td>Teams</td></tr>
+      <tr><td>Retention / disposal classes</td><td>Records</td><td>PROV-accountable exec</td><td>Privacy, Legal</td><td>All</td></tr>
+      <tr><td>Information classification / BIL</td><td>Security</td><td>Accountable exec</td><td>Privacy, EA</td><td>All</td></tr>
+    </table>
+
+    <h3>Risk register (top risks)</h3>
+    <table class="tbl">
+      <tr><th>Risk</th><th>Treatment</th></tr>
+      <tr><td>Over-disclosure to crews / hidden register</td><td>Minimal alert schema, domain segregation, retention split, approval gate.</td></tr>
+      <tr><td>Building on unvalidated assumptions</td><td>Discovery-first; carry two architecture options; decisions table gates the build.</td></tr>
+      <tr><td>Stale alerts causing operational harm</td><td>Review cadence, occupancy check, discontinuation workflow, incident feedback loop.</td></tr>
+      <tr><td>Cyber outage repeats 2022 impact</td><td>Isolation, queued signed publications, manual fallback, rehearsed DR.</td></tr>
+      <tr><td>FRV/CFA ambiguity causes duplication or disclosure gaps</td><td>Agreed instrument, data owner per stage, acknowledged transfers.</td></tr>
+    </table>
+
+    <h3>ADR backlog (architecture decisions to record)</h3>
+    <div class="two-col">
+      <ul class="clean">
+        <li>Option A (integrated) vs Option B (composed) architecture</li>
+        <li>Alert-store isolation mechanism &amp; RTO/RPO tier</li>
+        <li>Turnout/dispatch publication interface &amp; acknowledgement protocol</li>
+        <li>System of record for person, property, case, alert</li>
+        <li>FRV↔CFA exchange schema &amp; ownership model</li>
+        <li>Consent/legal-basis data structure &amp; versioning</li>
+        <li>Records classification &amp; retention approach</li>
+        <li>Hosting region &amp; transborder posture</li>
+        <li>De-identification &amp; small-cell suppression method</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ 12 DECISIONS NEEDED ============ -->
+  <section class="section" id="decisions">
+    <h2>Decisions needed from FRV</h2>
+    <p class="lede">The architecture cannot be finalised until these are answered. Each blocks or reshapes part of the design; delay carries a concrete consequence.</p>
+    <table class="tbl">
+      <tr><th>Decision</th><th>Owner</th><th>Dependency / deadline</th><th>Options</th><th>Consequence of delay</th></tr>
+      <tr><td>Does an internal case system already exist to build on?</td><td>Enterprise Architecture</td><td>Before architecture option chosen</td><td>Extend existing · adopt new platform · compose services</td><td>Cannot choose Option A vs B; rework risk.</td></tr>
+      <tr><td>Turnout/dispatch interface &amp; acknowledgement mechanism</td><td>Communications / dispatch</td><td>Before alert MVP</td><td>API · controlled admin interface · manual bridge</td><td>Alert path (the core value) cannot be proven.</td></tr>
+      <tr><td>Alert RTO/RPO &amp; isolation requirement</td><td>Security + Operations</td><td>Before resilience design</td><td>Near-zero · short · hours</td><td>Under- or over-engineering of the most critical path.</td></tr>
+      <tr><td>FRV/CFA data controller, transfer instrument &amp; closure responsibility</td><td>FRV + CFA + Legal</td><td>Before transfer build</td><td>Transfer · joint-manage · duplicate (avoid)</td><td>Uncontrolled duplication or disclosure gaps.</td></tr>
+      <tr><td>PROV retention/disposal classes per record type</td><td>Records</td><td>Before go-live</td><td>Per PROV RDA sentencing</td><td>Non-compliant retention; unlawful deletion risk.</td></tr>
+      <tr><td>Information classification &amp; Business Impact Level</td><td>Security</td><td>Before procurement/build</td><td>Per VPDSS assessment</td><td>Controls can't be sized; procurement stalls.</td></tr>
+      <tr><td>Microsoft Forms handling: region, retention, export, downstream automation</td><td>Privacy + ICT</td><td>Discovery Phase 2</td><td>Retain &amp; secure · replace intake</td><td>Unmapped privacy/records exposure on the live path.</td></tr>
+      <tr><td>Consent wording/version &amp; no-consent legal-basis criteria</td><td>Legal + Privacy</td><td>Before case MVP</td><td>Confirm per action type</td><td>Consent captured incorrectly; basis undefensible.</td></tr>
+      <tr><td>Is FRV an Information Sharing Entity for any part of this function?</td><td>Legal</td><td>Discovery Phase 2</td><td>Yes / no per scheme</td><td>Wrong sharing basis; compliance risk.</td></tr>
+      <tr><td>Outcome measures FRV can capture without unreasonable burden</td><td>Program + Analytics</td><td>Before reporting design</td><td>Subset of the four-lens framework</td><td>Reverts to volume-only measurement.</td></tr>
+    </table>
+    <p class="anchor-note">This mirrors the research pack's closing position: the safest starting architecture is a <b>privacy-segmented, property-aware case-management capability with a human-governed operational-alert projection</b> — not a generic form flowing into dispatch.</p>
+  </section>
+
+  <!-- ============ 13 EVIDENCE ============ -->
+  <section class="section" id="evidence">
+    <h2>Evidence &amp; sources</h2>
+    <p class="lede">This design is built on public sources inspected to 25 August 2026. Confidence is graded; internal FRV facts were not available and are carried as open questions throughout.</p>
+
+    <h3>Current primary sources — high confidence</h3>
+    <ul class="clean">
+      <li><a href="https://www.frv.vic.gov.au/people-higher-risk" target="_blank" rel="noopener">FRV — People at higher risk</a> (updated 10 Aug 2026): scope, referrers, consent, operational-use FAQ.</li>
+      <li><a href="https://forms.office.com/r/QMPBLtrUTi" target="_blank" rel="noopener">FRV — Fire Safety Referral for At Risk Groups</a> (inspected 25 Aug 2026): current intake fields &amp; privacy wording; downstream handling unknown.</li>
+      <li><a href="https://www.frv.vic.gov.au/hoarding-and-environmental-neglect" target="_blank" rel="noopener">FRV — Hoarding &amp; environmental neglect</a> (updated Jul 2026).</li>
+      <li><a href="https://www.parliament.vic.gov.au/48ff45/globalassets/tabled-paper-documents/tabled-paper-9967/fire-rescue-victoria-annual-report-2024-25.pdf" target="_blank" rel="noopener">FRV Annual Report 2024–25</a>: workload &amp; renewal catch-up.</li>
+      <li><a href="https://www.frv.vic.gov.au/sites/default/files/2025-03/fire-rescue-victoria-annual-report-2023-24.pdf" target="_blank" rel="noopener">FRV Annual Report 2023–24</a>: turnout-system use &amp; referral categories.</li>
+      <li><a href="https://www.cfa.vic.gov.au/ArticleDocuments/6752/hoarding-referral-pathway.pdf.aspx" target="_blank" rel="noopener">CFA/FRV Hoarding Referral Pathway</a> (May 2026).</li>
+      <li><a href="https://www.frv.vic.gov.au/privacy-statement" target="_blank" rel="noopener">FRV privacy statement</a>: applicable legislation &amp; website/CMS handling.</li>
+      <li><a href="https://www.frv.vic.gov.au/cyber-attack-information-dec-2022" target="_blank" rel="noopener">FRV cyber-attack notice (Dec 2022)</a>.</li>
+    </ul>
+
+    <h3>Historical operating-model sources — medium confidence</h3>
+    <ul class="clean">
+      <li><a href="https://www.frv.vic.gov.au/sites/default/files/2020-07/MFB%20Annual%20Report%202015%20-%202016_0.pdf" target="_blank" rel="noopener">MFB Annual Report 2015–16</a>: Residential Risk Referral flow.</li>
+      <li><a href="https://hoardinghomesolutions.com.au/wp-content/uploads/2017/12/MFB-Hoarding-Notification-Pack.pdf" target="_blank" rel="noopener">MFB Hoarding Notification Pack</a>: alert visibility, data minimisation, renewal/removal (low–medium for current detail; valuable requirements evidence).</li>
+    </ul>
+
+    <h3>Law, privacy, records &amp; security</h3>
+    <ul class="clean">
+      <li><a href="https://ovic.vic.gov.au/privacy/resources-for-organisations/information-privacy-principles-short-guide/" target="_blank" rel="noopener">OVIC IPP short guide</a> · <a href="https://ovic.vic.gov.au/book/ipp-2-use-and-disclosure/" target="_blank" rel="noopener">IPP 2 use &amp; disclosure</a></li>
+      <li><a href="https://www.health.vic.gov.au/rights-and-advocacy/rights-and-privacy-principles" target="_blank" rel="noopener">Victorian Health Privacy Principles</a></li>
+      <li><a href="https://prov.vic.gov.au/recordkeeping-government/standards-framework" target="_blank" rel="noopener">PROV standards framework</a> · <a href="https://prov.vic.gov.au/recordkeeping-government/a-z-topics/privacy-and-recordkeeping-obligations" target="_blank" rel="noopener">Privacy &amp; recordkeeping</a></li>
+      <li><a href="https://ovic.vic.gov.au/information-security/standards/" target="_blank" rel="noopener">OVIC VPDSS</a></li>
+      <li><a href="https://www.vic.gov.au/make-content-accessible" target="_blank" rel="noopener">Victorian accessibility guidance (WCAG 2.2 AA)</a></li>
+    </ul>
+
+    <h3>Comparators</h3>
+    <ul class="clean">
+      <li><a href="https://www.homefiresafety.tas.gov.au/rhn" target="_blank" rel="noopener">Tasmania Residential Hazard Notification</a> — explicit notification/discontinuation separation, responder-facing alert purpose, removal confirmation.</li>
+      <li><a href="https://www.fire.nsw.gov.au/fire-safety/home-fire-safety/topics/hoarding-and-squalor-fire-safety" target="_blank" rel="noopener">Fire &amp; Rescue NSW — hoarding &amp; squalor</a> — clear responder-awareness vs voluntary-visit vs non-regulatory boundary.</li>
+    </ul>
+
+    <div class="callout"><b>Handoff statement.</b> This research is strong enough to frame a system-design exercise and prevent major category errors. It is not strong enough to select a product, define a final architecture or estimate delivery without internal discovery.</div>
+  </section>
+
+  <div class="footer-note">
+    Fire Rescue Victoria — At Risk Groups conceptual &amp; logical system design. Vendor-neutral design hypothesis for validation; no platform, product or API is named or assumed. Built on public sources inspected to 25 August 2026, with evidence labels distinguishing confirmed fact from historical practice, inference and open questions. Not an FRV-validated requirements specification.
+  </div>
+</main>
+</div>
+
+<script>
+/* ---------- Personas ---------- */
+const PERSONAS=[
+ ["Self-referring resident / family","Safe, accessible intake and acknowledgement; may not know the jargon or their own risk factors."],
+ ["External professional referrer","Quick structured submission, agency details, a reference number and limited status feedback."],
+ ["Firefighter referrer","Incident-linked, mobile or station-based referral via the Fire Safety Issue Notification pathway, with minimal duplication."],
+ ["At Risk Groups triage officer","Validate jurisdiction, urgency, duplication, information sufficiency and legal basis before work begins."],
+ ["Practitioner / assessor","Plan interventions, contact supports, record assessments and outcomes, request alerts."],
+ ["Team manager / approver","Assign work; approve sensitive disclosures and alert publish/change/remove; oversee queues and risk."],
+ ["Communications / dispatch administrator","Manage operational-alert publication and correction into the turnout system."],
+ ["Responding firefighter / crew","Receive only concise, operationally relevant alert information at turnout — nothing more."],
+ ["CFA counterpart","Receive or own cases/alerts for CFA-area addresses under agreed arrangements."],
+ ["Partner service worker","May receive a referral or supply updates; must not gain general system access by default."],
+ ["Privacy / FOI / Records / Security officer","Access, correction, legal hold, disposal, audit and incident-response work."],
+ ["Analyst / program evaluator","Uses de-identified or aggregated data wherever possible; no routine case-content access."],
+ ["System / integration administrator","Maintains service health without routine access to full case content."]
+];
+const pg=document.getElementById('personaGrid');
+if(pg){PERSONAS.forEach((p,i)=>{
+  const d=document.createElement('div');d.className='persona';
+  d.innerHTML=`<div class="role"><span style="color:#7183a2;font-weight:700">${String(i+1).padStart(2,'0')}</span> ${p[0]}</div><div class="need">${p[1]}</div>`;
+  pg.appendChild(d);
+});}
+
+/* ---------- Bounded contexts ---------- */
+const BC=[
+ ["Intake &amp; Referral","intake","Capture from all channels into one auditable queue; acknowledge; no email-as-record.","This system"],
+ ["Case &amp; Service Management","case","The specialist work container; one case, many requested services; triage → outcome.","This system"],
+ ["Person / Household &amp; Occupancy","case","Minimum person context, household roles, dated occupancy periods.","This system"],
+ ["Property &amp; Jurisdiction","case","Normalised address, geocode, tenure, station/district, FRV/CFA jurisdiction.","Address/GIS (discovery)"],
+ ["Risk Observation &amp; Assessment","case","Time-bound observations with source/verification; versioned assessments.","This system"],
+ ["Consent &amp; Legal Basis","case","Action-scoped consent; recorded no-consent basis and rationale.","This system"],
+ ["Partner Coordination","intake","Cross-agency referral, disclosure and closed-loop confirmation.","This system + partners"],
+ ["Operational Alert Governance","alert","The human gate: verify, decide legal basis, approve publish/change/remove.","This system"],
+ ["Dispatch / Turnout Publication","alert","Projects the minimal alert to crews; records acknowledgement.","Turnout system (discovery)"],
+ ["Records, Audit &amp; Legal Hold","gov","Append-only accountability; retention, hold, authorised disposal.","Records/EDRMS (discovery)"],
+ ["Notification &amp; Scheduling","intake","Acknowledgements, tasks, renewal reminders, appointments.","This system"],
+ ["Analytics &amp; Evaluation","gov","De-identified outcome measurement; small-cell suppression.","Analytics platform (discovery)"]
+];
+const bcColor={intake:"#7b4fbd",case:"#0176d3",alert:"#ba0517",gov:"#396547"};
+const bcGrid=document.getElementById('bcGrid');
+if(bcGrid){BC.forEach(b=>{
+  const d=document.createElement('div');d.className='bc';d.style.background=bcColor[b[1]];
+  d.innerHTML=`<h5>${b[0]}</h5><p>${b[2]}</p><span class="auth">SoR: ${b[3]}</span>`;
+  bcGrid.appendChild(d);
+});}
+
+/* ---------- Service journeys ---------- */
+const JOURNEYS=[
+ {t:"Ordinary high-risk referral",tag:"case",steps:[
+   "Referrer submits via web/firefighter/partner channel; system acknowledges with a reference.",
+   "Address validated, geocoded, FRV/CFA jurisdiction determined; duplicate check by address+referrer+time.",
+   "Triage sets urgency, sufficiency and legal basis; case created with one or more requested services.",
+   "Practitioner assesses risk, records observations with dates/source/verification.",
+   "Advice delivered; partner referral raised if broader risk. Outcome and residual risk recorded."],
+   meta:"Alert: only if a verified, responder-relevant property hazard exists — via the human gate."},
+ {t:"Hoarding notification without resident consent (public/firefighter safety)",tag:"alert",steps:[
+   "Referral describes hoarding/high fuel load; no resident consent obtained.",
+   "Triage confirms this is a public/firefighter-safety basis — consent not required to <em>share for safety</em> (IPP 2.1(d) serious-threat / safety ground).",
+   "Manager records rationale, source reliability, decision-maker and necessity — a no-consent basis is captured, not assumed.",
+   "A <b>minimal</b> property-hazard alert is drafted: address, hazard category, responder implication. No resident name, no diagnosis.",
+   "Human approves publication; turnout system acknowledges; review date set."],
+   meta:"Consent NOT required to share for safety; consent still required before any home entry. Alert excludes personal identifiers."},
+ {t:"Consented home assessment or alarm installation",tag:"case",steps:[
+   "Resident (or authorised representative) gives action-scoped consent for entry + assessment and/or alarm install.",
+   "Consent record captures subject, action, giver, capacity, wording/version, date and expiry.",
+   "Visit scheduled; lone-worker/staff-safety check; assessment performed and versioned.",
+   "Alarm installed and completion evidence captured; escape-plan/PEEP output given to resident.",
+   "Outcome recorded; alert created/updated only if a residual responder-relevant hazard remains."],
+   meta:"Consent is scoped to the action. Entry without that specific consent is not permitted."},
+ {t:"PEEP or TAC / SDA / SIL assessment",tag:"case",steps:[
+   "Referral selects PEEP or a TAC/SDA/SIL assessment service line.",
+   "Case models this as a distinct requested service with its own evidence needs and completion criteria.",
+   "Assessor completes the plan; resident-controlled output produced.",
+   "Partner (NDIS / My Aged Care / provider) coordination with closed-loop confirmation where required.",
+   "Completion recorded against that service line specifically — not a generic 'reason closed'."],
+   meta:"Different service products, not just referral reasons. Each has its own workflow and completion definition."},
+ {t:"FRV → CFA transfer",tag:"gov",steps:[
+   "Address resolves to a CFA area at jurisdiction determination.",
+   "Transfer package assembled to an agreed data set under the agreed legal instrument.",
+   "CFA acknowledges (or rejects) via a versioned, audited exchange — acknowledgement is recorded, not assumed.",
+   "Ownership, status-sync and closure responsibility set per agreement; no uncontrolled duplication.",
+   "Resident access/correction requests can be routed to the correct controller."],
+   meta:"Data controller at each stage, transfer instrument and breach-notification owner are OPEN questions for discovery."},
+ {t:"Alert renewal",tag:"alert",steps:[
+   "Review-due reminder fires based on hazard-type/risk-configurable interval.",
+   "Practitioner re-checks hazard persistence AND occupancy (has the resident moved?).",
+   "If still valid: alert renewed with new effective/review dates and version bump.",
+   "If reduced/resolved: routed to discontinuation workflow, not silent deletion.",
+   "Renewal decision and evidence audited."],
+   meta:"System never silently keeps a stale alert forever, nor auto-deletes on a timer."},
+ {t:"Resident move or risk reduction requiring discontinuation",tag:"alert",steps:[
+   "Occupancy change or hazard-resolved signal detected/reported.",
+   "Discontinuation workflow opened with evidence and accountable decision-maker.",
+   "Human approves removal; turnout system acknowledges the removal event (explicit, versioned).",
+   "Case record preserved — alert removal does not destroy the case.",
+   "New occupant does NOT inherit the prior resident's person-related risk."],
+   meta:"Case completion must not auto-remove a valid alert; alert removal must not destroy the case."},
+ {t:"Duplicate or malicious referral",tag:"case",steps:[
+   "Duplicate detection flags by address, referrer and time window; safe linking offered.",
+   "Triage assesses malicious / neighbour-dispute / unsupported reports against defined criteria.",
+   "Unsupported report is redirected or declined with reason; not silently promoted to a case.",
+   "No resident is contacted merely because a third party supplied an address.",
+   "Decision and rationale audited; repeat-referral pattern retained for analytics."],
+   meta:"A raw allegation never becomes a dispatch alert without human verification and legal basis."},
+ {t:"Cyber / integration outage",tag:"gov",steps:[
+   "Case management or public intake becomes unavailable.",
+   "Active dispatch alerts remain available (isolation between domains).",
+   "Controlled offline/manual intake opens; entries captured for later reconciliation.",
+   "Alert changes queue as signed/versioned publications with idempotent retry.",
+   "On recovery, backlog and failed syncs are reconciled and visible; nothing silently lost."],
+   meta:"Directly informed by FRV's Dec-2022 cyber attack, which disrupted reporting and renewals for an extended period. Confirmed."},
+ {t:"Incident at a notified address, followed by review",tag:"alert",steps:[
+   "An incident occurs at a property that carried an operational alert.",
+   "Crew feedback captured: was the alert present, accurate and useful?",
+   "Alert accuracy and the earlier intervention are reviewed.",
+   "False-positive/stale/incorrect alerts corrected with history preserved.",
+   "Findings feed program evaluation using privacy-safe linkage."],
+   meta:"Closes the loop between prevention activity and real operational outcomes."},
+ {t:"Presentation request for an at-risk community",tag:"case",steps:[
+   "Referral selects the fire-safety presentation service line.",
+   "Modelled as a requested service against a community/organisation, not a residential property.",
+   "Scheduled, delivered, attendance/reach recorded.",
+   "No property alert is created; no individual resident register is built.",
+   "Completion recorded against the presentation service line."],
+   meta:"Shows the model handles non-property, non-alert service lines cleanly."}
+];
+const jl=document.getElementById('journeyList');
+const tagName={intake:"Intake",case:"Case mgmt",alert:"Alert domain",gov:"Cross-agency / resilience"};
+if(jl){JOURNEYS.forEach((j,i)=>{
+  const d=document.createElement('details');d.className='journey';
+  const li=j.steps.map(s=>`<li>${s}</li>`).join('');
+  d.innerHTML=`<summary><span class="dtag d-${j.tag}">${tagName[j.tag]}</span> ${String(i+1).padStart(2,'0')} · ${j.t}<span class="arw">▸</span></summary>
+    <div class="body"><ol class="steps">${li}</ol><div class="jmeta"><b>Alert / consent note:</b> ${j.meta}</div></div>`;
+  jl.appendChild(d);
+});}
+
+/* ---------- State machines ---------- */
+function renderSM(id,states){
+  const el=document.getElementById(id); if(!el) return;
+  states.forEach((s,i)=>{
+    const cls=s.k?(' '+s.k):'';
+    const chip=document.createElement('span');chip.className='st'+cls;chip.textContent=s.t;
+    el.appendChild(chip);
+    if(i<states.length-1){const a=document.createElement('span');a.className='sarrow';a.textContent='→';el.appendChild(a);}
+  });
+}
+renderSM('sm-case',[{t:"Received"},{t:"Awaiting triage"},{t:"More info required",k:"branch"},{t:"Accepted for assessment"},{t:"Active service delivery"},{t:"Monitoring / follow-up"},{t:"Completed",k:"term"},{t:"Archived (retention)",k:"term"}]);
+renderSM('sm-svc',[{t:"Requested"},{t:"Scheduled"},{t:"Consent required",k:"gate"},{t:"In delivery"},{t:"Completed",k:"term"},{t:"Not proceeded",k:"term"}]);
+renderSM('sm-consent',[{t:"Not sought"},{t:"Requested"},{t:"Granted (action-scoped)",k:"gate"},{t:"Withdrawn",k:"branch"},{t:"Expired",k:"branch"}]);
+renderSM('sm-alert',[{t:"Draft"},{t:"Verified",k:"gate"},{t:"Approved",k:"gate"},{t:"Active"},{t:"Review due"},{t:"Renewal / Changed",k:"branch"},{t:"Discontinuation pending",k:"branch"},{t:"Removed",k:"term"},{t:"Archived",k:"term"}]);
+renderSM('sm-transfer',[{t:"Identified (CFA area)"},{t:"Package assembled"},{t:"Sent"},{t:"Acknowledged",k:"gate"},{t:"Rejected → reconcile",k:"branch"},{t:"Owned by CFA",k:"term"}]);
+
+const links=document.querySelectorAll('.navlink');
+const sections=document.querySelectorAll('.section');
+const crumb=document.getElementById('crumb');
+links.forEach(l=>l.addEventListener('click',()=>{
+  const t=l.dataset.t;
+  links.forEach(x=>x.classList.remove('active'));
+  l.classList.add('active');
+  sections.forEach(s=>s.classList.toggle('show',s.id===t));
+  crumb.textContent=l.textContent.replace(/^\d+/,'').trim();
+  document.querySelector('main').scrollTo({top:0,behavior:'instant'});
+  window.scrollTo({top:0});
+}));
+document.querySelectorAll('[data-jump]').forEach(j=>j.addEventListener('click',()=>{
+  const target=[...links].find(l=>l.dataset.t===j.dataset.jump);
+  if(target) target.click();
+}));
+</script>
+</body>
+</html>
